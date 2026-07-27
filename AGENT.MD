@@ -1,0 +1,110 @@
+# AI Coding Guidelines (AGENT.md)
+
+This is a multi-vendor e-commerce platform ("Cupo") built with Laravel 11.
+Follow these rules strictly when writing or modifying code.
+
+## 1. Tech Stack
+- **Backend:** Laravel 11 (PHP 8.3+)
+- **Database:** MySQL, Redis (cache & flash sale stock handling)
+- **Search:** Laravel Scout + Meilisearch
+- **Real-time Chat:** Laravel Echo + Soketi (self-hosted WebSocket server)
+- **Payment:** VNPay & Momo Sandbox
+
+## 2. Do Not Edit
+- `vendor/`, `node_modules/`, `composer.lock`, `package-lock.json`
+- `storage/` — runtime cache, compiled views, logs
+- `bootstrap/cache/`
+- `.env` — never commit; use `.env.example` as the template
+- Do not create documentation files unless explicitly requested
+
+## 3. Database & Architecture Rules
+- **No EAV.** Store dynamic product attributes in a JSON column
+  `attributes` on the `products` table. Do not create separate
+  attribute/attribute_value tables.
+- **Order Splitting.** The parent `orders` table represents the overall
+  checkout/payment. Each `order_items` row belongs to a specific
+  `seller_id` and tracks its own fulfillment `status`
+  (pending → confirmed → shipping → completed), independent from other
+  sellers in the same order.
+- **Controller & Service Pattern.** Keep controllers skinny. Business
+  logic (payment, wallet, order splitting, flash sale stock handling)
+  belongs in `app/Services/`.
+- **Wallet & Reconciliation.** Only credit a seller's `balance` when the
+  corresponding `order_items.status` becomes `completed`. Every balance
+  change must be logged in `seller_balance_logs` (amount, reason,
+  reference order).
+
+## 4. Folder Structure
+
+app/
+Http/
+Controllers/
+Admin/
+Seller/
+Customer/
+Requests/
+Admin/
+Seller/
+Customer/
+Services/
+OrderSplittingService.php
+WalletService.php
+FlashSaleStockService.php
+Models/
+
+
+## 5. Flash Sale Stock Handling (critical path — read carefully)
+- Use `Redis::decr("flash_sale_stock:{product_id}")` for atomic stock
+  deduction. If the result is negative, roll back with `Redis::incr()`
+  and return an out-of-stock error — never let stock go below zero.
+- Do NOT write to MySQL synchronously inside the request. After a
+  successful Redis deduction, dispatch a queued job
+  (`SyncFlashSaleStockToDatabase`) to persist the change.
+- If Redis is unreachable, fail safe: reject the flash sale purchase
+  rather than falling back to an unlocked MySQL write.
+
+## 6. Coding Standards
+- Follow **PSR-12**. Format with Laravel Pint before every commit:
+  `vendor/bin/pint --dirty`
+- **Naming:**
+  - Foreign keys: `foreignId('table_name_id')->constrained()`
+  - Routes: kebab-case (e.g. `/seller/manage-products`)
+  - FormRequests: `{Domain}/{Action}{Entity}Request`
+    (e.g. `Admin/ApproveSellerRequest`)
+- **Validation:** Always use a dedicated `FormRequest` class. Never call
+  `$request->validate()` directly inside a controller.
+- **Security & Performance:**
+  - Always verify ownership (e.g. Seller A must not be able to edit
+    Seller B's product).
+  - Use eager loading (`with(['product', 'seller'])`) to avoid N+1
+    queries.
+  - Never hardcode payment gateway credentials — read them via
+    `config('services.vnpay.key')`.
+- **Testing:** Write tests for any service touching money or stock:
+  `OrderSplittingService`, `WalletService`, `FlashSaleStockService`.
+- **Migrations:** Every migration must implement a working `down()`
+  method. Never edit a migration that has already run on a shared
+  environment — create a new one instead.
+
+## 7. Common Commands
+| Task | Command |
+|---|---|
+| Run migrations | `php artisan migrate` |
+| Seed database | `php artisan db:seed` |
+| Start queue worker | `php artisan queue:work` |
+| Check code style | `./vendor/bin/pint` |
+| Run tests | `php artisan test` |
+
+## 8. CI Workflow (`.github/workflows/ci.yml`)
+Runs automatically on every push/PR to `main` and `develop`:
+Pint style check → run migrations against a test MySQL service → `php artisan test`.
+A PR should not be merged if this workflow is failing.
+
+## 9. Validation Checklist (before marking any task complete)
+1. `vendor/bin/pint --dirty` passes with no style violations
+2. `php artisan test` — all related tests pass
+3. No hardcoded credentials or secrets anywhere in the diff
+4. Ownership checks are in place for any seller-scoped or admin-scoped action
+5. New service classes touching stock or payment have at least one test
+6. New migrations have a working `down()` method
+7. No stray `dd()`, `dump()`, or `console.log` left in the code
