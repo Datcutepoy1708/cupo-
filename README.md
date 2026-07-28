@@ -37,7 +37,7 @@ See [AGENT.md](./AGENT.md) for detailed architecture guidelines.
 
 ## Documentation
 - [Database Schema](docs/database-schema.md)
-- [Contributing Guide](CONTRIBUTING.md)
+- [Contributing Guide](CONTRIBUTING.MD)
 
 ## Team
 | Name | Module |
