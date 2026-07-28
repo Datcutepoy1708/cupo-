@@ -1,0 +1,2 @@
+# 1 Khái niệm về migration 
+Migration = viết cấu trúc database bằng code, để nó có thể được chia sẻ, theo dõi lịch sử, và tái tạo lại tự động trên bất kỳ máy nào — thay vì phải tạo bảng bằng tay từng người từng máy một.
