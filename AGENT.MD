@@ -22,17 +22,30 @@ Follow these rules strictly when writing or modifying code.
   `attributes` on the `products` table. Do not create separate
   attribute/attribute_value tables.
 - **Order Splitting.** The parent `orders` table represents the overall
-  checkout/payment. Each `order_items` row belongs to a specific
+  checkout/payment. Each `seller_orders` row belongs to a specific
   `seller_id` and tracks its own fulfillment `status`
-  (pending → confirmed → shipping → completed), independent from other
-  sellers in the same order.
+  (pending → confirmed → shipping → completed → cancelled), independent
+  from other sellers in the same order. `order_items` rows belong to a
+  `seller_order_id` and store a snapshot of the purchased product
+  (`product_name`, `product_image`, `price` at time of purchase) —
+  never read live product data for historical orders.
 - **Controller & Service Pattern.** Keep controllers skinny. Business
   logic (payment, wallet, order splitting, flash sale stock handling)
   belongs in `app/Services/`.
-- **Wallet & Reconciliation.** Only credit a seller's `balance` when the
-  corresponding `order_items.status` becomes `completed`. Every balance
-  change must be logged in `seller_balance_logs` (amount, reason,
-  reference order).
+- **Checkout must be wrapped in a DB transaction.** A single checkout
+  writes to `orders`, one or more `seller_orders`, their `order_items`,
+  and deletes the related `cart_items`. Wrap all of this in
+  `DB::transaction()` — a partial failure must not leave an `orders`
+  row without its `seller_orders`.
+- **Wallet & Reconciliation.** Only credit a seller's `seller_profiles.balance`
+  when the corresponding `seller_orders.status` becomes `completed`.
+  Every balance change must be logged in `seller_balance_logs`
+  (amount, type, reference_id pointing to `seller_orders.id` or
+  `withdrawals.id`).
+- **Withdrawal holds.** When a seller creates a `withdrawals` request,
+  validate `amount <= seller_profiles.balance` and treat the amount as
+  held immediately (do not allow a second concurrent withdrawal request
+  to double-spend the same balance).
 
 ## 4. Folder Structure
 
