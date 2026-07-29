@@ -4,8 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-use function Laravel\Prompts\table;
-
 return new class extends Migration
 {
     /**
@@ -22,12 +20,12 @@ return new class extends Migration
             $table->string('banner')->nullable();
             $table->text('description')->nullable();
             $table->string('address');
-            $table->decimal('commission_rate',5,2)->default(5.00);
+            $table->decimal('commission_rate', 5, 2)->default(5.00);
             $table->decimal('balance', 15, 2)->default(0.00);
             $table->string('bank_name')->nullable();
-            $table->string('bank_account',50)->nullable();
+            $table->string('bank_account', 50)->nullable();
             $table->string('bank_owner')->nullable();
-            $table->enum('status',['pending','approved','rejected','blocked'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'blocked'])->default('pending');
             $table->timestamps();
             $table->index('status');
         });

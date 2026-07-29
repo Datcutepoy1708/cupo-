@@ -7,8 +7,8 @@ use App\Models\FlashSale;
 use App\Models\FlashSaleProduct;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class MarketingSeeder extends Seeder
 {

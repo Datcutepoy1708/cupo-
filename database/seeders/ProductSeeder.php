@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\User;
-use App\Models\Category;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -15,7 +15,7 @@ class ProductSeeder extends Seeder
     {
         $seller1 = User::where('email', 'seller1@gmail.com')->first();
         $seller2 = User::where('email', 'seller2@gmail.com')->first();
-        
+
         $catDienThoai = Category::where('slug', 'dien-thoai')->first();
         $catLaptop = Category::where('slug', 'laptop')->first();
         $catAoThun = Category::where('slug', 'ao-thun')->first();
