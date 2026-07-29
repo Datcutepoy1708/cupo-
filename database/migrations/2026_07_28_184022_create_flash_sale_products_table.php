@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('flash_sale_products', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('flash_sale_id')->constrained('flash_sales')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->decimal('flash_sale_price', 15, 2);
+            $table->integer('quantity_limit');
+            $table->integer('quantity_sold')->default(0);
             $table->timestamps();
         });
     }

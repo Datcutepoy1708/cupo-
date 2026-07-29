@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('payment_transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
+            $table->string('transaction_no', 100)->nullable()->unique();
+            $table->enum('payment_gateway', ['vnpay', 'momo']);
+            $table->decimal('amount', 15, 2);
+            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->json('raw_response')->nullable();
             $table->timestamps();
+
+            $table->index('payment_gateway');
+            $table->index('status');
         });
     }
 

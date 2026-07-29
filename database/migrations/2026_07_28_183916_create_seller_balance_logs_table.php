@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('seller_balance_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('seller_id')->constrained('users')->restrictOnDelete();
+            $table->decimal('amount', 15, 2);
+            $table->enum('type', ['order_earning', 'withdrawal', 'refund']);
+            $table->unsignedBigInteger('reference_id')->nullable();
+            $table->string('description')->nullable();
             $table->timestamps();
+            $table->index('type');
+            $table->index('reference_id');
         });
     }
 

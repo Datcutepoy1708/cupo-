@@ -46,6 +46,13 @@ Follow these rules strictly when writing or modifying code.
   validate `amount <= seller_profiles.balance` and treat the amount as
   held immediately (do not allow a second concurrent withdrawal request
   to double-spend the same balance).
+## Withdrawal Limit (MVP scope)
+- Withdrawals are NOT processed via real banking APIs. The `withdrawals`
+  table only tracks the request lifecycle (pending → approved/rejected).
+- Actual bank transfer happens manually, outside the system, performed
+  by the Admin. Approving a withdrawal in the UI simply deducts
+  `seller_profiles.balance` and logs `seller_balance_logs` — it does not
+  trigger any real money movement.
 
 ## 4. Folder Structure
 

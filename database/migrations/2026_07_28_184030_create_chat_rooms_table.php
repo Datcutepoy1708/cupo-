@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('chat_rooms', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
+
+            $table->unique(['buyer_id', 'seller_id']);
         });
     }
 

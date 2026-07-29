@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('review_replies', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('review_id')->unique()->constrained('reviews')->cascadeOnDelete();
+            $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
+            $table->text('reply');
             $table->timestamps();
         });
     }
