@@ -1,0 +1,110 @@
+/* ===== Nền & khung navbar ===== */
+.navbar.bg-body-tertiary {
+    background-color: #c62828 !important; /* đỏ chủ đạo */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Logo/brand */
+.navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.logo-text {
+    font-family: "Pacifico", cursive;
+    font-size: 28px;
+    color: #ffffff;
+    letter-spacing: 0;
+}
+/* Nút toggle mobile */
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+.navbar-toggler-icon {
+    filter: invert(1); /* icon 3 gạch chuyển trắng */
+}
+
+/* ===== Menu chính ===== */
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding-left: 12px;
+    padding-right: 12px;
+    transition: color 0.2s ease;
+}
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+    color: #ffffff !important;
+}
+.navbar-nav .nav-link.active {
+    color: #ffffff !important;
+    font-weight: 700;
+    border-bottom: 2px solid #ffffff;
+}
+
+/* Dropdown "Danh mục" */
+.dropdown-menu {
+    background-color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.dropdown-item {
+    color: #c62828;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #fdecea;
+    color: #b71c1c;
+}
+
+/* ===== Ô tìm kiếm ===== */
+.navbar form.d-flex .form-control {
+    border: 1px solid #ffffff;
+    background-color: rgba(255, 255, 255, 0.95);
+}
+.navbar form.d-flex .form-control:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.4);
+}
+.navbar form.d-flex .btn-outline-success {
+    color: #ffffff;
+    border-color: #ffffff;
+    background-color: transparent;
+}
+.navbar form.d-flex .btn-outline-success:hover {
+    background-color: #ffffff;
+    color: #c62828;
+}
+
+/* ===== Nút Đăng nhập / Đăng ký ===== */
+.navbar .btn-outline-primary {
+    color: #ffffff;
+    border-color: #ffffff;
+    background-color: transparent;
+}
+.navbar .btn-outline-primary:hover {
+    background-color: #ffffff;
+    color: #c62828;
+}
+.navbar .btn-primary {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #c62828;
+    font-weight: 600;
+}
+.navbar .btn-primary:hover {
+    background-color: #fdecea;
+    border-color: #fdecea;
+    color: #b71c1c;
+}
+
+/* Dropdown user (đã đăng nhập) */
+.navbar .btn-outline-secondary {
+    color: #ffffff;
+    border-color: #ffffff;
+    background-color: transparent;
+}
+.navbar .btn-outline-secondary:hover {
+    background-color: #ffffff;
+    color: #c62828;
+}
