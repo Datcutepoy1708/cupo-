@@ -145,3 +145,8 @@ git commit -m "fix: resolve merge conflict tại navigation.blade.php"
 
 Trước khi làm bất cứ điều gì không chắc → **Hỏi trước, code sau!**
 Thà mất 5 phút hỏi còn hơn mất 2 tiếng fix conflict. 
+
+## ⚠️ Quy tắc với file routes/web.php
+- KHÔNG xóa route của người khác
+- Chỉ THÊM route mới vào cuối file
+- Nếu cần tái cấu trúc → thảo luận với cả nhóm trước
