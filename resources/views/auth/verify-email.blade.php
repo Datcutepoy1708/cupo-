@@ -1,31 +1,43 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-    </div>
+@extends('layouts.auth')
 
-    @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </div>
-    @endif
+@section('content')
+    <div class="auth-wrapper">
+        <div class="card auth-card">
+            <div class="card-body auth-card-body">
+                <!-- Header -->
+                <div class="auth-header">
+                    <img src="{{ asset('images/cupo-icon.svg') }}" alt="Cupo" class="brand-logo">
+                    <h1 class="auth-title">Xác minh Email</h1>
+                    <p class="auth-subtitle">Cảm ơn bạn đã đăng ký tài khoản tại Cupo!</p>
+                </div>
 
-    <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
+                <div class="alert alert-info mb-4" role="alert">
+                    Vui lòng kiểm tra hòm thư của bạn và nhấp vào liên kết xác minh để hoàn tất quá trình đăng ký. Nếu bạn
+                    không nhận được email, chúng tôi sẵn sàng gửi lại.
+                </div>
 
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
+                @if (session('status') == 'verification-link-sent')
+                    <div class="alert alert-success mb-4" role="alert">
+                        Liên kết xác minh mới đã được gửi tới địa chỉ email bạn đã cung cấp khi đăng ký.
+                    </div>
+                @endif
+
+                <div class="d-flex flex-column gap-2">
+                    <form method="POST" action="{{ route('verification.send') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-auth-primary">
+                            Gửi lại email xác minh
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('logout') }}" class="text-center mt-2">
+                        @csrf
+                        <button type="submit" class="btn btn-link auth-link text-decoration-none p-0">
+                            Đăng xuất
+                        </button>
+                    </form>
+                </div>
             </div>
-        </form>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Log Out') }}
-            </button>
-        </form>
+        </div>
     </div>
-</x-guest-layout>
+@endsection

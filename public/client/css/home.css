@@ -1,3 +1,76 @@
-main {
-    background-color: aqua;
+.hero-slide {
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    background:
+        linear-gradient(135deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.2)),
+        url("https://picsum.photos/1600/700") center center/cover no-repeat;
+}
+
+/* Chấm điều hướng */
+.carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+}
+.carousel-indicators .active {
+    background-color: #c62828;
+}
+
+/* Nút prev/next dạng vòng tròn, thay icon mặc định của Bootstrap */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 48px;
+    opacity: 1;
+}
+.carousel-control-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 16px;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease;
+}
+.carousel-control-prev:hover .carousel-control-icon,
+.carousel-control-next:hover .carousel-control-icon {
+    background: rgba(255, 255, 255, 0.35);
+}
+.category-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #fdecea;
+    color: #c62828;
+    font-size: 22px;
+}
+.product-card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+.product-card img {
+    height: 160px;
+    object-fit: cover;
+}
+.newsletter-section {
+    background: linear-gradient(90deg, #7f0000 0%, #d32f2f 100%);
+}
+
+/* 5 cột đều nhau cho Flash Sale */
+@media (min-width: 992px) {
+    .col-flash-sale {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
 }

@@ -27,7 +27,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('home', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
@@ -40,6 +40,23 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
+    }
+
+    public function test_invalid_login_shows_a_general_error_alert(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->from('/login')->post('/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors();
+
+        $this->followRedirects($response)
+            ->assertSee('alert-danger')
+            ->assertSee(trans('auth.failed'));
     }
 
     public function test_users_can_logout(): void

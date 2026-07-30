@@ -1,3 +1,9 @@
+header {
+    z-index: 100;
+    position: sticky; /*Tạo hiệu ứng bám đỉnh khi cuộn xuống*/
+    top: -2px;
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.15);
+}
 /* ===== Nền & khung navbar ===== */
 .navbar.bg-body-tertiary {
     background-color: #c62828 !important; /* đỏ chủ đạo */

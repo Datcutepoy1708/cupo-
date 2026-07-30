@@ -1,0 +1,7 @@
+{
+    "These credentials do not match our records.": "Thông tin đăng nhập không chính xác.",
+    "The provided password is incorrect.": "Mật khẩu không đúng.",
+    "Too many login attempts. Please try again in :seconds seconds.": "Đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau :seconds giây.",
+    "The :attribute field is required.": "Trường :attribute không được bỏ trống.",
+    "The :attribute has already been taken.": ":Attribute này đã được sử dụng."
+}

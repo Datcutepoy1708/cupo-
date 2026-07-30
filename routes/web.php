@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 
 // Storefront routes
 Route::get('/', function () {
@@ -18,6 +19,8 @@ Route::get('/promotions', function () {
 Route::get('/help', function () {
     return view('client.help');
 })->name('help');
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 
 // Breeze Authenticated routes
 Route::get('/dashboard', function () {
