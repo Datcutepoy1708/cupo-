@@ -19,10 +19,10 @@ class Banner extends Model
     ];
 
     protected $casts = [
-        'is_active'  => 'boolean',
+        'is_active' => 'boolean',
         'sort_order' => 'integer',
-        'starts_at'  => 'datetime',
-        'ends_at'    => 'datetime',
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
     ];
 
     // Scope: Lấy các banner đang active và trong thời gian hiển thị
