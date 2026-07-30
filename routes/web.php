@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// ── Storefront (public) ───────────────────────────────────────────────────────
+// Storefront routes
 Route::get('/', function () {
     return view('client.home');
 });
@@ -19,7 +19,7 @@ Route::get('/help', function () {
     return view('client.help');
 })->name('help');
 
-// ── Authenticated routes ──────────────────────────────────────────────────────
+// Breeze Authenticated routes
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
