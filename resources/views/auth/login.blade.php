@@ -20,7 +20,9 @@
 
                 @if ($errors->any())
                     <div class="alert alert-danger mb-3" role="alert">
-                        {{ $errors->first() }}
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
                     </div>
                 @endif
 
