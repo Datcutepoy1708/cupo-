@@ -48,8 +48,9 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" name="date_of_birth"
-                        value="{{ old('date_of_birth', auth()->user()->date_of_birth?->format('Y-m-d')) }}">
+                    <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
+                        name="date_of_birth"
+                        value="{{ old('date_of_birth', auth()->user()->date_of_birth?->format('d/m/Y')) }}">
                     @error('date_of_birth')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

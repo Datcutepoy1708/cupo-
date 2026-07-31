@@ -2,12 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
 // Storefront Public Routes
 Route::get('/', function () {
     return view('client.home');
