@@ -18,7 +18,6 @@ class SellerProfile extends Model
         'banner',
         'description',
         'address',
-        'date_of_birth',
         'national_id',
         'commission_rate',
         'balance',
@@ -31,7 +30,6 @@ class SellerProfile extends Model
     protected function casts(): array
     {
         return [
-            'date_of_birth' => 'date',
             'national_id' => 'encrypted',
             'commission_rate' => 'decimal:2',
             'balance' => 'decimal:2',

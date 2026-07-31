@@ -23,7 +23,10 @@ class SellerRegistrationController extends Controller
         $user = $request->user();
 
         DB::transaction(function () use ($user, $request) {
-            $user->update(['role' => 'seller']);
+            $user->update([
+                'role' => 'seller',
+                'date_of_birth' => Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->format('Y-m-d'),
+            ]);
 
             SellerProfile::create([
                 'user_id' => $user->id,
@@ -31,7 +34,6 @@ class SellerRegistrationController extends Controller
                 'slug' => Str::slug($request->shop_name).'-'.Str::random(5),
                 'address' => $request->address,
                 'description' => $request->description,
-                'date_of_birth' => Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->format('Y-m-d'),
                 'national_id' => $request->national_id,
                 'status' => 'pending',
             ]);

@@ -187,13 +187,11 @@ the business rule changes):
 - `order_items.product_id`, `order_items.product_variant_id`,
   `cart_items.product_variant_id` → `nullOnDelete()` (order_items keep
   a snapshot; cart_items should degrade gracefully, not vanish silently)
-## 15. Seller KYC Fields
-- `seller_profiles.date_of_birth` and `national_id` are required only
-  when a customer registers to become a seller — not for regular
-  customer accounts.
-- Age check: seller must be >= 18 years old, calculated via
-  `Carbon::createFromFormat(...)->age`, never a hand-rolled date diff.
-- `national_id` must be unique across `seller_profiles` (one ID per
-  seller account) and cast as `encrypted` in the `SellerProfile` model
-  — never expose it unmasked outside the Seller's own profile page or
-  Admin verification screens.
+## 15. Seller KYC Fields (updated)
+- `users.date_of_birth` is the single source of truth — never duplicate
+  it into `seller_profiles`. Access it via the `user()` relationship
+  from `SellerProfile`, or directly on `User`.
+- `seller_profiles.national_id` remains seller-only KYC data.
+- Seller registration form may collect `date_of_birth` if the user
+  hasn't set one yet, but must write it back to `users.date_of_birth`
+  — never store a separate copy on `seller_profiles`.

@@ -26,6 +26,7 @@ class SellerRegistrationTest extends TestCase
 
         $response->assertSessionHasErrors(['date_of_birth']);
         $this->assertEquals('customer', $user->fresh()->role);
+        $this->assertNull($user->fresh()->date_of_birth);
     }
 
     public function test_seller_registration_requires_valid_12_digit_national_id(): void
@@ -44,7 +45,7 @@ class SellerRegistrationTest extends TestCase
         $response->assertSessionHasErrors(['national_id']);
     }
 
-    public function test_valid_customer_over_18_can_register_as_seller_with_encrypted_national_id(): void
+    public function test_valid_customer_over_18_can_register_as_seller_with_single_source_of_truth_dob(): void
     {
         $user = User::factory()->create(['role' => 'customer']);
 
@@ -58,10 +59,16 @@ class SellerRegistrationTest extends TestCase
         ]);
 
         $response->assertRedirect(route('seller.pending-approval'));
-        $this->assertEquals('seller', $user->fresh()->role);
+
+        $updatedUser = $user->fresh();
+        $this->assertEquals('seller', $updatedUser->role);
+        // Rule 15 updated: date_of_birth là Single Source of Truth trên bảng users
+        $this->assertEquals('2000-08-15', $updatedUser->date_of_birth->format('Y-m-d'));
 
         $profile = SellerProfile::where('user_id', $user->id)->first();
         $this->assertNotNull($profile);
-        $this->assertEquals('012345678901', $profile->national_id); // Đọc thông qua Eloquent Model tự giải mã
+        $this->assertEquals('012345678901', $profile->national_id); // Dữ liệu CCCD được giải mã thông qua Eloquent Model
+        // Kiểm tra chắc chắn date_of_birth được truy cập thông qua relationship $profile->user->date_of_birth
+        $this->assertEquals('2000-08-15', $profile->user->date_of_birth->format('Y-m-d'));
     }
 }
