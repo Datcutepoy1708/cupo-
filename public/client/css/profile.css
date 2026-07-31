@@ -269,11 +269,11 @@ body {
 
 /* Password toggle */
 .toggle-password {
-    color: #999;
     position: absolute;
-    right: 20px;
-    top: 48%;
-    transform: translateY(10px);
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
     cursor: pointer;
 }
 .toggle-password:hover {
@@ -366,6 +366,61 @@ body {
     background: #f8f9fa;
     border-top: 1px solid #e9ecef;
     padding: 1rem 2rem;
+}
+
+/* ===== Sổ địa chỉ ===== */
+.address-row {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease;
+}
+.address-row:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+.address-row-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.address-info {
+    flex: 1;
+}
+.address-default-badge {
+    background: var(--primary-red-light);
+    color: var(--primary-red-dark);
+    font-weight: 600;
+    font-size: 0.72rem;
+}
+.address-type-tag {
+    display: inline-block;
+    border: 1px solid var(--border-color);
+    color: #666;
+    font-size: 0.78rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+.address-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.address-row-footer {
+    border-top: 1px dashed var(--border-color);
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
+    text-align: right;
+}
+.address-row-footer .btn-link {
+    color: var(--primary-red);
+    font-size: 0.85rem;
+    text-decoration: none;
+    font-weight: 500;
+}
+.address-row-footer .btn-link:hover {
+    text-decoration: underline;
 }
 
 /* ===== Order status tabs (kiểu Shopee) ===== */
@@ -544,4 +599,11 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-red-dark);
+}
+/* Tắt icon cảnh báo mặc định của Bootstrap trên ô mật khẩu có icon con mắt,
+   tránh chồng lên .toggle-password */
+.password-field.is-invalid,
+.password-field.is-valid {
+    background-image: none !important;
+    padding-right: 45px; /* chừa đúng chỗ cho icon con mắt, không cần chừa thêm cho icon Bootstrap nữa */
 }

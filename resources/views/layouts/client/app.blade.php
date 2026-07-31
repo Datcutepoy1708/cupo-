@@ -58,6 +58,10 @@
 
     {{-- embed bootstrap js --}}
     <script src="{{ asset('client/js/bootstrap.bundle.min.js') }}"></script>
+    {{-- embed page js --}}
+    @if (request()->routeIs('profile.*'))
+        <script src="{{ asset('client/js/profile.js') }}"></script>
+    @endif
 </body>
 
 </html>
