@@ -39,26 +39,26 @@ class ProfileController extends Controller
         return Redirect::route('profile.show')
             ->with('status', 'profile-updated')
             ->with('active_tab', 'personal');
-        }
+    }
 
     public function updatePassword(Request $request): RedirectResponse
-{
-    $validated = $request->validate([
-        'current_password' => ['required', 'current_password'],
-        'new_password' => ['required', 'confirmed', Password::defaults(), 'different:current_password'],
-    ], [], [
-        'current_password' => 'mật khẩu hiện tại',
-        'new_password' => 'mật khẩu mới',
-    ]);
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'new_password' => ['required', 'confirmed', Password::defaults(), 'different:current_password'],
+        ], [], [
+            'current_password' => 'mật khẩu hiện tại',
+            'new_password' => 'mật khẩu mới',
+        ]);
 
-    $request->user()->update([
-        'password' => Hash::make($validated['new_password']),
-    ]);
+        $request->user()->update([
+            'password' => Hash::make($validated['new_password']),
+        ]);
 
-    return back()
-        ->with('status', 'password-updated')
-        ->with('active_tab', 'changePassword');
-}
+        return back()
+            ->with('status', 'password-updated')
+            ->with('active_tab', 'changePassword');
+    }
 
     /**
      * Delete the user's account.
