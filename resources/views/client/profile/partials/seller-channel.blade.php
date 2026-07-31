@@ -41,71 +41,61 @@
 
         <h5 class="fw-bold mb-3">Thông tin đăng ký gian hàng</h5>
 
-        <form method="post" action="#">
+        @if ($errors->any())
+            <div class="alert alert-danger mb-3" role="alert">
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('seller.register.store') }}">
+            @csrf
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Tên gian hàng <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="shop_name"
-                        placeholder="VD: Cupo Store - Điện tử chính hãng">
+                    <input type="text" class="form-control" name="shop_name" value="{{ old('shop_name') }}"
+                        placeholder="VD: Cupo Store - Thời trang cao cấp" required>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Ngành hàng kinh doanh <span class="text-danger">*</span></label>
-                    <select class="form-select" name="shop_category">
-                        <option value="">Chọn ngành hàng</option>
-                        <option>Điện tử - Công nghệ</option>
-                        <option>Thời trang</option>
-                        <option>Đồ gia dụng</option>
-                        <option>Làm đẹp - Sức khỏe</option>
-                        <option>Mẹ & bé</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label">Loại hình kinh doanh <span class="text-danger">*</span></label>
-                    <div class="d-flex gap-4 mt-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="business_type" id="typePersonal"
-                                checked>
-                            <label class="form-check-label" for="typePersonal">Cá nhân</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="business_type" id="typeCompany">
-                            <label class="form-check-label" for="typeCompany">Doanh nghiệp</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Số CCCD / Mã số thuế <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="tax_id" placeholder="Nhập số CCCD hoặc MST">
-                </div>
-            </div>
-
-            <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="shop_phone" value="0987654321">
+                    <input type="tel" class="form-control" name="phone" value="{{ old('phone', Auth::user()->phone) }}" placeholder="0987654321" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Ngày sinh (dd/mm/yyyy) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="date_of_birth" value="{{ old('date_of_birth', Auth::user()->date_of_birth?->format('d/m/Y')) }}" placeholder="VD: 15/08/2000" required>
+                    <small class="text-muted">Người bán phải từ đủ 18 tuổi trở lên.</small>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Email liên hệ <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control" name="shop_email" value="nguyenvana@gmail.com">
+                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}" placeholder="Nhập đúng 12 chữ số CCCD" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">Địa chỉ gian hàng <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="address" value="{{ old('address') }}"
+                        placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành" required>
                 </div>
             </div>
 
             <div class="row mb-4">
                 <div class="col-md-12">
-                    <label class="form-label">Địa chỉ lấy hàng <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="pickup_address"
-                        placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành">
+                    <label class="form-label">Mô tả gian hàng</label>
+                    <textarea class="form-control" name="description" rows="3" placeholder="Mô tả ngắn gọn về cửa hàng của bạn">{{ old('description') }}</textarea>
                 </div>
             </div>
 
             <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" id="agreeTerms">
+                <input class="form-check-input" type="checkbox" id="agreeTerms" required checked>
                 <label class="form-check-label small" for="agreeTerms">
-                    Tôi đã đọc và đồng ý với <a href="#" style="color: var(--primary-red);">Điều khoản người
-                        bán</a> của Cupo
+                    Tôi đã đọc và đồng ý với <a href="#" style="color: var(--primary-red);">Điều khoản người bán</a> của Cupo
                 </label>
             </div>
 
