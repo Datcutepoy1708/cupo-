@@ -25,6 +25,8 @@
     @elseif (request()->routeIs('profile.*'))
         <link href="{{ asset('client/css/profile.css') }}" rel="stylesheet">
     @endif
+    {{-- embed modal css --}}
+    <link href="{{ asset('client/css/modal.css') }}" rel="stylesheet">
     <title>Document</title>
 </head>
 
@@ -62,6 +64,8 @@
     @if (request()->routeIs('profile.*'))
         <script src="{{ asset('client/js/profile.js') }}"></script>
     @endif
+
+    @stack('scripts')
 </body>
 
 </html>
