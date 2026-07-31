@@ -1,78 +1,102 @@
-@props([
-    'name',
-    'show' => false,
-    'maxWidth' => '2xl'
-])
+@once
+    @push('styles')
+        <style>
+            .modal-content {
+                border: none;
+                border-radius: 14px;
+                overflow: hidden;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+            }
+
+            .modal-header {
+                background: var(--primary-red, #c62828);
+                color: #fff;
+                border-bottom: none;
+                padding: 1.25rem 1.5rem;
+            }
+
+            .modal-header .modal-title {
+                font-weight: 600;
+                font-size: 1.15rem;
+            }
+
+            .modal-header .btn-close {
+                filter: brightness(0) invert(1);
+                opacity: 0.9;
+            }
+
+            .modal-header .btn-close:hover {
+                opacity: 1;
+            }
+
+            .modal-body {
+                padding: 1.75rem;
+                background: #fff;
+            }
+
+            .modal-footer {
+                background: #f8f9fa;
+                border-top: 1px solid #eee;
+                padding: 1rem 1.5rem;
+            }
+
+            .modal-footer .btn {
+                padding: 0.5rem 1.4rem;
+            }
+
+            .modal-footer .btn-danger,
+            .modal-footer .btn-primary {
+                background: var(--primary-red, #c62828);
+                border-color: var(--primary-red, #c62828);
+            }
+
+            .modal-footer .btn-danger:hover,
+            .modal-footer .btn-primary:hover {
+                background: var(--primary-red-dark, #b71c1c);
+                border-color: var(--primary-red-dark, #b71c1c);
+            }
+        </style>
+    @endpush
+@endonce
+
+@props(['name', 'title' => null, 'maxWidth' => 'md', 'static' => false])
 
 @php
-$maxWidth = [
-    'sm' => 'sm:max-w-sm',
-    'md' => 'sm:max-w-md',
-    'lg' => 'sm:max-w-lg',
-    'xl' => 'sm:max-w-xl',
-    '2xl' => 'sm:max-w-2xl',
-][$maxWidth];
+    $maxWidthClass =
+        [
+            'sm' => 'modal-sm',
+            'md' => '',
+            'lg' => 'modal-lg',
+            'xl' => 'modal-xl',
+        ][$maxWidth] ?? '';
 @endphp
 
-<div
-    x-data="{
-        show: @js($show),
-        focusables() {
-            // All focusable element types...
-            let selector = 'a, button, input:not([type=\'hidden\']), textarea, select, details, [tabindex]:not([tabindex=\'-1\'])'
-            return [...$el.querySelectorAll(selector)]
-                // All non-disabled elements...
-                .filter(el => ! el.hasAttribute('disabled'))
-        },
-        firstFocusable() { return this.focusables()[0] },
-        lastFocusable() { return this.focusables().slice(-1)[0] },
-        nextFocusable() { return this.focusables()[this.nextFocusableIndex()] || this.firstFocusable() },
-        prevFocusable() { return this.focusables()[this.prevFocusableIndex()] || this.lastFocusable() },
-        nextFocusableIndex() { return (this.focusables().indexOf(document.activeElement) + 1) % (this.focusables().length + 1) },
-        prevFocusableIndex() { return Math.max(0, this.focusables().indexOf(document.activeElement)) -1 },
-    }"
-    x-init="$watch('show', value => {
-        if (value) {
-            document.body.classList.add('overflow-y-hidden');
-            {{ $attributes->has('focusable') ? 'setTimeout(() => firstFocusable().focus(), 100)' : '' }}
-        } else {
-            document.body.classList.remove('overflow-y-hidden');
-        }
-    })"
-    x-on:open-modal.window="$event.detail == '{{ $name }}' ? show = true : null"
-    x-on:close-modal.window="$event.detail == '{{ $name }}' ? show = false : null"
-    x-on:close.stop="show = false"
-    x-on:keydown.escape.window="show = false"
-    x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
-    x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
-    x-show="show"
-    class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
-    style="display: {{ $show ? 'block' : 'none' }};"
->
-    <div
-        x-show="show"
-        class="fixed inset-0 transform transition-all"
-        x-on:click="show = false"
-        x-transition:enter="ease-out duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="ease-in duration-200"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-    >
-        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-    </div>
+<div class="modal fade" id="{{ $name }}" tabindex="-1" aria-labelledby="{{ $name }}-label"
+    aria-hidden="true"
+    @if ($static) data-bs-backdrop="static"
+        data-bs-keyboard="false" @endif>
+    <div class="modal-dialog modal-dialog-centered {{ $maxWidthClass }}">
+        <div class="modal-content">
 
-    <div
-        x-show="show"
-        class="mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"
-        x-transition:enter="ease-out duration-300"
-        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-        x-transition:leave="ease-in duration-200"
-        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-    >
-        {{ $slot }}
+            @if ($title || isset($header))
+                <div class="modal-header">
+                    <h5 class="modal-title" id="{{ $name }}-label">
+                        {{ $header ?? $title }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+            @endif
+
+            <div class="modal-body">
+                {{ $slot }}
+            </div>
+
+            @isset($footer)
+                <div class="modal-footer">
+                    {{ $footer }}
+                </div>
+            @endisset
+
+        </div>
     </div>
 </div>

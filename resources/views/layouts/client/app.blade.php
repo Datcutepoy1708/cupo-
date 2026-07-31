@@ -23,7 +23,7 @@
     @elseif (request()->routeIs('promotions'))
         <link href="{{ asset('client/css/promotions.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('profile.*'))
-        <link href="{{ asset('client/css/auth.css') }}" rel="stylesheet">
+        <link href="{{ asset('client/css/profile.css') }}" rel="stylesheet">
     @endif
     <title>Document</title>
 </head>
@@ -38,6 +38,24 @@
     <footer>
         @include('layouts.client.footer')
     </footer>
+
+    @auth
+        <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+            @csrf
+        </form>
+
+        <x-modal name="logoutModal" title="Xác nhận đăng xuất" max-width="sm">
+            <p class="mb-0">Bạn có chắc chắn muốn đăng xuất không?</p>
+
+            <x-slot name="footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="logoutForm" class="btn btn-danger">
+                    <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
+                </button>
+            </x-slot>
+        </x-modal>
+    @endauth
+
     {{-- embed bootstrap js --}}
     <script src="{{ asset('client/js/bootstrap.bundle.min.js') }}"></script>
 </body>

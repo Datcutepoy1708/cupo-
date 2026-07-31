@@ -1,0 +1,547 @@
+:root {
+    --primary-red: #c62828;
+    --primary-red-dark: #b71c1c;
+    --primary-red-light: #fdecea;
+    --bg-cream: #fff8f7;
+    --text-dark: #333;
+    --border-color: #ddd;
+}
+
+body {
+    background: #f5f6fa;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    background: var(--bg-cream);
+    height: 100vh;
+    border-right: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+}
+
+.profile-section {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.profile-img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 3px solid var(--primary-red);
+}
+
+.profile-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Menu chính */
+.nav-pills .nav-link {
+    color: var(--text-dark);
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s;
+}
+.nav-pills .nav-link:hover {
+    background: var(--primary-red-light);
+}
+.nav-pills .nav-link.active {
+    background: var(--primary-red);
+    color: #fff;
+    font-weight: 600;
+}
+.nav-pills .nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* Dropdown lịch sử */
+.nav-link.dropdown-toggle {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav-link.dropdown-toggle::after {
+    transition: transform 0.3s ease;
+}
+.nav-link.dropdown-toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+}
+.dropdown-menu-custom {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+.dropdown-item-custom {
+    padding: 0.75rem 1rem 0.75rem 2rem;
+    border-radius: 8px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+.dropdown-item-custom:hover {
+    background-color: var(--primary-red-light);
+    color: var(--primary-red-dark);
+    border-left-color: var(--primary-red);
+}
+.dropdown-item-custom.active {
+    background-color: var(--primary-red-light);
+    color: var(--primary-red-dark);
+    border-left-color: var(--primary-red);
+    font-weight: 500;
+}
+.dropdown-item-custom i {
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Logout */
+.logout-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    border-top: 1px solid #f3d0cd;
+    background: var(--bg-cream);
+}
+.logout-btn {
+    background: var(--primary-red);
+    color: #fff;
+    border: none;
+    width: 100%;
+}
+.logout-btn:hover {
+    background: var(--primary-red-dark);
+}
+
+/* ===== Avatar upload ===== */
+.avatar-upload-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px dashed var(--border-color);
+}
+.avatar-preview-container {
+    position: relative;
+    cursor: pointer;
+}
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+.avatar-preview-container:hover .avatar-preview {
+    transform: scale(1.05);
+}
+.camera-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--primary-red);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.camera-overlay i {
+    color: var(--primary-red);
+    font-size: 18px;
+}
+.avatar-preview-container:hover .camera-overlay {
+    background: var(--primary-red);
+}
+.avatar-preview-container:hover .camera-overlay i {
+    color: white;
+}
+.avatar-upload-controls h5 {
+    color: var(--text-dark);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.file-name-display {
+    display: inline-block;
+    color: #666;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+/* ===== Content ===== */
+.content-area {
+    padding: 2rem;
+}
+.content-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    min-height: 600px;
+    animation: fadeIn 0.4s ease-out;
+}
+.content-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--text-dark);
+    border-bottom: 3px solid var(--primary-red);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* Form */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 0.2rem rgba(198, 40, 40, 0.15);
+}
+.form-label {
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+.btn-save {
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.8rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+.btn-save:hover {
+    background: var(--primary-red-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+.btn-cancel {
+    background: #f0f0f0;
+    color: var(--text-dark);
+    border: none;
+    padding: 0.6rem 1.8rem;
+    font-weight: 500;
+}
+.btn-cancel:hover {
+    background: #ddd;
+}
+.btn-home {
+    background: var(--primary-red);
+    color: white;
+    border: none;
+    margin-top: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 6px;
+}
+.btn-home:hover {
+    background: var(--primary-red-dark);
+    color: white;
+}
+
+/* Password toggle */
+.toggle-password {
+    color: #999;
+    position: absolute;
+    right: 20px;
+    top: 48%;
+    transform: translateY(10px);
+    cursor: pointer;
+}
+.toggle-password:hover {
+    color: var(--primary-red);
+}
+
+/* ===== Table ===== */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+.table thead th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    padding: 1rem;
+}
+.table tbody td {
+    padding: 0.7rem;
+    vertical-align: middle;
+}
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    font-weight: 500;
+}
+
+/* ===== Wishlist cards ===== */
+.wishlist-card {
+    position: relative;
+    transition: transform 0.2s ease;
+}
+.wishlist-card:hover {
+    transform: translateY(-4px);
+}
+.wishlist-card img {
+    height: 140px;
+    object-fit: cover;
+}
+.btn-remove-wishlist {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    color: var(--primary-red);
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Modal chi tiết ===== */
+.modal-detail .modal-content {
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+.modal-detail .modal-header {
+    background: var(--primary-red-dark);
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+.modal-detail .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+.modal-detail .modal-body {
+    padding: 2rem;
+    background: #fafafa;
+}
+.modal-detail h6 {
+    color: var(--primary-red-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--primary-red);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+.modal-detail .table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+.modal-detail .modal-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 2rem;
+}
+
+/* ===== Order status tabs (kiểu Shopee) ===== */
+.order-status-tabs {
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+.order-status-tabs .nav-link {
+    color: var(--text-dark);
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    white-space: nowrap;
+    position: relative;
+}
+.order-status-tabs .nav-link.active {
+    color: var(--primary-red);
+    border-bottom-color: var(--primary-red);
+    background: transparent;
+}
+.order-status-tabs .status-count {
+    display: inline-block;
+    margin-left: 4px;
+    background: #eee;
+    color: #666;
+    font-size: 0.75rem;
+    padding: 1px 7px;
+    border-radius: 10px;
+}
+.order-status-tabs .nav-link.active .status-count {
+    background: var(--primary-red-light);
+    color: var(--primary-red-dark);
+}
+
+/* ===== Order row (thay cho table) ===== */
+.order-row {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease;
+}
+.order-row:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+.order-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+.order-id {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.order-row-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.order-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Empty state cho từng tab trạng thái */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+}
+.empty-state i {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* ===== Kênh người bán ===== */
+.seller-intro-icon {
+    font-size: 3rem;
+    color: var(--primary-red);
+    margin-bottom: 1rem;
+    display: block;
+}
+.seller-benefit {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--bg-cream);
+    border-radius: 10px;
+    height: 100%;
+}
+.seller-benefit i {
+    font-size: 1.8rem;
+    color: var(--primary-red);
+    margin-bottom: 0.75rem;
+    display: block;
+}
+.seller-benefit h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* ===== Pagination ===== */
+.pagination {
+    margin: 20px 0;
+    gap: 5px;
+}
+.page-item .page-link {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--primary-red-dark);
+    border: 2px solid var(--primary-red);
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+}
+.pagination button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+.page-link:focus {
+    box-shadow: 0 0 0 0.25rem rgba(198, 40, 40, 0.2);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        min-height: auto;
+    }
+    .logout-section {
+        position: relative;
+    }
+    .avatar-upload-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    .content-area {
+        padding: 1rem;
+    }
+    .content-card {
+        padding: 1.5rem;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--primary-red);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-red-dark);
+}

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary p-3">
     <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center me-5" href="#">
+        <a class="navbar-brand d-flex align-items-center me-5" href="{{ route('home') }}">
             <img src="{{ asset('images/cupo-icon-transparent.svg') }}" alt="Cupo" width="36" height="36"
                 class="d-block mb-1">
             <span class="logo-text">Cupo</span>
@@ -64,15 +64,15 @@
                             {{ auth()->user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Tài khoản</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Tài khoản</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">Đăng xuất</button>
-                                </form>
+                                <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                    data-bs-target="#logoutModal">
+                                    Đăng xuất
+                                </button>
                             </li>
                         </ul>
                     </div>
