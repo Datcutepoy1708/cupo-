@@ -48,8 +48,11 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control" name="birth_day"
-                        value="{{ old('birth_day', auth()->user()->birth_day ?? '') }}">
+                    <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" name="date_of_birth"
+                        value="{{ old('date_of_birth', auth()->user()->date_of_birth?->format('Y-m-d')) }}">
+                    @error('date_of_birth')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -64,8 +67,11 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Số điện thoại</label>
-                    <input type="tel" class="form-control" name="phone"
+                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" name="phone"
                         value="{{ old('phone', auth()->user()->phone ?? '') }}">
+                    @error('phone')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
