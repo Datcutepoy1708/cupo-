@@ -18,6 +18,7 @@ class SellerRegistrationRequest extends FormRequest
             'shop_name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:500'],
+            'business_type' => ['nullable', 'string', 'in:personal,company'],
             'description' => ['nullable', 'string'],
             'date_of_birth' => [
                 'required',

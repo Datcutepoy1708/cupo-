@@ -13,6 +13,7 @@ class SellerProfile extends Model
     protected $fillable = [
         'user_id',
         'shop_name',
+        'business_type',
         'slug',
         'logo',
         'banner',

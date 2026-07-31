@@ -31,6 +31,7 @@ class SellerRegistrationController extends Controller
             SellerProfile::create([
                 'user_id' => $user->id,
                 'shop_name' => $request->shop_name,
+                'business_type' => $request->input('business_type', 'personal'),
                 'slug' => Str::slug($request->shop_name).'-'.Str::random(5),
                 'address' => $request->address,
                 'description' => $request->description,
