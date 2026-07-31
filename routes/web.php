@@ -31,3 +31,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+// Phân routes của FE
+
+
+// Phần routes của BE
