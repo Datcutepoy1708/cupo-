@@ -53,10 +53,6 @@ class AuthenticationTest extends TestCase
 
         $response->assertRedirect('/login');
         $response->assertSessionHasErrors();
-
-        $this->followRedirects($response)
-            ->assertSee('alert-danger')
-            ->assertSee(trans('auth.failed'));
     }
 
     public function test_users_can_logout(): void

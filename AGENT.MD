@@ -128,3 +128,70 @@ A PR should not be merged if this workflow is failing.
 5. New service classes touching stock or payment have at least one test
 6. New migrations have a working `down()` method
 7. No stray `dd()`, `dump()`, or `console.log` left in the code
+## 10. Middleware & Access Control Rules
+
+- **Separate "not authenticated" from "wrong role".** Never collapse
+  both into a single `abort(403)`. An unauthenticated user must be
+  redirected to `route('login')`; only an authenticated user with the
+  wrong role/permission gets a 403.
+- **Always check account status before role.** A user with
+  `status = 'blocked'` must be denied regardless of their `role`, even
+  if their session is still valid. Check status immediately after
+  confirming authentication, before checking role/permission.
+- **Middleware should accept multiple roles via variadic parameters**
+  (`string ...$roles`), not a single `string $role` — routes shared
+  across roles (e.g. a report page visible to both admin and seller)
+  are common in this system.
+- **Use strict comparison** (`in_array($x, $y, true)`, `===`) for role/
+  status checks. Never rely on loose comparison for anything
+  security-related.
+- **Prefer `$request->user()` over `auth()->user()`** inside middleware
+  — it resolves against the guard actually handling the request,
+  which matters once multiple guards exist (e.g. separate admin guard).
+
+## 11. General Code Rigor Checklist
+
+When writing any Controller, Middleware, or Service method, verify:
+1. Every foreign key's `on delete` behavior is deliberate — see
+   "Foreign Key Delete Rules" below, don't default to cascade.
+2. Every list of allowed values (roles, statuses, enums) is checked
+   with strict comparison, not loose `==`.
+3. Every "not found" / "not authorized" / "invalid input" case is
+   handled as a *distinct* branch with the correct HTTP status
+   (401 = not authenticated, 403 = authenticated but forbidden,
+   404 = not found, 422 = validation failed) — never collapse
+   different failure reasons into one generic error.
+4. Every monetary or stock-related write is wrapped in a transaction
+   or an atomic Redis operation — never a bare `->save()` with no
+   consistency guarantee when multiple rows are involved.
+
+## 12. Foreign Key Delete Rules
+
+Ask before writing any `->constrained()`: *"If the parent row is
+deleted, does this child row still have meaning on its own?"*
+
+| Answer | Use |
+|---|---|
+| No — child is meaningless without the parent | `cascadeOnDelete()` |
+| Yes — child is financial/historical data that must not silently disappear | `restrictOnDelete()` |
+| Yes — child has its own value, the link is just optional/reference | `nullOnDelete()` (column must be `nullable()`) |
+
+Examples already decided in this codebase (do not re-litigate unless
+the business rule changes):
+- `orders.user_id`, `seller_orders.seller_id` → `restrictOnDelete()`
+  (financial history)
+- `products.category_id` → `restrictOnDelete()` (forces re-categorization
+  before deleting a category)
+- `addresses.user_id`, `cart_items.cart_id`, `product_images.product_id`
+  → `cascadeOnDelete()` (meaningless without parent)
+- `order_items.product_id`, `order_items.product_variant_id`,
+  `cart_items.product_variant_id` → `nullOnDelete()` (order_items keep
+  a snapshot; cart_items should degrade gracefully, not vanish silently)
+## 15. Seller KYC Fields (updated)
+- `users.date_of_birth` is the single source of truth — never duplicate
+  it into `seller_profiles`. Access it via the `user()` relationship
+  from `SellerProfile`, or directly on `User`.
+- `seller_profiles.national_id` remains seller-only KYC data.
+- Seller registration form may collect `date_of_birth` if the user
+  hasn't set one yet, but must write it back to `users.date_of_birth`
+  — never store a separate copy on `seller_profiles`.
