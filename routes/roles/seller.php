@@ -3,11 +3,7 @@
 use App\Http\Controllers\Seller\SellerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Seller Routes
-|--------------------------------------------------------------------------
-*/
+
 
 Route::middleware(['auth', 'role:customer,seller'])->group(function () {
     Route::post('/seller/register', [SellerRegistrationController::class, 'store'])->name('seller.register.store');
