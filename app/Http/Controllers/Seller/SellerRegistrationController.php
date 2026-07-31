@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\SellerRegistrationRequest;
 use App\Models\SellerProfile;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -30,6 +31,8 @@ class SellerRegistrationController extends Controller
                 'slug' => Str::slug($request->shop_name).'-'.Str::random(5),
                 'address' => $request->address,
                 'description' => $request->description,
+                'date_of_birth' => Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->format('Y-m-d'),
+                'national_id' => $request->national_id,
                 'status' => 'pending',
             ]);
         });
