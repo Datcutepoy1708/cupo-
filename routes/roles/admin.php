@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminSellerController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminCategoryController;
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
@@ -12,4 +13,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/sellers/{sellerProfile}/approve', [AdminSellerController::class, 'approve'])->name('sellers.approve');
     Route::patch('/sellers/{sellerProfile}/reject', [AdminSellerController::class, 'reject'])->name('sellers.reject');
     Route::patch('/sellers/{sellerProfile}/block', [AdminSellerController::class, 'block'])->name('sellers.block');
+
+    Route::apiResource('categories', AdminCategoryController::class);
 });
