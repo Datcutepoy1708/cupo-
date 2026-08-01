@@ -26,6 +26,7 @@ class SellerProfile extends Model
         'bank_account',
         'bank_owner',
         'status',
+        'admin_note',
     ];
 
     protected function casts(): array

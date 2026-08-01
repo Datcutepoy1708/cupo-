@@ -15,18 +15,20 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectUsersTo(fn () => route('home'));
 
-        // Đăng kí alias (bí danh) cho các middleware
+        // Đăng ký alias (bí danh) cho các middleware
         $middleware->alias([
             'role' => EnsureRole::class,
             'seller.approved' => EnsureSellerApproved::class,
         ]);
 
-        // Chỉ bỏ qua kiểm tra CSRF khi đang làm việc ở môi trường DEV (Local)
+        // Bỏ qua kiểm tra CSRF khi đang dev trên môi trường Local để test mượt mà bằng Postman
         if (env('APP_ENV') === 'local') {
             $middleware->validateCsrfTokens(except: [
                 'register',
                 'login',
                 'seller/*',
+                'admin/*',
+                'profile',
             ]);
         }
     })
