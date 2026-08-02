@@ -40,12 +40,22 @@ class EnsureRole
             return redirect()->route('login')->withErrors(['email' => 'Tài khoản của bạn đã bị khóa.']);
         }
 
-        if (! empty($roles) && ! in_array($user->role, $roles, true)) {
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'Unauthorized.'], 403);
+        if (! empty($roles)) {
+            // Tách các role truyền dạng "customer,seller"
+            $allowedRoles = [];
+            foreach ($roles as $role) {
+                foreach (explode(',', $role) as $r) {
+                    $allowedRoles[] = trim($r);
+                }
             }
 
-            abort(403, 'Bạn không có quyền truy cập trang này.');
+            if (! in_array($user->role, $allowedRoles, true)) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Unauthorized.'], 403);
+                }
+
+                abort(403, 'Bạn không có quyền truy cập trang này.');
+            }
         }
 
         return $next($request);

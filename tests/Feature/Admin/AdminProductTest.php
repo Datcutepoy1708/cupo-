@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -22,9 +22,9 @@ class AdminProductTest extends TestCase
         return Product::create([
             'seller_id' => $seller->id,
             'category_id' => $category->id,
-            'name' => 'Sản phẩm test ' . $seller->id,
-            'slug' => 'san-pham-test-' . $seller->id,
-            'sku' => 'SKU-TEST-' . $seller->id,
+            'name' => 'Sản phẩm test '.$seller->id,
+            'slug' => 'san-pham-test-'.$seller->id,
+            'sku' => 'SKU-TEST-'.$seller->id,
             'price' => 100000,
             'stock' => 10,
             'thumbnail' => 'https://via.placeholder.com/300',
@@ -32,8 +32,6 @@ class AdminProductTest extends TestCase
             'status' => $status,
         ]);
     }
-
-
 
     public function test_admin_can_view_products_list(): void
     {

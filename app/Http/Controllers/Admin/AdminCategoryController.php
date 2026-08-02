@@ -42,7 +42,7 @@ class AdminCategoryController extends Controller
             'name.required' => 'Vui lòng nhập tên danh mục.',
             'parent_id.exists' => 'Danh mục cha không tồn tại.',
         ]);
-        $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
+        $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(5);
         $validated['status'] = $validated['status'] ?? true;
 
         $category = Category::create($validated);
@@ -63,6 +63,7 @@ class AdminCategoryController extends Controller
             'data' => $category->load(['parent', 'children']),
         ]);
     }
+
     /**
      * PUT/PATCH /admin/categories/{category}
      * Admin sửa thông tin danh mục
@@ -77,9 +78,10 @@ class AdminCategoryController extends Controller
         ]);
 
         if (isset($validated['name'])) {
-            $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
+            $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(5);
         }
         $category->update($validated);
+
         return response()->json([
             'message' => 'Cập nhật danh mục thành công!',
             'data' => $category->fresh(['parent', 'children']),

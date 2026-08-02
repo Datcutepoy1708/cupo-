@@ -1,9 +1,10 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Http\Requests\Admin\AdminRejectResourceRequest;
+use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -42,7 +43,7 @@ class AdminProductController extends Controller
 
         return response()->json([
             'message' => 'Duyệt sản phẩm thành công! Sản phẩm đã được công khai trên sàn',
-            'data' => $product->fresh(['seller', 'category'])
+            'data' => $product->fresh(['seller', 'category']),
         ]);
     }
 
@@ -55,10 +56,10 @@ class AdminProductController extends Controller
             'status' => 'rejected',
             'admin_note' => $request->validated('admin_note'),
         ]);
+
         return response()->json([
             'message' => 'Đã từ chối/gỡ sản phẩm vi phạm!',
             'data' => $product->fresh(['seller', 'category']),
         ]);
     }
-
 }
