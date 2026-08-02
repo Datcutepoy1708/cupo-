@@ -200,6 +200,8 @@ the business rule changes):
   withdrawal, dispute...) must require and store a reason via
   `admin_note` — never change status to `rejected`/`blocked` silently.
 - Approve actions do not require a reason.
+- The reason must be validated via a dedicated FormRequest, following
+  Section 6's rule — never validated inline in the controller.
 ## 17. Backend-Only Scope — Do Not Touch Frontend
 
 - This assistant's responsibility is **backend only**: migrations,
