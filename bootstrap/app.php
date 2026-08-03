@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'profile',
                 'cart',
                 'cart/*',
+                'checkout'
             ]);
         }
     })

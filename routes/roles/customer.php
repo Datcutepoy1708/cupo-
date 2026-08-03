@@ -3,6 +3,8 @@
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Client\CheckoutController;
+
 
 Route::middleware('auth')->group(function () {
 
@@ -20,5 +22,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/items/{cartItem}', [CartController::class, 'destroy'])->name('destroy');
         Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
     });
+
+    // API Đặt hàng & Checkout Tách Đơn
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
 });
