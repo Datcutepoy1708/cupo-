@@ -8,30 +8,35 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectUsersTo(fn () => route('home'));
+        $middleware->redirectUsersTo(fn() => route('home'));
 
-        // Đăng kí alias (bí danh) cho các middleware
+        // Đăng ký alias (bí danh) cho các middleware
         $middleware->alias([
             'role' => EnsureRole::class,
             'seller.approved' => EnsureSellerApproved::class,
         ]);
 
-        // Chỉ bỏ qua kiểm tra CSRF khi đang làm việc ở môi trường DEV (Local)
+        // Bỏ qua kiểm tra CSRF khi đang dev trên môi trường Local để test mượt mà bằng Postman
         if (env('APP_ENV') === 'local') {
             $middleware->validateCsrfTokens(except: [
                 'register',
                 'login',
                 'seller/*',
+                'admin/*',
+                'profile',
+                'cart',
+                'cart/*',
+                'checkout'
             ]);
         }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn ($request) => $request->is('api/*') || $request->expectsJson()
+            fn($request) => $request->is('api/*') || $request->expectsJson()
         );
     })->create();
