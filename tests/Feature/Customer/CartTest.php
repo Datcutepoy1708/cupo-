@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Customer;
 
-use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\SellerProfile;
@@ -22,8 +20,8 @@ class CartTest extends TestCase
         return Product::create([
             'seller_id' => $seller->id,
             'category_id' => $category->id,
-            'name' => 'Sản phẩm ' . $sku,
-            'slug' => 'san-pham-' . strtolower($sku),
+            'name' => 'Sản phẩm '.$sku,
+            'slug' => 'san-pham-'.strtolower($sku),
             'sku' => $sku,
             'price' => 100000,
             'stock' => $stock,
@@ -118,5 +116,4 @@ class CartTest extends TestCase
             ->assertJsonPath('status', 'success')
             ->assertJsonCount(2, 'data.shops'); // Tự động gom nhóm thành 2 Shop độc lập
     }
-
 }

@@ -23,7 +23,7 @@ class CartController extends Controller
             ->where('user_id', $request->user()->id)
             ->first();
 
-        if (!$cart || $cart->items->isEmpty()) {
+        if (! $cart || $cart->items->isEmpty()) {
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -86,7 +86,7 @@ class CartController extends Controller
             : $product->stock;
 
         if ($availableStock < $validated['quantity']) {
-            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: ' . $availableStock . ').'], 400);
+            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: '.$availableStock.').'], 400);
         }
 
         // 3. Tìm hoặc tạo giỏ hàng cho User
@@ -133,7 +133,7 @@ class CartController extends Controller
         $availableStock = $cartItem->variant ? $cartItem->variant->stock : $cartItem->product->stock;
 
         if ($availableStock < $validated['quantity']) {
-            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: ' . $availableStock . ').'], 400);
+            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: '.$availableStock.').'], 400);
         }
 
         $cartItem->update(['quantity' => $validated['quantity']]);

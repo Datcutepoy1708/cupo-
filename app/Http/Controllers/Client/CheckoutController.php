@@ -30,7 +30,7 @@ class CheckoutController extends Controller
                     ->where('user_id', $user->id)
                     ->first();
 
-                if (!$cart || $cart->items->isEmpty()) {
+                if (! $cart || $cart->items->isEmpty()) {
                     throw new \Exception('Giỏ hàng của bạn đang trống, không thể đặt hàng.');
                 }
 
@@ -49,7 +49,7 @@ class CheckoutController extends Controller
                 // 3. Tạo Đơn hàng Tổng (Master Order)
                 $order = Order::create([
                     'user_id' => $user->id,
-                    'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+                    'order_number' => 'ORD-'.strtoupper(Str::random(10)),
                     'shipping_name' => $validated['recipient_name'],
                     'shipping_phone' => $validated['phone'],
                     'shipping_address' => $validated['shipping_address'],
@@ -63,7 +63,7 @@ class CheckoutController extends Controller
                 ]);
 
                 // 4.  TỰ ĐỘNG TÁCH ĐƠN THEO TỪNG SHOP (Shopee-Style Order Splitting)
-                $groupedItems = $cart->items->groupBy(fn($item) => $item->product->seller_id);
+                $groupedItems = $cart->items->groupBy(fn ($item) => $item->product->seller_id);
                 $masterTotalAmount = 0;
 
                 foreach ($groupedItems as $sellerId => $sellerItems) {
