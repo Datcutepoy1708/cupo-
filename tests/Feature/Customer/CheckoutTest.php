@@ -20,8 +20,8 @@ class CheckoutTest extends TestCase
         return Product::create([
             'seller_id' => $seller->id,
             'category_id' => $category->id,
-            'name' => 'Sản phẩm ' . $sku,
-            'slug' => 'san-pham-' . strtolower($sku),
+            'name' => 'Sản phẩm '.$sku,
+            'slug' => 'san-pham-'.strtolower($sku),
             'sku' => $sku,
             'price' => 100000,
             'stock' => $stock,

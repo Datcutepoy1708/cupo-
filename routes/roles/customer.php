@@ -1,10 +1,9 @@
 <?php
 
 use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Client\CheckoutController;
-
 
 Route::middleware('auth')->group(function () {
 
