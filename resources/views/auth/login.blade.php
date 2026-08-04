@@ -54,7 +54,7 @@
                             @endif
                         </div>
                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
-                            name="password" required autocomplete="current-password" placeholder="••••••••">
+                            name="password" required autocomplete="current-password" placeholder="Tối thiểu 8 ký tự">
                         @error('password')
                             <div class="invalid-feedback">
                                 {{ $message }}

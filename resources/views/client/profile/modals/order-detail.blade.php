@@ -10,7 +10,7 @@
                 <div class="mb-4">
                     <h6><i class="fa-solid fa-box me-2"></i>Sản phẩm trong đơn</h6>
                     <div class="table-responsive">
-                        <table class="table table-sm">
+                        <table class="table table-sm align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th>Sản phẩm</th>
@@ -21,19 +21,40 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Tai nghe Bluetooth XZ200</td>
+                                    <td>
+                                        <div class="modal-product-cell">
+                                            <img src="https://picsum.photos/id/1/200"
+                                                onerror="this.src='https://via.placeholder.com/48'"
+                                                alt="Tai nghe Bluetooth XZ200" class="modal-product-thumb">
+                                            <span>Tai nghe Bluetooth XZ200</span>
+                                        </div>
+                                    </td>
                                     <td class="text-center">1</td>
                                     <td class="text-end">590.000₫</td>
                                     <td class="text-end">590.000₫</td>
                                 </tr>
                                 <tr>
-                                    <td>Ốp lưng chống sốc</td>
+                                    <td>
+                                        <div class="modal-product-cell">
+                                            <img src="https://picsum.photos/id/2/200"
+                                                onerror="this.src='https://via.placeholder.com/48'"
+                                                alt="Ốp lưng chống sốc" class="modal-product-thumb">
+                                            <span>Ốp lưng chống sốc</span>
+                                        </div>
+                                    </td>
                                     <td class="text-center">2</td>
                                     <td class="text-end">120.000₫</td>
                                     <td class="text-end">240.000₫</td>
                                 </tr>
                                 <tr>
-                                    <td>Cáp sạc nhanh Type-C</td>
+                                    <td>
+                                        <div class="modal-product-cell">
+                                            <img src="https://picsum.photos/id/3/200"
+                                                onerror="this.src='https://via.placeholder.com/48'"
+                                                alt="Cáp sạc nhanh Type-C" class="modal-product-thumb">
+                                            <span>Cáp sạc nhanh Type-C</span>
+                                        </div>
+                                    </td>
                                     <td class="text-center">2</td>
                                     <td class="text-end">210.000₫</td>
                                     <td class="text-end">420.000₫</td>

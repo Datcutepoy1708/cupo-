@@ -45,7 +45,7 @@
                     <div class="mb-3">
                         <label for="password" class="form-label">Mật khẩu</label>
                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
-                            name="password" required autocomplete="new-password" placeholder="••••••••">
+                            name="password" required autocomplete="new-password" placeholder="Tối thiểu 8 ký tự">
                         @error('password')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -58,7 +58,8 @@
                         <label for="password_confirmation" class="form-label">Xác nhận mật khẩu</label>
                         <input id="password_confirmation" type="password"
                             class="form-control @error('password_confirmation') is-invalid @enderror"
-                            name="password_confirmation" required autocomplete="new-password" placeholder="••••••••">
+                            name="password_confirmation" required autocomplete="new-password"
+                            placeholder="Tối thiểu 8 ký tự">
                         @error('password_confirmation')
                             <div class="invalid-feedback">
                                 {{ $message }}

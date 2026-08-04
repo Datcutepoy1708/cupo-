@@ -5,7 +5,8 @@
         <div class="seller-intro text-center mb-4">
             <i class="fa-solid fa-shop seller-intro-icon"></i>
             <h2 class="content-title border-0 mb-2" style="display:block;">Trở thành người bán trên Cupo</h2>
-            <p class="text-muted mb-0">Mở gian hàng miễn phí, tiếp cận hàng triệu khách hàng và bắt đầu kinh doanh ngay hôm nay.</p>
+            <p class="text-muted mb-0">Mở gian hàng miễn phí, tiếp cận hàng triệu khách hàng và bắt đầu kinh doanh ngay
+                hôm nay.</p>
         </div>
 
         <div class="row g-3 mb-4">
@@ -13,7 +14,8 @@
                 <div class="seller-benefit">
                     <i class="fa-solid fa-sack-dollar"></i>
                     <h6>Miễn phí đăng ký</h6>
-                    <p class="small text-muted mb-0">Không tốn phí mở gian hàng, chỉ thu phí trên mỗi đơn thành công.</p>
+                    <p class="small text-muted mb-0">Không tốn phí mở gian hàng, chỉ thu phí trên mỗi đơn thành công.
+                    </p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -58,13 +60,13 @@
                     <label class="form-label">Loại hình kinh doanh <span class="text-danger">*</span></label>
                     <div class="d-flex gap-4 mt-2">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="business_type" id="typePersonal" value="personal"
-                                {{ old('business_type', 'personal') === 'personal' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="business_type" id="typePersonal"
+                                value="personal" {{ old('business_type', 'personal') === 'personal' ? 'checked' : '' }}>
                             <label class="form-check-label" for="typePersonal">Cá nhân</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="business_type" id="typeCompany" value="company"
-                                {{ old('business_type') === 'company' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="business_type" id="typeCompany"
+                                value="company" {{ old('business_type') === 'company' ? 'checked' : '' }}>
                             <label class="form-check-label" for="typeCompany">Doanh nghiệp</label>
                         </div>
                     </div>
@@ -74,19 +76,24 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="phone" value="{{ old('phone', Auth::user()->phone) }}" placeholder="0987654321" required>
+                    <input type="tel" class="form-control" name="phone"
+                        value="{{ old('phone', Auth::user()->phone) }}" placeholder="0987654321" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Ngày sinh (dd/mm/yyyy) <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="date_of_birth" value="{{ old('date_of_birth', Auth::user()->date_of_birth?->format('d/m/Y')) }}" placeholder="VD: 15/08/2000" required>
+                    <input type="date" class="form-control" name="date_of_birth"
+                        value="{{ old('date_of_birth', Auth::user()->date_of_birth?->format('d/m/Y')) }}"
+                        placeholder="VD: 15/08/2000" required>
                     <small class="text-muted">Người bán phải từ đủ 18 tuổi trở lên.</small>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}" placeholder="Nhập đúng 12 chữ số CCCD/MST" required>
+                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span
+                            class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}"
+                        placeholder="Nhập đúng 12 chữ số CCCD/MST" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Địa chỉ gian hàng <span class="text-danger">*</span></label>
@@ -105,7 +112,8 @@
             <div class="form-check mb-4">
                 <input class="form-check-input" type="checkbox" id="agreeTerms" required checked>
                 <label class="form-check-label small" for="agreeTerms">
-                    Tôi đã đọc và đồng ý với <a href="#" style="color: var(--primary-red);">Điều khoản người bán</a> của Cupo
+                    Tôi đã đọc và đồng ý với <a href="#" style="color: var(--primary-red);">Điều khoản người
+                        bán</a> của Cupo
                 </label>
             </div>
 

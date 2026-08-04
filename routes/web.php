@@ -2,19 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
 // Storefront Public Routes
 Route::get('/', function () {
-    return view('client.home');
+    return view('client.home.index');
 })->name('home');
 
 Route::get('/home', function () {
-    return view('client.home');
+    return view('client.home.index');
 });
 
 Route::get('/promotions', function () {

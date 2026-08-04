@@ -367,7 +367,19 @@ body {
     border-top: 1px solid #e9ecef;
     padding: 1rem 2rem;
 }
-
+.modal-product-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.modal-product-thumb {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
 /* ===== Sổ địa chỉ ===== */
 .address-row {
     border: 1px solid var(--border-color);
@@ -481,16 +493,68 @@ body {
     font-weight: 600;
     color: var(--text-dark);
 }
-.order-row-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
 .order-row-actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
     margin-top: 1rem;
+}
+
+/* ===== Order items (nhiều sản phẩm trong 1 đơn) ===== */
+.order-items {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-item-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+.order-item-row:last-child {
+    border-bottom: none;
+}
+
+.order-thumb {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.order-info {
+    flex: 1;
+    min-width: 0; /* để text-overflow hoạt động đúng khi tên sản phẩm dài */
+}
+.order-info p.mb-1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.order-item-price {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    min-width: 90px;
+    text-align: right;
+}
+
+/* Footer: ngày đặt + tổng tiền cả đơn */
+.order-row-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+.order-total-label {
+    font-size: 0.95rem;
 }
 
 /* Empty state cho từng tab trạng thái */
