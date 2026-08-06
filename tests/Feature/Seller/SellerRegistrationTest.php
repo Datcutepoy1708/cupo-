@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Seller;
 
 use App\Models\SellerProfile;
 use App\Models\User;
