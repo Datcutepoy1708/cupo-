@@ -112,8 +112,11 @@ class CartController extends Controller
             ]);
         }
 
+        $totalItems = $cart->items()->sum('quantity');
+
         return response()->json([
             'message' => 'Thêm sản phẩm vào giỏ hàng thành công!',
+            'total_items' => $totalItems,
         ]);
     }
 
@@ -136,9 +139,11 @@ class CartController extends Controller
         }
 
         $cartItem->update(['quantity' => $validated['quantity']]);
+        $totalItems = $cartItem->cart->items()->sum('quantity');
 
         return response()->json([
             'message' => 'Cập nhật số lượng thành công!',
+            'total_items' => $totalItems,
             'data' => $cartItem->fresh(['product', 'variant']),
         ]);
     }
@@ -153,10 +158,13 @@ class CartController extends Controller
             return response()->json(['message' => 'Bạn không có quyền xóa mục giỏ hàng này.'], 403);
         }
 
+        $cart = $cartItem->cart;
         $cartItem->delete();
+        $totalItems = $cart->items()->sum('quantity');
 
         return response()->json([
             'message' => 'Đã xóa sản phẩm khỏi giỏ hàng!',
+            'total_items' => $totalItems,
         ]);
     }
 
@@ -173,6 +181,7 @@ class CartController extends Controller
 
         return response()->json([
             'message' => 'Đã làm sạch giỏ hàng!',
+            'total_items' => 0,
         ]);
     }
 }

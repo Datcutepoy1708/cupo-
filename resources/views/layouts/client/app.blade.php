@@ -65,6 +65,9 @@
         <script src="{{ asset('client/js/profile.js') }}"></script>
     @endif
 
+    {{-- embed cart js --}}
+    <script src="{{ asset('client/js/cart.js') }}"></script>
+
     @stack('scripts')
 </body>
 
