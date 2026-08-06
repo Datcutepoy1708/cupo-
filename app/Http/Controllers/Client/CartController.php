@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\CartStoreRequest;
 use App\Http\Requests\Client\CartUpdateRequest;
@@ -17,52 +18,47 @@ class CartController extends Controller
      * GET /cart
      * Lấy danh sách sản phẩm trong giỏ hàng (Gom nhóm theo Shop/Seller)
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse|View
     {
         $cart = Cart::with(['items.product.seller.sellerProfile', 'items.product.category', 'items.variant'])
             ->where('user_id', $request->user()->id)
             ->first();
-
-        if (! $cart || $cart->items->isEmpty()) {
+        $groupedShops = collect();
+        $totalPrice = 0;
+        $totalItems = 0;
+        if ($cart && $cart->items->isNotEmpty()) {
+            // Gom nhóm sản phẩm theo seller_id (Tách đơn hàng theo Shop)
+            $groupedShops = $cart->items->groupBy(function ($item) {
+                return $item->product->seller_id;
+            })->map(function ($items) {
+                $firstProduct = $items->first()->product;
+                $seller = $firstProduct->seller;
+                return [
+                    'seller_id' => $seller->id,
+                    'shop_name' => $seller->sellerProfile->shop_name ?? $seller->name,
+                    'items' => $items->values(),
+                ];
+            })->values();
+            $totalPrice = $cart->items->sum(function ($item) {
+                $price = $item->variant ? $item->variant->price : $item->product->price;
+                return $price * $item->quantity;
+            });
+            $totalItems = $cart->items->sum('quantity');
+        }
+        // Nếu request yêu cầu JSON (API/Postman/AJAX) -> Trả về JSON
+        if ($request->wantsJson()) {
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'shops' => [],
-                    'total_items' => 0,
-                    'total_price' => 0,
+                    'cart_id' => $cart->id ?? null,
+                    'shops' => $groupedShops,
+                    'total_items' => $totalItems,
+                    'total_price' => $totalPrice,
                 ],
             ]);
         }
-
-        // Gom nhóm sản phẩm theo seller_id (Phục vụ Tách Đơn Hàng Shopee-style)
-        $groupedShops = $cart->items->groupBy(function ($item) {
-            return $item->product->seller_id;
-        })->map(function ($items) {
-            $firstProduct = $items->first()->product;
-            $seller = $firstProduct->seller;
-
-            return [
-                'seller_id' => $seller->id,
-                'shop_name' => $seller->sellerProfile->shop_name ?? $seller->name,
-                'items' => $items->values(),
-            ];
-        })->values();
-
-        $totalPrice = $cart->items->sum(function ($item) {
-            $price = $item->variant ? $item->variant->price : $item->product->price;
-
-            return $price * $item->quantity;
-        });
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'cart_id' => $cart->id,
-                'shops' => $groupedShops,
-                'total_items' => $cart->items->sum('quantity'),
-                'total_price' => $totalPrice,
-            ],
-        ]);
+        // Yêu cầu từ trình duyệt web -> Trả về Blade View HTML
+        return view('client.cart.index', compact('groupedShops', 'totalPrice', 'totalItems'));
     }
 
     /**
@@ -86,7 +82,7 @@ class CartController extends Controller
             : $product->stock;
 
         if ($availableStock < $validated['quantity']) {
-            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: '.$availableStock.').'], 400);
+            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: ' . $availableStock . ').'], 400);
         }
 
         // 3. Tìm hoặc tạo giỏ hàng cho User
@@ -133,7 +129,7 @@ class CartController extends Controller
         $availableStock = $cartItem->variant ? $cartItem->variant->stock : $cartItem->product->stock;
 
         if ($availableStock < $validated['quantity']) {
-            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: '.$availableStock.').'], 400);
+            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: ' . $availableStock . ').'], 400);
         }
 
         $cartItem->update(['quantity' => $validated['quantity']]);
