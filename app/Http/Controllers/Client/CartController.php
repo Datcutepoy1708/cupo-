@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Client;
 
-use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\CartStoreRequest;
 use App\Http\Requests\Client\CartUpdateRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -33,6 +33,7 @@ class CartController extends Controller
             })->map(function ($items) {
                 $firstProduct = $items->first()->product;
                 $seller = $firstProduct->seller;
+
                 return [
                     'seller_id' => $seller->id,
                     'shop_name' => $seller->sellerProfile->shop_name ?? $seller->name,
@@ -41,6 +42,7 @@ class CartController extends Controller
             })->values();
             $totalPrice = $cart->items->sum(function ($item) {
                 $price = $item->variant ? $item->variant->price : $item->product->price;
+
                 return $price * $item->quantity;
             });
             $totalItems = $cart->items->sum('quantity');
@@ -57,6 +59,7 @@ class CartController extends Controller
                 ],
             ]);
         }
+
         // Yêu cầu từ trình duyệt web -> Trả về Blade View HTML
         return view('client.cart.index', compact('groupedShops', 'totalPrice', 'totalItems'));
     }
@@ -82,7 +85,7 @@ class CartController extends Controller
             : $product->stock;
 
         if ($availableStock < $validated['quantity']) {
-            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: ' . $availableStock . ').'], 400);
+            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: '.$availableStock.').'], 400);
         }
 
         // 3. Tìm hoặc tạo giỏ hàng cho User
@@ -129,7 +132,7 @@ class CartController extends Controller
         $availableStock = $cartItem->variant ? $cartItem->variant->stock : $cartItem->product->stock;
 
         if ($availableStock < $validated['quantity']) {
-            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: ' . $availableStock . ').'], 400);
+            return response()->json(['message' => 'Số lượng tồn kho không đủ (Còn lại: '.$availableStock.').'], 400);
         }
 
         $cartItem->update(['quantity' => $validated['quantity']]);
