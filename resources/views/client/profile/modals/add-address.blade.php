@@ -38,7 +38,7 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <label class="form-label">Địa chỉ cụ thể <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="detail_address" placeholder="Số nhà, tên đường...">
+                <input type="text" class="form-control" name="address_detail" placeholder="Số nhà, tên đường...">
             </div>
         </div>
 

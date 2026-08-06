@@ -76,13 +76,13 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="phone"
-                        value="{{ old('phone', Auth::user()->phone) }}" placeholder="0987654321" required>
+                    <input type="tel" class="form-control" name="phone" value="{{ old('phone', Auth::user()->phone) }}"
+                        placeholder="0987654321" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Ngày sinh (dd/mm/yyyy) <span class="text-danger">*</span></label>
                     <input type="date" class="form-control" name="date_of_birth"
-                        value="{{ old('date_of_birth', Auth::user()->date_of_birth?->format('d/m/Y')) }}"
+                        value="{{ old('date_of_birth', Auth::user()->date_of_birth?->format('Y-m-d')) }}"
                         placeholder="VD: 15/08/2000" required>
                     <small class="text-muted">Người bán phải từ đủ 18 tuổi trở lên.</small>
                 </div>
@@ -105,7 +105,8 @@
             <div class="row mb-4">
                 <div class="col-md-12">
                     <label class="form-label">Mô tả gian hàng</label>
-                    <textarea class="form-control" name="description" rows="3" placeholder="Mô tả ngắn gọn về cửa hàng của bạn">{{ old('description') }}</textarea>
+                    <textarea class="form-control" name="description" rows="3"
+                        placeholder="Mô tả ngắn gọn về cửa hàng của bạn">{{ old('description') }}</textarea>
                 </div>
             </div>
 

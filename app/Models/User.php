@@ -70,4 +70,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Dispute::class, 'buyer_id');
     }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function getCartCountAttribute(): int
+    {
+        return $this->cart?->items()->sum('quantity') ?? 0;
+    }
 }
