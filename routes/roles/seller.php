@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerProductController;
 use App\Http\Controllers\Seller\SellerRegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -27,5 +28,10 @@ Route::prefix('seller')->group(function () {
         Route::apiResource('products', SellerProductController::class);
 
     });
+
+    // API Seller Quản lý Đơn hàng
+    Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{sellerOrder}', [SellerOrderController::class, 'show'])->name('orders.show');
+    Route::patch('/orders/{sellerOrder}/status', [SellerOrderController::class, 'updateStatus'])->name('orders.update-status');
 
 });
