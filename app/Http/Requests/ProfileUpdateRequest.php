@@ -28,6 +28,8 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'phone' => ['nullable', 'string', 'max:20'],
             'date_of_birth' => ['nullable', 'date'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
         ];
+
     }
 }

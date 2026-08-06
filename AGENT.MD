@@ -229,3 +229,16 @@ the business rule changes):
   is handled separately — here's the Postman spec to test the
   endpoint." Do not silently comply and do not silently refuse either
   — say what you're doing and why.
+## 18. No Icons/Emoji in Written Output
+
+- Never use emoji or decorative icons (✅, 🎯, 📋, ⭐, 🚀, etc.) in any
+  generated text: code comments, commit messages, PR descriptions,
+  README content, markdown reports, or chat responses.
+- This applies to headings, bullet points, status indicators, and
+  section markers alike — use plain text labels instead
+  (e.g. "Done" / "Pending" / "High priority" rather than ✅ / ⏳ / 🔴).
+- Tables and checklists should use plain Markdown syntax (`- [ ]`,
+  `- [x]`) without emoji decoration.
+- This rule is about written/generated text only — it does not apply
+  to actual product UI icons (Font Awesome, SVG icons in Blade views),
+  which remain a frontend design decision, not a content rule.

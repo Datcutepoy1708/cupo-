@@ -1,65 +1,43 @@
 <x-modal name="addAddressModal" title="Thêm địa chỉ mới">
-    <form id="addAddressForm" method="post" action="#">
+    <form id="addAddressForm" method="post" action="{{ route('addresses.store') }}">
+        @csrf
         <div class="row mb-3">
             <div class="col-md-6">
-                <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="name" placeholder="Nhập họ và tên người nhận">
+                <label class="form-label">Họ và tên người nhận <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="recipient_name" placeholder="Nhập họ và tên người nhận"
+                    required>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                <input type="tel" class="form-control" name="phone" placeholder="Nhập số điện thoại">
+                <input type="tel" class="form-control" name="recipient_phone" placeholder="Nhập số điện thoại" required>
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-4">
                 <label class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
-                <select class="form-select" name="province">
-                    <option value="">Chọn Tỉnh/Thành</option>
-                    <option>TP. Hồ Chí Minh</option>
-                    <option>Hà Nội</option>
-                    <option>Đà Nẵng</option>
-                </select>
+                <input type="text" class="form-control" name="province" placeholder="Tỉnh/Thành phố" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label">Quận/Huyện <span class="text-danger">*</span></label>
-                <select class="form-select" name="district">
-                    <option value="">Chọn Quận/Huyện</option>
-                </select>
+                <input type="text" class="form-control" name="district" placeholder="Quận/Huyện" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label">Phường/Xã <span class="text-danger">*</span></label>
-                <select class="form-select" name="ward">
-                    <option value="">Chọn Phường/Xã</option>
-                </select>
+                <input type="text" class="form-control" name="ward" placeholder="Phường/Xã" required>
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-12">
                 <label class="form-label">Địa chỉ cụ thể <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="address_detail" placeholder="Số nhà, tên đường...">
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <label class="form-label">Loại địa chỉ</label>
-                <div class="d-flex gap-4 mt-1">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="address_type" id="addrTypeHome" checked>
-                        <label class="form-check-label" for="addrTypeHome">Nhà riêng</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="address_type" id="addrTypeOffice">
-                        <label class="form-check-label" for="addrTypeOffice">Văn phòng</label>
-                    </div>
-                </div>
+                <input type="text" class="form-control" name="address_detail" placeholder="Số nhà, tên đường..."
+                    required>
             </div>
         </div>
 
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="setDefaultAddress" name="is_default">
+            <input class="form-check-input" type="checkbox" id="setDefaultAddress" name="is_default" value="1">
             <label class="form-check-label" for="setDefaultAddress">Đặt làm địa chỉ mặc định</label>
         </div>
     </form>

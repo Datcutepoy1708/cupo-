@@ -1,7 +1,10 @@
 {{-- ===== SIDEBAR ===== --}}
 <div class="col-md-3 col-lg-2 px-0 sidebar">
     <div class="profile-section">
-        <img src="{{ asset('https://picsum.photos/1600/700') }}" alt="Avatar" class="profile-img" id="sidebar-avatar">
+        <img src="{{ auth()->user()->avatar_url }}"
+             alt="Ảnh đại diện của {{ auth()->user()->name }}"
+             class="profile-img"
+             id="sidebar-avatar">
         <div class="profile-name" id="username-display">{{ auth()->user()->name }}</div>
     </div>
 

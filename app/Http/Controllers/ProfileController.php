@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -28,13 +29,27 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Fill các field thông thường, bỏ qua avatar (xử lý riêng)
+        $user->fill($request->safe()->except('avatar'));
+
+        // Xử lý upload avatar nếu có file được gửi lên
+        if ($request->hasFile('avatar')) {
+            // Xóa ảnh cũ trong storage để tránh tích lũy file rác
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            // Lưu ảnh mới: storage/app/public/avatars/{user_id}/{filename}
+            $user->avatar = $request->file('avatar')
+                ->store('avatars/'.$user->id, 'public');
         }
 
-        $request->user()->save();
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.show')
             ->with('status', 'profile-updated')
