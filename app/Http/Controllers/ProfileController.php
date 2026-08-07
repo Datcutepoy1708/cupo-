@@ -26,7 +26,7 @@ class ProfileController extends Controller
 
         return view('client.profile.index', [
             'user' => $request->user(),
-            'orders' => $orders
+            'orders' => $orders,
         ]);
     }
 
@@ -48,7 +48,7 @@ class ProfileController extends Controller
             }
             // Lưu ảnh mới: storage/app/public/avatars/{user_id}/{filename}
             $user->avatar = $request->file('avatar')
-                ->store('avatars/' . $user->id, 'public');
+                ->store('avatars/'.$user->id, 'public');
         }
 
         if ($user->isDirty('email')) {
