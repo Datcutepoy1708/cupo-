@@ -242,3 +242,38 @@ the business rule changes):
 - This rule is about written/generated text only — it does not apply
   to actual product UI icons (Font Awesome, SVG icons in Blade views),
   which remain a frontend design decision, not a content rule.
+
+
+## 19. Admin Route Security
+- The `role:admin` middleware is the actual access control — never
+  rely on URL obscurity as the primary protection.
+- Admin route prefix is configurable via `ADMIN_PATH` in `.env`
+  (default `admin`), read via `config('app.admin_path')` — this is a
+  supplementary measure to reduce automated bot noise, not a security
+  boundary by itself.
+- Login routes (especially admin) must have `throttle` middleware
+  applied to mitigate brute-force attempts.
+## Component Reuse Rules
+
+- **Rule of 2**: if the same markup block (structure + styling) appears
+  or is about to appear in 2 or more places, extract it into a
+  `components/` Blade component immediately — do not wait for a third
+  occurrence.
+- Before writing new markup for status labels, buttons, cards, badges,
+  or form inputs, check `resources/views/components/` first. If an
+  existing component covers 80%+ of the need, extend it with a new
+  prop rather than writing new raw HTML.
+- Known reusable components (do not recreate these):
+  - `<x-status-badge :status="$status" type="order|product|seller" />`
+    — maps a status string to the correct color/label, shared across
+    Admin, Seller, and Customer views.
+  - `<x-button>`, `<x-input>`, `<x-modal>` — base form/UI primitives.
+  - `<x-pagination :items="$items" />` — wraps Laravel's paginator UI
+    consistently across all list pages (products, orders, sellers).
+- A component belongs in `components/` only if it is presentational
+  and role-agnostic. If a piece of markup is tied to one specific
+  role's layout (e.g. the admin sidebar), it stays in
+  `layouts/{role}/`, not `components/`.
+- When creating a new component, document its expected props as PHP
+  doc comments at the top of the file, so its contract is discoverable
+  without reading the whole implementation.
