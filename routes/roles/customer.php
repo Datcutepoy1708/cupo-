@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
 
     // API Đặt hàng & Checkout Tách Đơn
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::put('/reviews/{review}', [ProductReviewController::class, 'update'])->name('products.reviews.update');
+    Route::delete('/reviews/{review}', [ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
 
     // API Lịch sử Đơn hàng cá nhân
     Route::get('/customer/orders', [CustomerOrderController::class, 'index'])->name('customer.orders.index');
@@ -37,10 +39,13 @@ Route::middleware('auth')->group(function () {
 
     // API Đánh giá Sản phẩm
     Route::post('/products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
+    Route::put('/reviews/{review}', [ProductReviewController::class, 'update'])->name('products.reviews.update');
+    Route::delete('/reviews/{review}', [ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
 
     // Quản lý Sổ địa chỉ
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
+
 });

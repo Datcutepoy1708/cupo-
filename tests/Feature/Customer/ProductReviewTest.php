@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\SellerOrder;
 use App\Models\SellerProfile;
 use App\Models\User;
@@ -110,5 +111,77 @@ class ProductReviewTest extends TestCase
             'user_id' => $customer->id,
             'rating' => 5,
         ]);
+    }
+
+    private function createPurchasedReview(User $customer): array
+    {
+        [$seller, $product] = $this->createProductWithSeller();
+
+        $masterOrder = Order::create([
+            'user_id' => $customer->id,
+            'order_number' => 'ORD-REV-'.rand(1000, 9999),
+            'shipping_name' => 'Khách Hàng',
+            'shipping_phone' => '0987654321',
+            'shipping_address' => 'Hà Nội',
+            'payment_method' => 'cod',
+            'total_item_amount' => 150000,
+            'grand_total' => 150000,
+        ]);
+
+        $review = Review::create([
+            'product_id' => $product->id,
+            'user_id' => $customer->id,
+            'order_id' => $masterOrder->id,
+            'rating' => 3,
+            'comment' => 'Đánh giá ban đầu',
+            'status' => 'approved',
+        ]);
+
+        return [$product, $review];
+    }
+
+    public function test_customer_can_update_their_own_review(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer']);
+        [$product, $review] = $this->createPurchasedReview($customer);
+
+        $response = $this->actingAs($customer)->putJson("/reviews/{$review->id}", [
+            'rating' => 5,
+            'comment' => 'Sản phẩm tuyệt vời sau khi dùng thử!',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('message', 'Cập nhật đánh giá sản phẩm thành công!');
+
+        $this->assertDatabaseHas('reviews', [
+            'id' => $review->id,
+            'rating' => 5,
+            'comment' => 'Sản phẩm tuyệt vời sau khi dùng thử!',
+        ]);
+    }
+
+    public function test_customer_cannot_update_another_customer_review(): void
+    {
+        $customer1 = User::factory()->create(['role' => 'customer']);
+        $customer2 = User::factory()->create(['role' => 'customer']);
+        [$product, $review] = $this->createPurchasedReview($customer1);
+
+        $response = $this->actingAs($customer2)->putJson("/reviews/{$review->id}", [
+            'rating' => 1,
+            'comment' => 'Cố tình sửa bài người khác',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_customer_can_delete_their_own_review(): void
+    {
+        $customer = User::factory()->create(['role' => 'customer']);
+        [$product, $review] = $this->createPurchasedReview($customer);
+
+        $response = $this->actingAs($customer)->deleteJson("/reviews/{$review->id}");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
     }
 }

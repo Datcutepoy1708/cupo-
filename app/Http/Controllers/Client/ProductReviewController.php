@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductReviewController extends Controller
 {
@@ -74,5 +75,48 @@ class ProductReviewController extends Controller
             'message' => 'Đánh giá sản phẩm thành công! Cảm ơn nhận xét của bạn.',
             'data' => $review->load('user:id,name'),
         ], 201);
+    }
+
+    /**
+     * PUT /reviews/{review}
+     * Khách hàng cập nhật đánh giá sản phẩm của chính mình
+     */
+    public function update(StoreProductReviewRequest $request, Review $review): JsonResponse
+    {
+        // Chặn nếu cố tình sửa đánh giá của người khác
+        if ($review->user_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Bạn không có quyền chỉnh sửa đánh giá này.',
+            ], 403);
+        }
+        $validated = $request->validated();
+        $review->update([
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
+        ]);
+
+        return response()->json([
+            'message' => 'Cập nhật đánh giá sản phẩm thành công!',
+            'data' => $review->fresh('user:id,name'),
+        ]);
+    }
+
+    /**
+     * DELETE /reviews/{review}
+     * Khách hàng xóa đánh giá sản phẩm của chính mình
+     */
+    public function destroy(Request $request, Review $review): JsonResponse
+    {
+        // Chặn nếu cố tình xóa đánh giá của người khác
+        if ($review->user_id !== $request->user()->id) {
+            return response()->json([
+                'message' => 'Bạn không có quyền xóa đánh giá này.',
+            ], 403);
+        }
+        $review->delete();
+
+        return response()->json([
+            'message' => 'Đã xóa đánh giá sản phẩm thành công!',
+        ]);
     }
 }
