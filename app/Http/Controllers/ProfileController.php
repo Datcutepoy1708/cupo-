@@ -19,8 +19,14 @@ class ProfileController extends Controller
      */
     public function show(Request $request): View
     {
+        $orders = $request->user()->orders()
+            ->with(['sellerOrders.items.product', 'sellerOrders.seller.sellerProfile'])
+            ->latest()
+            ->get();
+
         return view('client.profile.index', [
             'user' => $request->user(),
+            'orders' => $orders
         ]);
     }
 
@@ -42,7 +48,7 @@ class ProfileController extends Controller
             }
             // Lưu ảnh mới: storage/app/public/avatars/{user_id}/{filename}
             $user->avatar = $request->file('avatar')
-                ->store('avatars/'.$user->id, 'public');
+                ->store('avatars/' . $user->id, 'public');
         }
 
         if ($user->isDirty('email')) {

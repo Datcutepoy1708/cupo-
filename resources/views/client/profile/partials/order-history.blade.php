@@ -1,142 +1,33 @@
-<div class="tab-pane fade" id="historyOrder" role="tabpanel">
+<div class="tab-pane fade {{ $activeTab === 'historyOrder' ? 'show active' : '' }}" id="historyOrder" role="tabpanel">
     <div class="content-card">
         <h2 class="content-title">Đơn hàng của tôi</h2>
 
         @php
-            $demoOrders = [
-                [
-                    'id' => 'DH0231',
-                    'date' => '28/07/2026',
-                    'total' => '1.250.000',
-                    'status' => 'confirmed',
-                    'items' => [
-                        [
-                            'name' => 'Tai nghe Bluetooth XZ200',
-                            'image' => 'https://picsum.photos/id/1/200',
-                            'qty' => 1,
-                            'price' => '750.000',
-                        ],
-                        [
-                            'name' => 'Ốp lưng chống sốc',
-                            'image' => 'https://picsum.photos/id/2/200',
-                            'qty' => 2,
-                            'price' => '150.000',
-                        ],
-                        [
-                            'name' => 'Cáp sạc nhanh Type-C',
-                            'image' => 'https://picsum.photos/id/3/200',
-                            'qty' => 1,
-                            'price' => '200.000',
-                        ],
-                    ],
-                ],
-                [
-                    'id' => 'DH0228',
-                    'date' => '25/07/2026',
-                    'total' => '1.590.000',
-                    'status' => 'unpaid',
-                    'items' => [
-                        [
-                            'name' => 'Đồng hồ thông minh Fit3',
-                            'image' => 'https://picsum.photos/id/4/200',
-                            'qty' => 1,
-                            'price' => '1.590.000',
-                        ],
-                    ],
-                ],
-                [
-                    'id' => 'DH0225',
-                    'date' => '20/07/2026',
-                    'total' => '259.000',
-                    'status' => 'completed',
-                    'items' => [
-                        [
-                            'name' => 'Áo thun nam form rộng',
-                            'image' => 'https://picsum.photos/id/5/200',
-                            'qty' => 1,
-                            'price' => '259.000',
-                        ],
-                    ],
-                ],
-                [
-                    'id' => 'DH0219',
-                    'date' => '10/07/2026',
-                    'total' => '890.000',
-                    'status' => 'processing',
-                    'items' => [
-                        [
-                            'name' => 'Nồi chiên không dầu 5L',
-                            'image' => 'https://picsum.photos/id/6/200',
-                            'qty' => 1,
-                            'price' => '890.000',
-                        ],
-                    ],
-                ],
-                [
-                    'id' => 'DH0210',
-                    'date' => '05/07/2026',
-                    'total' => '650.000',
-                    'status' => 'returned',
-                    'items' => [
-                        [
-                            'name' => 'Giày sneaker unisex',
-                            'image' => 'https://picsum.photos/id/7/200',
-                            'qty' => 1,
-                            'price' => '650.000',
-                        ],
-                    ],
-                ],
-                [
-                    'id' => 'DH0204',
-                    'date' => '02/07/2026',
-                    'total' => '420.000',
-                    'status' => 'cancelled',
-                    'items' => [
-                        [
-                            'name' => 'Balo laptop chống nước',
-                            'image' => 'https://picsum.photos/id/8/200',
-                            'qty' => 1,
-                            'price' => '420.000',
-                        ],
-                    ],
-                ],
-            ];
-
             $statusMeta = [
                 'unpaid' => ['label' => 'Chờ thanh toán', 'badge' => 'bg-warning text-dark'],
-                'processing' => ['label' => 'Đang xử lý', 'badge' => 'bg-info text-dark'],
-                'confirmed' => ['label' => 'Đang giao', 'badge' => 'bg-success'],
-                'completed' => ['label' => 'Hoàn thành', 'badge' => 'bg-primary'],
+                'pending' => ['label' => 'Chờ xác nhận', 'badge' => 'bg-info text-dark'],
+                'confirmed' => ['label' => 'Đang chuẩn bị', 'badge' => 'bg-info text-dark'],
+                'shipping' => ['label' => 'Đang giao hàng', 'badge' => 'bg-primary'],
+                'completed' => ['label' => 'Hoàn thành', 'badge' => 'bg-success'],
                 'cancelled' => ['label' => 'Đã hủy', 'badge' => 'bg-danger'],
-                'returned' => ['label' => 'Trả hàng/Hoàn tiền', 'badge' => 'bg-secondary'],
             ];
 
             $orderFilters = [
                 'all' => 'Tất cả',
                 'unpaid' => 'Chờ thanh toán',
-                'processing' => 'Đang xử lý',
-                'confirmed' => 'Đang giao',
+                'pending' => 'Chờ xác nhận',
+                'shipping' => 'Đang giao',
                 'completed' => 'Hoàn thành',
                 'cancelled' => 'Đã hủy',
-                'returned' => 'Trả hàng/Hoàn tiền',
             ];
         @endphp
 
         <ul class="nav order-status-tabs mb-4" role="tablist">
             @foreach ($orderFilters as $key => $label)
-                @php
-                    $count =
-                        $key === 'all'
-                            ? count($demoOrders)
-                            : count(array_filter($demoOrders, fn($o) => $o['status'] === $key));
-                @endphp
                 <li class="nav-item">
                     <a class="nav-link {{ $key === 'all' ? 'active' : '' }}" data-bs-toggle="pill"
                         href="#orderStatus-{{ $key }}" role="tab">
                         {{ $label }}
-                        @if ($count > 0)
-                            <span class="status-count">{{ $count }}</span>
-                        @endif
                     </a>
                 </li>
             @endforeach
@@ -144,69 +35,80 @@
 
         <div class="tab-content">
             @foreach ($orderFilters as $key => $label)
-                @php
-                    $filteredOrders =
-                        $key === 'all' ? $demoOrders : array_filter($demoOrders, fn($o) => $o['status'] === $key);
-                @endphp
-                <div class="tab-pane fade {{ $key === 'all' ? 'show active' : '' }}"
-                    id="orderStatus-{{ $key }}" role="tabpanel">
+                <div class="tab-pane fade {{ $key === 'all' ? 'show active' : '' }}" id="orderStatus-{{ $key }}"
+                    role="tabpanel">
 
-                    @if (count($filteredOrders) > 0)
+                    @php
+                        $filteredOrders = ($key === 'all')
+                            ? $orders
+                            : $orders->filter(function ($o) use ($key) {
+                                if ($key === 'unpaid')
+                                    return $o->payment_status === 'unpaid';
+                                return $o->sellerOrders->contains('status', $key);
+                            });
+                    @endphp
+
+                    @if ($filteredOrders->isNotEmpty())
                         @foreach ($filteredOrders as $order)
-                            <div class="order-row">
-                                <div class="order-row-top">
-                                    <span class="order-id">Đơn hàng #{{ $order['id'] }}</span>
-                                    <span class="badge {{ $statusMeta[$order['status']]['badge'] }}">
-                                        {{ $statusMeta[$order['status']]['label'] }}
-                                    </span>
-                                </div>
+                            @foreach ($order->sellerOrders as $sellerOrder)
+                                @if ($key !== 'all' && $key !== 'unpaid' && $sellerOrder->status !== $key)
+                                    @continue
+                                @endif
 
-                                <div class="order-items">
-                                    @foreach ($order['items'] as $item)
-                                        <div class="order-item-row">
-                                            <img src="{{ $item['image'] ?? 'https://via.placeholder.com/80' }}"
-                                                onerror="this.src='https://via.placeholder.com/80'"
-                                                alt="{{ $item['name'] }}" class="order-thumb">
+                                <div class="order-row mb-3 border rounded p-3">
+                                    <div class="order-row-top d-flex justify-content-between border-bottom pb-2 mb-2">
+                                        <span class="order-id fw-bold">
+                                            Mã đơn: #{{ $order->order_number }}
+                                            <small
+                                                class="text-muted ms-2">({{ $sellerOrder->seller->sellerProfile->shop_name ?? $sellerOrder->seller->name }})</small>
+                                        </span>
+                                        <span class="badge {{ $statusMeta[$sellerOrder->status]['badge'] ?? 'bg-secondary' }}">
+                                            {{ $statusMeta[$sellerOrder->status]['label'] ?? $sellerOrder->status }}
+                                        </span>
+                                    </div>
 
-                                            <div class="order-info">
-                                                <p class="mb-1">{{ $item['name'] }}</p>
-                                                <p class="text-muted small mb-0">x{{ $item['qty'] }}</p>
+                                    <div class="order-items">
+                                        @foreach ($sellerOrder->items as $item)
+                                            <div class="order-item-row d-flex align-items-center py-2 border-bottom">
+                                                <img src="{{ asset($item->product_image ?? 'https://via.placeholder.com/80') }}"
+                                                    alt="{{ $item->product_name }}" class="order-thumb me-3"
+                                                    style="width: 60px; height: 60px; object-fit: cover;">
+
+                                                <div class="order-info flex-grow-1">
+                                                    <p class="mb-1 fw-bold">{{ $item->product_name }}</p>
+                                                    <p class="text-muted small mb-0">Số lượng: x{{ $item->quantity }}</p>
+                                                </div>
+
+                                                <div class="order-item-price text-end font-monospace">
+                                                    {{ number_format($item->price) }}₫
+                                                </div>
                                             </div>
+                                        @endforeach
+                                    </div>
 
-                                            <div class="order-item-price text-end">
-                                                {{ $item['price'] }}₫
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
+                                    <div
+                                        class="order-row-footer d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                                        <span class="text-muted small">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</span>
+                                        <span class="order-total-label">
+                                            Tổng tiền đơn shop:
+                                            <span class="fw-bold text-danger">{{ number_format($sellerOrder->grand_total) }}₫</span>
+                                        </span>
+                                    </div>
 
-                                <div class="order-row-footer">
-                                    <span class="text-muted small">Ngày đặt: {{ $order['date'] }}</span>
-                                    <span class="order-total-label">
-                                        Tổng tiền:
-                                        <span class="fw-bold" style="color: var(--primary-red);">
-                                            {{ $order['total'] }}₫</span>
-                                    </span>
+                                    <div class="order-row-actions text-end mt-2">
+                                        @if ($order->payment_status === 'unpaid')
+                                            <a href="#" class="btn btn-sm btn-danger">Thanh toán ngay</a>
+                                        @elseif ($sellerOrder->status === 'completed')
+                                            <a href="{{ route('products.reviews.index', $sellerOrder->items->first()->product_id) }}"
+                                                class="btn btn-sm btn-outline-secondary">Đánh giá sản phẩm</a>
+                                        @endif
+                                    </div>
                                 </div>
-
-                                <div class="order-row-actions">
-                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                                        data-bs-target="#orderDetailModal">
-                                        Xem chi tiết
-                                    </button>
-                                    @if ($order['status'] === 'unpaid')
-                                        <button class="btn btn-sm btn-save">Thanh toán ngay</button>
-                                    @elseif($order['status'] === 'confirmed')
-                                        <button class="btn btn-sm btn-outline-danger">Đã nhận được hàng</button>
-                                    @elseif($order['status'] === 'completed')
-                                        <button class="btn btn-sm btn-outline-secondary">Mua lại</button>
-                                    @endif
-                                </div>
-                            </div>
+                            @endforeach
                         @endforeach
                     @else
-                        <div class="empty-state">
-                            <i class="fa-solid fa-inbox"></i>
+                        <div class="empty-state text-center py-4 text-muted">
+                            <i class="fa-solid fa-inbox display-4 d-block mb-2"></i>
                             <p class="mb-0">Không có đơn hàng nào ở trạng thái này</p>
                         </div>
                     @endif
