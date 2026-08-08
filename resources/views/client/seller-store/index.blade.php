@@ -78,8 +78,6 @@
                     <button type="submit" form="editBannerForm" class="btn btn-danger">Cập nhật</button>
                 </x-slot>
             </x-modal>
-
-
         </div>
     </div>
 @endsection
