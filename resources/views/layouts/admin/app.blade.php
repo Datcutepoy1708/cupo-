@@ -10,7 +10,8 @@
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     {{-- Font Awesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -45,9 +46,9 @@
             <nav class="sidebar-nav">
 
                 {{-- Tong quan --}}
-                <div class="sidebar-nav-label">Tong quan</div>
+                <div class="sidebar-nav-label">Tổng quan</div>
                 <a href="{{ route('admin.dashboard') }}"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    class="sidebar-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-gauge-high"></i>
                     Dashboard
                 </a>
@@ -55,24 +56,24 @@
                 <hr class="sidebar-divider">
 
                 {{-- San xuat --}}
-                <div class="sidebar-nav-label">Quan ly san</div>
+                <div class="sidebar-nav-label">Quản lý sàn</div>
 
                 <a href="{{ route('admin.sellers.index') }}"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}">
+                    class="sidebar-nav-item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-store"></i>
-                    Gian hang & Seller
+                    Gian hàng & Seller
                 </a>
 
                 <a href="{{ route('admin.products.index') }}"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                    class="sidebar-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-box-open"></i>
-                    San pham
+                    Sản phẩm
                 </a>
 
                 <a href="{{ route('admin.categories.index') }}"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                    class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-tags"></i>
-                    Danh muc
+                    Danh mục
                 </a>
 
                 <hr class="sidebar-divider">
@@ -80,22 +81,19 @@
                 {{-- Kinh doanh --}}
                 <div class="sidebar-nav-label">Kinh doanh</div>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bag-shopping"></i>
-                    Don hang
+                    Đơn hàng
                 </a>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-money-bill-transfer"></i>
-                    Rut tien Seller
+                    Rút tiền & Seller
                 </a>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-scale-balanced"></i>
-                    Tranh chap
+                    Tranh chấp/Khiếu nại
                 </a>
 
                 <hr class="sidebar-divider">
@@ -103,20 +101,17 @@
                 {{-- Marketing --}}
                 <div class="sidebar-nav-label">Marketing</div>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-image"></i>
-                    Banner trang chu
+                    Banner trang chủ
                 </a>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-ticket"></i>
-                    Ma giam gia
+                    Ma giảm giá
                 </a>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bolt"></i>
                     Flash Sale
                 </a>
@@ -124,35 +119,29 @@
                 <hr class="sidebar-divider">
 
                 {{-- He thong --}}
-                <div class="sidebar-nav-label">He thong</div>
+                <div class="sidebar-nav-label">Hệ thống</div>
 
-                <a href="#"
-                   class="sidebar-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users"></i>
-                    Nguoi dung
+                    Người dùng
                 </a>
 
                 <a href="#" class="sidebar-nav-item">
                     <i class="fa-solid fa-gear"></i>
-                    Cai dat
+                    Cài đặt
                 </a>
 
             </nav>
 
             {{-- Footer user info --}}
             <div class="sidebar-footer">
-                <img src="{{ auth()->user()->avatar_url }}"
-                     alt="{{ auth()->user()->name }}"
-                     class="admin-avatar">
+                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="admin-avatar">
                 <div class="admin-info">
                     <div class="admin-name">{{ auth()->user()->name }}</div>
-                    <div class="admin-role">Quan tri vien</div>
+                    <div class="admin-role">Quản trị viên</div>
                 </div>
-                <button type="button"
-                        class="logout-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#adminLogoutModal"
-                        title="Dang xuat">
+                <button type="button" class="logout-btn" data-bs-toggle="modal" data-bs-target="#adminLogoutModal"
+                    title="Dang xuat">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
@@ -191,19 +180,15 @@
                 </button>
 
                 {{-- Xem trang chu --}}
-                <a href="{{ route('home') }}"
-                   class="topbar-icon-btn"
-                   title="Xem trang Customer"
-                   target="_blank">
+                <a href="{{ route('home') }}" class="topbar-icon-btn" title="Xem trang Customer" target="_blank">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
 
                 {{-- Admin user --}}
                 <div class="dropdown">
                     <a href="#" class="topbar-admin-info" data-bs-toggle="dropdown">
-                        <img src="{{ auth()->user()->avatar_url }}"
-                             alt="{{ auth()->user()->name }}"
-                             class="topbar-avatar">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
+                            class="topbar-avatar">
                         <span class="topbar-name">{{ auth()->user()->name }}</span>
                         <i class="fa-solid fa-chevron-down" style="font-size:11px; color:#adb5bd; margin-left:2px;"></i>
                     </a>
@@ -213,13 +198,13 @@
                                 {{ auth()->user()->email }}
                             </span>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
                         <li>
-                            <button type="button"
-                                    class="dropdown-item text-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#adminLogoutModal">
-                                <i class="fa-solid fa-right-from-bracket me-2"></i>Dang xuat
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal"
+                                data-bs-target="#adminLogoutModal">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất
                             </button>
                         </li>
                     </ul>
@@ -247,18 +232,16 @@
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title">Xac nhan dang xuat</h5>
+                    <h5 class="modal-title">Xác nhận đăng xuất</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-2">
-                    Ban co chac chan muon dang xuat khoi trang quan tri?
+                    Bạn có muốn đăng xuất khỏi trang quản trị?
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Huy</button>
-                    <button type="submit"
-                            form="adminLogoutForm"
-                            class="btn btn-sm btn-danger">
-                        <i class="fa-solid fa-right-from-bracket me-1"></i>Dang xuat
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="adminLogoutForm" class="btn btn-sm btn-danger">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i>Đăng xuất
                     </button>
                 </div>
             </div>
