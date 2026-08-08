@@ -22,7 +22,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Danh mục
+                        Nổi bật
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">Bán nhiều nhất</a></li>
@@ -68,6 +68,14 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
+
+                            @if (auth()->user()->role === 'seller')
+                                <li><a class="dropdown-item" href="{{ route('seller.shop') }}">Cửa hàng của tôi</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            @endif
+
                             <li>
                                 <button type="button" class="dropdown-item" data-bs-toggle="modal"
                                     data-bs-target="#logoutModal">
