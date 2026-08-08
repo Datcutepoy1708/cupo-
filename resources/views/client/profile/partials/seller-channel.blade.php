@@ -76,8 +76,8 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="phone" value="{{ old('phone', Auth::user()->phone) }}"
-                        placeholder="0987654321" required>
+                    <input type="tel" class="form-control" name="phone"
+                        value="{{ old('phone', Auth::user()->phone) }}" placeholder="0987654321" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Ngày sinh (dd/mm/yyyy) <span class="text-danger">*</span></label>
@@ -105,13 +105,37 @@
             <div class="row mb-4">
                 <div class="col-md-12">
                     <label class="form-label">Mô tả gian hàng</label>
-                    <textarea class="form-control" name="description" rows="3"
-                        placeholder="Mô tả ngắn gọn về cửa hàng của bạn">{{ old('description') }}</textarea>
+                    <textarea class="form-control" name="description" rows="3" placeholder="Mô tả ngắn gọn về cửa hàng của bạn">{{ old('description') }}</textarea>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold mb-3">Thông tin ngân hàng nhận tiền</h5>
+            <p class="text-muted small mb-3">Cupo sẽ chuyển tiền bán hàng vào tài khoản này sau khi đơn hàng hoàn tất.
+            </p>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Ngân hàng <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="bank_name" value="{{ old('bank_name') }}"
+                        placeholder="VD: Vietcombank" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Số tài khoản <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="bank_account"
+                        value="{{ old('bank_account') }}" placeholder="Nhập số tài khoản" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Chủ tài khoản <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="bank_owner" value="{{ old('bank_owner') }}"
+                        placeholder="Đúng như trên thẻ/tài khoản" required>
                 </div>
             </div>
 
             <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" id="agreeTerms" required checked>
+                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" required
+                    {{ old('agree_terms') ? 'checked' : '' }}>
                 <label class="form-check-label small" for="agreeTerms">
                     Tôi đã đọc và đồng ý với <a href="#" style="color: var(--primary-red);">Điều khoản người
                         bán</a> của Cupo
