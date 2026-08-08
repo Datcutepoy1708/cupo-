@@ -77,6 +77,12 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class);
     }
 
+    public function followedShops()
+    {
+        return $this->belongsToMany(SellerProfile::class, 'shop_follows', 'user_id', 'seller_profile_id')
+            ->withPivot('followed_at');
+    }
+
     public function getCartCountAttribute(): int
     {
         return $this->cart?->items()->sum('quantity') ?? 0;

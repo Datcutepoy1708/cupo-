@@ -42,4 +42,15 @@ class SellerProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'seller_categories');
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'shop_follows', 'seller_profile_id', 'user_id')
+            ->withPivot('followed_at');
+    }
 }

@@ -6,25 +6,56 @@ use App\Http\Controllers\Controller;
 use App\Models\SellerProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminSellerController extends Controller
 {
     /**
-     * Danh sách gian hàng cho Admin (lọc theo status)
-     * URL: GET /admin/sellers?status=pending
+     * Danh sách gian hàng cho Admin.
+     * - Browser request  -> tra ve Blade view (admin.sellers.index)
+     * - AJAX / JSON      -> tra ve JSON paginate kem meta dem tung trang thai
+     *
+     * Query params:
+     *   status  = pending | approved | rejected | blocked
+     *   search  = tu khoa tim kiem (shop_name, email chu shop)
+     *   page    = so trang
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View|JsonResponse
     {
-        $status = $request->query('status');
+        // Browser thong thuong -> tra Blade view, JS se tu AJAX load du lieu
+        if (! $request->wantsJson()) {
+            return view('admin.sellers.index');
+        }
 
-        $sellers = SellerProfile::with('user')
-            ->when($status, function ($query, $status) {
-                return $query->where('status', $status);
+        $status = $request->query('status');
+        $keyword = $request->query('search');
+
+        $sellers = SellerProfile::with(['user', 'categories'])
+            ->withCount('followers')
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($keyword, function ($q) use ($keyword) {
+                $q->where('shop_name', 'like', '%'.$keyword.'%')
+                    ->orWhereHas('user', fn ($uq) => $uq->where('email', 'like', '%'.$keyword.'%')
+                        ->orWhere('name', 'like', '%'.$keyword.'%'));
             })
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return response()->json($sellers);
+        // Dem so luong theo tung trang thai de cap nhat badge va stat cards
+        $counts = SellerProfile::selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return response()->json(array_merge($sellers->toArray(), [
+            'meta' => [
+                'total_all' => $counts->sum(),
+                'total_pending' => $counts->get('pending', 0),
+                'total_approved' => $counts->get('approved', 0),
+                'total_rejected' => $counts->get('rejected', 0),
+                'total_blocked' => $counts->get('blocked', 0),
+            ],
+        ]));
     }
 
     /**
