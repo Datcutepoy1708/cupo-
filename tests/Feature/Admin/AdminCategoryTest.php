@@ -11,12 +11,22 @@ class AdminCategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_view_categories_list(): void
+    public function test_admin_can_view_categories_page(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->get('/admin/categories');
+
+        $response->assertStatus(200)
+            ->assertViewIs('admin.categories.index');
+    }
+
+    public function test_admin_can_fetch_categories_json(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         Category::create(['name' => 'Thời trang', 'slug' => 'thoi-trang']);
 
-        $response = $this->actingAs($admin)->getJson('/admin/categories');
+        $response = $this->actingAs($admin)->getJson('/admin/categories/data');
 
         $response->assertStatus(200)
             ->assertJsonStructure(['status', 'data']);
@@ -26,7 +36,7 @@ class AdminCategoryTest extends TestCase
     {
         $customer = User::factory()->create(['role' => 'customer']);
 
-        $response = $this->actingAs($customer)->getJson('/admin/categories');
+        $response = $this->actingAs($customer)->getJson('/admin/categories/data');
 
         $response->assertStatus(403);
     }

@@ -277,3 +277,52 @@ the business rule changes):
 - When creating a new component, document its expected props as PHP
   doc comments at the top of the file, so its contract is discoverable
   without reading the whole implementation.
+## 20. Strict Separation of HTML, CSS, and JS
+
+- **Every Blade view must contain HTML/markup only.** No `<style>`
+  blocks, no `<script>` blocks, no inline `style="..."` attributes,
+  no inline `onclick="..."` or other inline event handlers — with zero
+  exceptions, regardless of how small the snippet is.
+- **Every page gets its own dedicated CSS file and JS file**, matching
+  the view's location:
+  - `resources/views/admin/sellers/index.blade.php`
+    → `public/admin/css/sellers.css` + `public/admin/js/sellers.js`
+  - `resources/views/client/home/index.blade.php`
+    → `public/client/css/home.css` + `public/client/js/home.js`
+- **No JS config objects inline in Blade**, even short ones. Data the
+  JS needs from the backend (route URLs, CSRF token, IDs) must be
+  passed via `data-*` attributes on the HTML element the script reads
+  from, not via an inline `<script>` block defining a global object.
+
+  Wrong:
+```blade
+  <script>
+      window.ADMIN_SELLERS_ROUTES = { index: '{{ route(...) }}', ... };
+  </script>
+```
+
+  Right:
+```blade
+  <div id="sellersApp"
+       data-index-url="{{ route('admin.sellers.index') }}"
+       data-approve-url="{{ url('admin/sellers') }}"
+       data-csrf="{{ csrf_token() }}">
+  </div>
+```
+```js
+  // sellers.js
+  const app = document.getElementById('sellersApp');
+  const indexUrl = app.dataset.indexUrl;
+```
+
+- **`@push('styles')` / `@push('scripts')` must only reference external
+  files** (`<link href="...">`, `<script src="...">`) — never contain
+  raw CSS/JS inside the push block itself.
+- If a piece of markup is repeated across pages (modals, badges,
+  cards), it still follows this rule once extracted into a
+  component/partial — the component's own script/style, if any, lives
+  in a matching dedicated file, not inline in the component's Blade
+  file.
+- This rule applies retroactively: when touching an existing view that
+  violates it, extract the inline CSS/JS into proper files as part of
+  that change, rather than adding more inline code next to it.

@@ -26,6 +26,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/sellers/{sellerProfile}/reject', [AdminSellerController::class, 'reject'])->name('sellers.reject');
     Route::patch('/sellers/{sellerProfile}/block', [AdminSellerController::class, 'block'])->name('sellers.block');
 
+    Route::get('/categories/data', [AdminCategoryController::class, 'data'])->name('categories.data');
     Route::apiResource('categories', AdminCategoryController::class);
 
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');

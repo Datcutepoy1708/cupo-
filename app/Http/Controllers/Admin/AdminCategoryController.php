@@ -7,17 +7,28 @@ use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class AdminCategoryController extends Controller
 {
     /**
      * GET /admin/categories
-     * Lấy danh sách cây danh mục (load kèm các danh mục con 'children')
+     * Trả về view trang quản lý danh mục
      */
-    public function index(Request $request): JsonResponse
+    public function index(): View
+    {
+        return view('admin.categories.index');
+    }
+
+    /**
+     * GET /admin/categories/data
+     * JSON API: Lấy cây danh mục để AJAX render
+     */
+    public function data(): JsonResponse
     {
         $categories = Category::with('children')
             ->whereNull('parent_id')
+            ->withCount(['children', 'sellerProfiles'])
             ->latest()
             ->get();
 
