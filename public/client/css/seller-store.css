@@ -1,0 +1,306 @@
+.shop-page {
+    background: #f5f6fa;
+    padding-bottom: 60px;
+    padding-top: 10px;
+}
+
+/* ===== Banner ===== */
+.shop-banner {
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    background-color: #ddd;
+    border-radius: 12px 12px 0 0;
+}
+
+/* ===== Header: avatar + tên + thống kê ===== */
+.shop-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    background: #fff;
+    padding: 0 24px 20px;
+    margin-top: -1px;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    position: relative;
+}
+
+.shop-avatar-wrap {
+    margin-top: -60px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.shop-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.shop-info {
+    flex: 1;
+    padding-top: 16px;
+}
+
+.shop-info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.shop-name {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #222;
+}
+
+.shop-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    color: #555;
+    font-size: 14px;
+}
+
+.shop-stats .divider {
+    color: #ddd;
+}
+
+.shop-stats .stars {
+    color: #f5a623;
+    font-weight: 600;
+}
+.shop-stats .stars .text-muted {
+    color: #888 !important;
+    font-weight: 400;
+}
+
+.shop-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ===== Nav tab ngang ===== */
+.shop-nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: #fff;
+    margin-top: 16px;
+    padding: 0 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+}
+
+.shop-nav-tabs .nav-link {
+    color: #555;
+    font-weight: 500;
+    padding: 16px 18px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    white-space: nowrap;
+}
+
+.shop-nav-tabs .nav-link.active {
+    color: var(--primary-red, #c62828);
+    border-bottom-color: var(--primary-red, #c62828);
+    background: transparent;
+    font-weight: 700;
+}
+
+/* ===== Dashboard nội dung ===== */
+.shop-dashboard {
+    background: #fff;
+    margin-top: 16px;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    min-height: 400px;
+}
+
+.shop-product-card {
+    position: relative;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.shop-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+.shop-product-card img {
+    height: 160px;
+    object-fit: cover;
+}
+
+.bestseller-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--primary-red, #c62828);
+    color: #fff;
+    font-size: 11px;
+    z-index: 2;
+}
+
+/* ===== Tab đánh giá ===== */
+.shop-rating-summary {
+    text-align: center;
+    padding: 20px;
+    background: var(--primary-red-light, #fdecea);
+    border-radius: 10px;
+    margin-bottom: 24px;
+}
+.rating-score .score-number {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--primary-red, #c62828);
+    line-height: 1;
+}
+.rating-score .score-stars {
+    color: #f5a623;
+    font-size: 18px;
+    margin: 8px 0 4px;
+}
+
+.review-row {
+    border-bottom: 1px solid #eee;
+    padding: 16px 0;
+}
+.review-row:last-child {
+    border-bottom: none;
+}
+.review-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.review-stars {
+    color: #f5a623;
+    font-size: 14px;
+}
+
+/* ===== Tab thông tin shop ===== */
+.shop-info-table td {
+    padding: 10px 0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .shop-banner {
+        height: 160px;
+    }
+    .shop-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 16px 16px;
+    }
+    .shop-avatar-wrap {
+        margin-top: -50px;
+    }
+    .shop-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    .shop-actions {
+        width: 100%;
+    }
+    .shop-actions .btn {
+        flex: 1;
+    }
+}
+
+/* ===== Chế độ quản lý (seller dashboard) ===== */
+.shop-banner {
+    position: relative;
+}
+.banner-edit-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+}
+.banner-edit-btn:hover {
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+}
+
+.avatar-edit-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 32px;
+    height: 32px;
+    background: var(--primary-red, #c62828);
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    font-size: 12px;
+}
+.avatar-edit-btn:hover {
+    background: var(--primary-red-dark, #b71c1c);
+}
+
+.tab-badge {
+    display: inline-block;
+    background: var(--primary-red, #c62828);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+.dash-section-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #222;
+}
+
+.dash-stat-card {
+    background: var(--primary-red-light, #fdecea);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+}
+.dash-stat-card i {
+    font-size: 22px;
+    color: var(--primary-red, #c62828);
+    margin-bottom: 8px;
+    display: block;
+}
+.dash-stat-card h4 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #222;
+}
+.dash-stat-card p {
+    font-size: 13px;
+    color: #777;
+    margin: 0;
+}
+
+.dash-product-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+}

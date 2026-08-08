@@ -34,10 +34,11 @@
                 <i class="fa-solid fa-heart"></i> Yêu thích
             </a>
         </div>
-
-        <a class="nav-link {{ $activeTab === 'sellerChannel' ? 'active' : '' }}" data-bs-toggle="pill"
-            href="#sellerChannel" role="tab">
-            <i class="fa-solid fa-shop"></i> Kênh người bán
-        </a>
+        @if (auth()->user()->role === 'customer')
+            <a class="nav-link {{ $activeTab === 'sellerChannel' ? 'active' : '' }}" data-bs-toggle="pill"
+                href="#sellerChannel" role="tab">
+                <i class="fa-solid fa-shop"></i> Đăng kí bán hàng
+            </a>
+        @endif
     </nav>
 </div>
