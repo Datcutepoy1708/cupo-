@@ -6,12 +6,12 @@ use App\Http\Controllers\Seller\SellerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('seller')->group(function () {
-    //route tra ve view cua hang cua seller
+    // route tra ve view cua hang cua seller
     Route::middleware(['auth', 'role: seller'])
-    ->get('/shop', function () {
-        return view('client.seller-store.index');
-    })
-    ->name('seller.shop');
+        ->get('/shop', function () {
+            return view('client.seller-store.index');
+        })
+        ->name('seller.shop');
 
     // 1. Route Đăng ký làm Người bán (Cho phép cả Customer & Seller)
     Route::middleware(['auth', 'role:customer,seller'])->group(function () {
