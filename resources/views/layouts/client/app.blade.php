@@ -26,6 +26,7 @@
         <link href="{{ asset('client/css/promotions.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('profile.*'))
         <link href="{{ asset('client/css/profile.css') }}" rel="stylesheet">
+        <link href="{{ asset('client/css/seller-register.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('seller.shop'))
         <link href="{{ asset('client/css/seller-store.css') }}" rel="stylesheet">
     @endif
@@ -67,6 +68,7 @@
     {{-- embed page js --}}
     @if (request()->routeIs('profile.*'))
         <script src="{{ asset('client/js/profile.js') }}"></script>
+        <script src="{{ asset('client/js/seller-register.js') }}"></script>
     @elseif (request()->routeIs('home'))
         <script src="{{ asset('client/js/home.js') }}"></script>
     @endif

@@ -28,7 +28,7 @@ class SellerRegistrationController extends Controller
                 'date_of_birth' => Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->format('Y-m-d'),
             ]);
 
-            SellerProfile::create([
+            $sellerProfile = SellerProfile::create([
                 'user_id' => $user->id,
                 'shop_name' => $request->shop_name,
                 'business_type' => $request->input('business_type', 'personal'),
@@ -38,6 +38,10 @@ class SellerRegistrationController extends Controller
                 'national_id' => $request->national_id,
                 'status' => 'pending',
             ]);
+
+            if ($request->filled('category_ids')) {
+                $sellerProfile->categories()->sync($request->category_ids);
+            }
         });
 
         return redirect()->route('seller.pending-approval');
