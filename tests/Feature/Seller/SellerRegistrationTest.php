@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Seller;
 
+use App\Models\Category;
 use App\Models\SellerProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -70,5 +71,27 @@ class SellerRegistrationTest extends TestCase
         $this->assertEquals('012345678901', $profile->national_id); // Dữ liệu CCCD được giải mã thông qua Eloquent Model
         // Kiểm tra chắc chắn date_of_birth được truy cập thông qua relationship $profile->user->date_of_birth
         $this->assertEquals('2000-08-15', $profile->user->date_of_birth->format('Y-m-d'));
+    }
+
+    public function test_customer_can_register_as_seller_with_categories(): void
+    {
+        $user = User::factory()->create(['role' => 'customer']);
+        $category = Category::create(['name' => 'Điện tử', 'slug' => 'dien-tu']);
+
+        $response = $this->actingAs($user)->post('/seller/register', [
+            'shop_name' => 'Shop Điện Tử',
+            'phone' => '0987654321',
+            'address' => 'Ha Noi',
+            'description' => 'Mô tả shop điện tử',
+            'date_of_birth' => '15/08/2000',
+            'national_id' => '012345678902',
+            'category_ids' => [$category->id],
+        ]);
+
+        $response->assertRedirect(route('seller.pending-approval'));
+
+        $profile = SellerProfile::where('user_id', $user->id)->first();
+        $this->assertNotNull($profile);
+        $this->assertEquals('Điện tử', $profile->categories->first()->name);
     }
 }

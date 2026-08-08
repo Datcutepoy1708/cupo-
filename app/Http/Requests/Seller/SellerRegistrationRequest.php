@@ -34,6 +34,8 @@ class SellerRegistrationRequest extends FormRequest
                     }
                 },
             ],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['exists:categories,id'],
             'national_id' => [
                 'required',
                 'string',
@@ -49,6 +51,7 @@ class SellerRegistrationRequest extends FormRequest
             'date_of_birth.date_format' => 'Ngày sinh phải có định dạng dd/mm/yyyy (ví dụ: 15/08/2000).',
             'national_id.required' => 'Vui lòng nhập số căn cước công dân.',
             'national_id.regex' => 'Số căn cước công dân phải gồm đúng 12 chữ số.',
+            'category_ids.*.exists' => 'Danh mục sản phẩm được chọn không hợp lệ.',
         ];
     }
 }

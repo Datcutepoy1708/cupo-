@@ -50,6 +50,8 @@
 
         <form method="POST" action="{{ route('seller.register.store') }}">
             @csrf
+
+            {{-- Tên gian hàng + Loại hình --}}
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Tên gian hàng <span class="text-danger">*</span></label>
@@ -73,6 +75,47 @@
                 </div>
             </div>
 
+            {{-- ===== TAG MULTI-SELECT: Lĩnh vực kinh doanh ===== --}}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <label class="form-label">Lĩnh vực / Danh mục hàng hóa buôn bán <span class="text-danger">*</span></label>
+
+                    {{-- Browse 2 tầng: ngành cha → mặt hàng con → nút Thêm --}}
+                    <div class="cat-browse-row">
+                        <select id="parentCategorySelect" class="form-select">
+                            <option value="" disabled selected>-- Chọn ngành hàng --</option>
+                            @if (isset($categories) && count($categories) > 0)
+                                @foreach ($categories as $parentCat)
+                                    <option value="{{ $parentCat->id }}" data-children='@json($parentCat->children ?? [])'>
+                                        {{ $parentCat->name }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+
+                        <select id="childCategorySelect" class="form-select" disabled>
+                            <option value="" disabled selected>-- Chọn mặt hàng cụ thể --</option>
+                        </select>
+
+                        <button type="button" id="addCategoryTagBtn" class="cat-add-btn" disabled>
+                            + Thêm
+                        </button>
+                    </div>
+
+                    {{-- Khu vực hiển thị các tag đã chọn --}}
+                    <div id="categoryTagsWrap" class="cat-tags-wrap">
+                        <span id="categoryTagsPlaceholder" class="cat-tags-placeholder">
+                            Chưa chọn danh mục nào — hãy chọn ở trên rồi nhấn + Thêm
+                        </span>
+                    </div>
+
+                    {{-- Hidden inputs gửi giá trị lên server --}}
+                    <div id="categoryHiddenInputs"></div>
+                    <small class="text-muted mt-1 d-block">Có thể chọn nhiều lĩnh vực kinh doanh cho 1 gian hàng.</small>
+                </div>
+            </div>
+
+            {{-- Liên hệ + Ngày sinh --}}
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">Số điện thoại liên hệ <span class="text-danger">*</span></label>
@@ -88,10 +131,10 @@
                 </div>
             </div>
 
+            {{-- CCCD + Địa chỉ --}}
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span
-                            class="text-danger">*</span></label>
+                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}"
                         placeholder="Nhập đúng 12 chữ số CCCD/MST" required>
                 </div>
@@ -102,6 +145,7 @@
                 </div>
             </div>
 
+            {{-- Mô tả --}}
             <div class="row mb-4">
                 <div class="col-md-12">
                     <label class="form-label">Mô tả gian hàng</label>
@@ -133,6 +177,7 @@
                 </div>
             </div>
 
+            {{-- Điều khoản --}}
             <div class="form-check mb-4">
                 <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" required
                     {{ old('agree_terms') ? 'checked' : '' }}>

@@ -54,4 +54,12 @@ class Category extends Model
     {
         return $this->belongsToMany(SellerProfile::class, 'seller_categories');
     }
+
+    /**
+     * Scope: Lấy cây danh mục (Root categories kèm các cấp con)
+     */
+    public function scopeTree($query)
+    {
+        return $query->whereNull('parent_id')->with('children.children');
+    }
 }
