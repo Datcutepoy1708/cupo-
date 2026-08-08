@@ -71,6 +71,8 @@
         <script src="{{ asset('client/js/seller-register.js') }}"></script>
     @elseif (request()->routeIs('home'))
         <script src="{{ asset('client/js/home.js') }}"></script>
+    @elseif (request()->routeIs('seller.shop'))
+        <script src="{{ asset('client/js/seller-store.js') }}"></script>
     @endif
 
     {{-- embed cart js --}}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\SellerOrder;
 use App\Models\Review;
@@ -16,6 +17,8 @@ class SellerProfileController extends Controller
         $shop = Auth::user()->sellerProfile;
 
         abort_if(!$shop, 404, 'Bạn chưa đăng ký gian hàng.');
+
+        $allCategories = collect();
 
         if ($shop->status === 'approved') {
             $shop->product_count = Product::where('seller_id', $shop->id)->count();
@@ -54,8 +57,22 @@ class SellerProfileController extends Controller
 
             $shop->review_count = $shop->reviews->count();
             $shop->rating = round($shop->reviews->avg('rating') ?? 0, 1);
+
+            $shop->followers_count = $shop->followers()->count();
+
+            // load quan hệ categories() có sẵn để blade dùng $shop->categories
+            $shop->load('categories');
+
+            // Ngành hàng chia 2 cấp: danh mục cha kèm danh mục con đang bật (status = true)
+            $allCategories = Category::where('status', true)
+                ->whereNull('parent_id')
+                ->with(['children' => function ($q) {
+                    $q->where('status', true)->orderBy('name');
+                }])
+                ->orderBy('name')
+                ->get();
         }
 
-        return view('client.seller-store.index', compact('shop'));
+        return view('client.seller-store.index', compact('shop', 'allCategories'));
     }
 }

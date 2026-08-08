@@ -78,7 +78,8 @@
             {{-- ===== TAG MULTI-SELECT: Lĩnh vực kinh doanh ===== --}}
             <div class="row mb-3">
                 <div class="col-12">
-                    <label class="form-label">Lĩnh vực / Danh mục hàng hóa buôn bán <span class="text-danger">*</span></label>
+                    <label class="form-label">Lĩnh vực / Danh mục hàng hóa buôn bán <span
+                            class="text-danger">*</span></label>
 
                     {{-- Browse 2 tầng: ngành cha → mặt hàng con → nút Thêm --}}
                     <div class="cat-browse-row">
@@ -111,7 +112,8 @@
 
                     {{-- Hidden inputs gửi giá trị lên server --}}
                     <div id="categoryHiddenInputs"></div>
-                    <small class="text-muted mt-1 d-block">Có thể chọn nhiều lĩnh vực kinh doanh cho 1 gian hàng.</small>
+                    <small class="text-muted mt-1 d-block">Có thể chọn nhiều lĩnh vực kinh doanh cho 1 gian
+                        hàng.</small>
                 </div>
             </div>
 
@@ -134,7 +136,8 @@
             {{-- CCCD + Địa chỉ --}}
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span class="text-danger">*</span></label>
+                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span
+                            class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}"
                         placeholder="Nhập đúng 12 chữ số CCCD/MST" required>
                 </div>
@@ -153,34 +156,9 @@
                 </div>
             </div>
 
-            <hr class="my-4">
-
-            <h5 class="fw-bold mb-3">Thông tin ngân hàng nhận tiền</h5>
-            <p class="text-muted small mb-3">Cupo sẽ chuyển tiền bán hàng vào tài khoản này sau khi đơn hàng hoàn tất.
-            </p>
-
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <label class="form-label">Ngân hàng <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="bank_name" value="{{ old('bank_name') }}"
-                        placeholder="VD: Vietcombank" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Số tài khoản <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="bank_account"
-                        value="{{ old('bank_account') }}" placeholder="Nhập số tài khoản" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Chủ tài khoản <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="bank_owner" value="{{ old('bank_owner') }}"
-                        placeholder="Đúng như trên thẻ/tài khoản" required>
-                </div>
-            </div>
-
             {{-- Điều khoản --}}
             <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" required
-                    {{ old('agree_terms') ? 'checked' : '' }}>
+                <input class="form-check-input" type="checkbox" id="agreeTerms" required checked>
                 <label class="form-check-label small" for="agreeTerms">
                     Tôi đã đọc và đồng ý với <a href="#" style="color: var(--primary-red);">Điều khoản người
                         bán</a> của Cupo
