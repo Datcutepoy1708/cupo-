@@ -19,6 +19,7 @@ class User extends Authenticatable
         'date_of_birth',
         'role',
         'status',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -69,5 +70,29 @@ class User extends Authenticatable
     public function disputes()
     {
         return $this->hasMany(Dispute::class, 'buyer_id');
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function getCartCountAttribute(): int
+    {
+        return $this->cart?->items()->sum('quantity') ?? 0;
+    }
+
+    /**
+     * URL ảnh đại diện — trả về ảnh thật nếu có,
+     * fallback về UI Avatars (tự tạo ảnh chữ cái đầu tên).
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->avatar) {
+            return asset('storage/'.$this->avatar);
+        }
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name)
+            .'&background=c62828&color=fff&size=128&bold=true';
     }
 }

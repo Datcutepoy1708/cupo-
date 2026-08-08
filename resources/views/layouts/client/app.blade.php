@@ -71,6 +71,9 @@
         <script src="{{ asset('client/js/home.js') }}"></script>
     @endif
 
+    {{-- embed cart js --}}
+    <script src="{{ asset('client/js/cart.js') }}"></script>
+
     @stack('scripts')
 </body>
 

@@ -8,6 +8,7 @@ use App\Http\Requests\Client\CartUpdateRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -17,52 +18,50 @@ class CartController extends Controller
      * GET /cart
      * Lấy danh sách sản phẩm trong giỏ hàng (Gom nhóm theo Shop/Seller)
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse|View
     {
         $cart = Cart::with(['items.product.seller.sellerProfile', 'items.product.category', 'items.variant'])
             ->where('user_id', $request->user()->id)
             ->first();
+        $groupedShops = collect();
+        $totalPrice = 0;
+        $totalItems = 0;
+        if ($cart && $cart->items->isNotEmpty()) {
+            // Gom nhóm sản phẩm theo seller_id (Tách đơn hàng theo Shop)
+            $groupedShops = $cart->items->groupBy(function ($item) {
+                return $item->product->seller_id;
+            })->map(function ($items) {
+                $firstProduct = $items->first()->product;
+                $seller = $firstProduct->seller;
 
-        if (! $cart || $cart->items->isEmpty()) {
+                return [
+                    'seller_id' => $seller->id,
+                    'shop_name' => $seller->sellerProfile->shop_name ?? $seller->name,
+                    'items' => $items->values(),
+                ];
+            })->values();
+            $totalPrice = $cart->items->sum(function ($item) {
+                $price = $item->variant ? $item->variant->price : $item->product->price;
+
+                return $price * $item->quantity;
+            });
+            $totalItems = $cart->items->sum('quantity');
+        }
+        // Nếu request yêu cầu JSON (API/Postman/AJAX) -> Trả về JSON
+        if ($request->wantsJson()) {
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'shops' => [],
-                    'total_items' => 0,
-                    'total_price' => 0,
+                    'cart_id' => $cart->id ?? null,
+                    'shops' => $groupedShops,
+                    'total_items' => $totalItems,
+                    'total_price' => $totalPrice,
                 ],
             ]);
         }
 
-        // Gom nhóm sản phẩm theo seller_id (Phục vụ Tách Đơn Hàng Shopee-style)
-        $groupedShops = $cart->items->groupBy(function ($item) {
-            return $item->product->seller_id;
-        })->map(function ($items) {
-            $firstProduct = $items->first()->product;
-            $seller = $firstProduct->seller;
-
-            return [
-                'seller_id' => $seller->id,
-                'shop_name' => $seller->sellerProfile->shop_name ?? $seller->name,
-                'items' => $items->values(),
-            ];
-        })->values();
-
-        $totalPrice = $cart->items->sum(function ($item) {
-            $price = $item->variant ? $item->variant->price : $item->product->price;
-
-            return $price * $item->quantity;
-        });
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'cart_id' => $cart->id,
-                'shops' => $groupedShops,
-                'total_items' => $cart->items->sum('quantity'),
-                'total_price' => $totalPrice,
-            ],
-        ]);
+        // Yêu cầu từ trình duyệt web -> Trả về Blade View HTML
+        return view('client.cart.index', compact('groupedShops', 'totalPrice', 'totalItems'));
     }
 
     /**
@@ -113,8 +112,11 @@ class CartController extends Controller
             ]);
         }
 
+        $totalItems = $cart->items()->sum('quantity');
+
         return response()->json([
             'message' => 'Thêm sản phẩm vào giỏ hàng thành công!',
+            'total_items' => $totalItems,
         ]);
     }
 
@@ -137,9 +139,11 @@ class CartController extends Controller
         }
 
         $cartItem->update(['quantity' => $validated['quantity']]);
+        $totalItems = $cartItem->cart->items()->sum('quantity');
 
         return response()->json([
             'message' => 'Cập nhật số lượng thành công!',
+            'total_items' => $totalItems,
             'data' => $cartItem->fresh(['product', 'variant']),
         ]);
     }
@@ -154,10 +158,13 @@ class CartController extends Controller
             return response()->json(['message' => 'Bạn không có quyền xóa mục giỏ hàng này.'], 403);
         }
 
+        $cart = $cartItem->cart;
         $cartItem->delete();
+        $totalItems = $cart->items()->sum('quantity');
 
         return response()->json([
             'message' => 'Đã xóa sản phẩm khỏi giỏ hàng!',
+            'total_items' => $totalItems,
         ]);
     }
 
@@ -174,6 +181,7 @@ class CartController extends Controller
 
         return response()->json([
             'message' => 'Đã làm sạch giỏ hàng!',
+            'total_items' => 0,
         ]);
     }
 }

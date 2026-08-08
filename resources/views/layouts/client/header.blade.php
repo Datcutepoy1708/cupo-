@@ -49,14 +49,14 @@
                 @else
                     <a href="{{ route('cart.index') }}"
                         class="btn btn-outline-light position-relative me-2 d-flex align-items-center justify-content-center"
-                        style="width: 38px; height: 38px;">
+                        style="width: 38px; height: 38px;"
+                        aria-label="Giỏ hàng">
                         <i class="fa-solid fa-cart-shopping" style="font-size: 18px;"></i>
-                        @if (auth()->user()->cart_count ?? 0 > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 10px;">
-                                {{ auth()->user()->cart_count }}
-                            </span>
-                        @endif
+                        <span id="header-cart-badge"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ (auth()->user()->cart_count ?? 0) > 0 ? '' : 'd-none' }}"
+                            style="font-size: 10px;">
+                            {{ auth()->user()->cart_count ?? 0 }}
+                        </span>
                     </a>
                     <div class="dropdown">
                         <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button"

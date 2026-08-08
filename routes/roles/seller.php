@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerProductController;
 use App\Http\Controllers\Seller\SellerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('seller')->group(function () {
     //route tra ve view cua hang cua seller
-    Route::middleware(['auth', 'role: seller']) // 'seller' = middleware tự kiểm tra user đã có shop chưa
+    Route::middleware(['auth', 'role: seller'])
     ->get('/shop', function () {
         return view('client.seller-store.index');
     })
@@ -32,6 +33,9 @@ Route::prefix('seller')->group(function () {
         // API RESTful Seller Quản lý Sản phẩm (/seller/products)
         Route::apiResource('products', SellerProductController::class);
 
+        // API Seller Quản lý Đơn hàng
+        Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{sellerOrder}', [SellerOrderController::class, 'show'])->name('orders.show');
+        Route::patch('/orders/{sellerOrder}/status', [SellerOrderController::class, 'updateStatus'])->name('orders.update-status');
     });
-
 });

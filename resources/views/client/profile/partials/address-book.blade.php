@@ -1,4 +1,4 @@
-<div class="tab-pane fade" id="addressBook" role="tabpanel">
+<div class="tab-pane fade {{ $activeTab === 'addressBook' ? 'show active' : '' }}" id="addressBook" role="tabpanel">
     <div class="content-card">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="content-title mb-0">Sổ địa chỉ</h2>
@@ -7,67 +7,58 @@
             </button>
         </div>
 
-        @php
-            $demoAddresses = [
-                [
-                    'id' => 1,
-                    'name' => 'Nguyễn Văn A',
-                    'phone' => '0987 654 321',
-                    'address' => '123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-                    'type' => 'Nhà riêng',
-                    'default' => true,
-                ],
-                [
-                    'id' => 2,
-                    'name' => 'Nguyễn Văn A',
-                    'phone' => '0912 345 678',
-                    'address' => '45 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-                    'type' => 'Văn phòng',
-                    'default' => false,
-                ],
-                [
-                    'id' => 3,
-                    'name' => 'Trần Thị B',
-                    'phone' => '0977 111 222',
-                    'address' => '78 Đường Trần Hưng Đạo, Phường 7, Quận 5, TP. Hồ Chí Minh',
-                    'type' => 'Nhà riêng',
-                    'default' => false,
-                ],
-            ];
-        @endphp
+        @if (session('status') === 'address-created')
+            <div class="alert alert-success">Thêm địa chỉ mới thành công!</div>
+        @elseif (session('status') === 'address-updated')
+            <div class="alert alert-success">Cập nhật địa chỉ thành công!</div>
+        @elseif (session('status') === 'address-deleted')
+            <div class="alert alert-success">Đã xóa địa chỉ!</div>
+        @elseif (session('status') === 'address-default-updated')
+            <div class="alert alert-success">Đã cập nhật địa chỉ mặc định!</div>
+        @endif
 
-        @foreach ($demoAddresses as $addr)
+        @forelse (auth()->user()->addresses as $addr)
             <div class="address-row">
                 <div class="address-row-body">
                     <div class="address-info">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="fw-bold">{{ $addr['name'] }}</span>
+                            <span class="fw-bold">{{ $addr->recipient_name }}</span>
                             <span class="text-muted">|</span>
-                            <span class="text-muted">{{ $addr['phone'] }}</span>
-                            @if ($addr['default'])
+                            <span class="text-muted">{{ $addr->recipient_phone }}</span>
+                            @if ($addr->is_default)
                                 <span class="badge address-default-badge">Mặc định</span>
                             @endif
                         </div>
-                        <p class="text-muted mb-2">{{ $addr['address'] }}</p>
-                        <span class="address-type-tag">{{ $addr['type'] }}</span>
+                        <p class="text-muted mb-0">
+                            {{ $addr->address_detail }}, {{ $addr->ward }}, {{ $addr->district }}, {{ $addr->province }}
+                        </p>
                     </div>
                     <div class="address-actions">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                            data-bs-target="#editAddressModal">
-                            <i class="fa-solid fa-pen"></i> Sửa
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger">
-                            <i class="fa-solid fa-trash"></i> Xóa
-                        </button>
+                        <form action="{{ route('addresses.destroy', $addr) }}" method="POST"
+                            onsubmit="return confirm('Bạn có chắc muốn xóa địa chỉ này?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fa-solid fa-trash"></i> Xóa
+                            </button>
+                        </form>
                     </div>
                 </div>
-                @if (!$addr['default'])
+                @if (!$addr->is_default)
                     <div class="address-row-footer">
-                        <button type="button" class="btn btn-sm btn-link p-0">Đặt làm mặc
-                            định</button>
+                        <form action="{{ route('addresses.set-default', $addr) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-sm btn-link p-0">Đặt làm mặc định</button>
+                        </form>
                     </div>
                 @endif
             </div>
-        @endforeach
+        @empty
+            <div class="empty-state">
+                <i class="fa-solid fa-location-dot"></i>
+                <p>Bạn chưa có địa chỉ nào. Hãy thêm địa chỉ mới!</p>
+            </div>
+        @endforelse
     </div>
 </div>
