@@ -5,6 +5,7 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CustomerOrderController;
 use App\Http\Controllers\Client\ProductReviewController;
+use App\Http\Controllers\Client\ShopFollowController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,5 +48,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
+
+    // Theo dõi Gian hàng (Shop Follow)
+    Route::post('/shops/{sellerProfile}/follow', [ShopFollowController::class, 'toggle'])->name('shops.follow.toggle');
+    Route::get('/customer/followed-shops', [ShopFollowController::class, 'index'])->name('customer.followed-shops.index');
 
 });

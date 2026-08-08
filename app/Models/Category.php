@@ -49,4 +49,9 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function sellerProfiles()
+    {
+        return $this->belongsToMany(SellerProfile::class, 'seller_categories');
+    }
 }

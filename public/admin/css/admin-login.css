@@ -1,0 +1,182 @@
+/* =============================================
+   CUPO ADMIN — Trang Đăng nhập Admin
+   ============================================= */
+
+body {
+    font-family: "Roboto", sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-box {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+}
+
+/* Header */
+.login-header {
+    background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+    padding: 32px 36px 28px;
+    text-align: center;
+}
+
+.login-header .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.login-header .brand img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.login-header .brand-name {
+    font-family: "Pacifico", cursive;
+    font-size: 26px;
+    color: #ffffff;
+}
+
+.login-header .subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Body form */
+.login-body {
+    padding: 32px 36px 36px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    border: 1.5px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: #c62828;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12);
+    outline: none;
+}
+
+.input-group-text {
+    border: 1.5px solid #dee2e6;
+    border-radius: 8px 0 0 8px;
+    background: #f8f9fa;
+    color: #6c757d;
+    border-right: none;
+    padding: 10px 12px;
+}
+
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #c62828;
+}
+
+/* Submit button */
+.btn-admin-login {
+    width: 100%;
+    background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    margin-top: 4px;
+}
+
+.btn-admin-login:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.btn-admin-login:active {
+    transform: translateY(0);
+}
+
+/* Alert error */
+.alert-login-error {
+    background: #fdecea;
+    border: 1px solid #f5c6c6;
+    border-radius: 8px;
+    color: #b71c1c;
+    font-size: 13px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+}
+
+.alert-login-success {
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 8px;
+    color: #2e7d32;
+    font-size: 13px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+}
+
+/* Security note */
+.security-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 16px;
+    font-size: 11px;
+    color: #6c757d;
+}
+
+.security-note i {
+    color: #2e7d32;
+    font-size: 13px;
+}
+
+/* Footer link */
+.login-footer {
+    text-align: center;
+    padding: 16px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 12px;
+    color: #adb5bd;
+}
+
+.login-footer a {
+    color: #c62828;
+    text-decoration: none;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}
