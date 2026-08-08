@@ -3,7 +3,7 @@
 @section('page-title', 'Quản lý Danh mục')
 
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Quản lý Danh mục</li>
+    <li class="breadcrumb-item active">Danh mục</li>
 @endsection
 
 @push('styles')
@@ -12,135 +12,130 @@
 
 @section('content')
 
-    {{-- ===== Context cho categories.js (Rule 20: không inline JS) ===== --}}
+    {{-- Context cho categories.js (Rule 20) --}}
     <div id="categoriesApp"
         data-data-url="{{ route('admin.categories.data') }}"
         data-store-url="{{ route('admin.categories.store') }}"
         data-update-url="{{ url('admin/categories') }}/__ID__"
         data-destroy-url="{{ url('admin/categories') }}/__ID__"
         data-csrf="{{ csrf_token() }}"
-        style="display:none;">
-    </div>
+        style="display:none;"></div>
 
-    {{-- ===== Stat cards ===== --}}
-    <div class="row g-3 mb-4">
-        <div class="col-sm-4">
-            <div class="cat-stat-card">
-                <div class="cat-stat-icon red">
-                    <i class="fa-solid fa-tags"></i>
-                </div>
-                <div>
-                    <div class="cat-stat-num" id="statTotal">—</div>
-                    <div class="cat-stat-label">Tổng danh mục</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="cat-stat-card">
-                <div class="cat-stat-icon green">
-                    <i class="fa-solid fa-folder"></i>
-                </div>
-                <div>
-                    <div class="cat-stat-num" id="statParent">—</div>
-                    <div class="cat-stat-label">Danh mục gốc</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="cat-stat-card">
-                <div class="cat-stat-icon orange">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
-                <div>
-                    <div class="cat-stat-num" id="statChildren">—</div>
-                    <div class="cat-stat-label">Danh mục con</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="admin-card" style="border-radius:12px; overflow:hidden;">
 
-    {{-- ===== Card chính: Tree view ===== --}}
-    <div class="admin-card">
+        {{-- ===== Page header ===== --}}
+        <div class="cat-page-header">
+            <div>
+                <h4 class="cat-page-title">Danh mục</h4>
+                <p class="cat-page-sub">Quản lý danh mục hàng hóa</p>
+            </div>
+            <button type="button" id="btnAddCategory" class="btn-cat-primary">
+                <i class="fa-solid fa-plus"></i>
+                Thêm danh mục
+            </button>
+        </div>
 
-        {{-- Card header --}}
-        <div class="admin-card-header">
-            <div class="cat-toolbar">
-                <div>
-                    <h6 class="mb-0 fw-bold" style="font-size:15px;">Cây danh mục hàng hóa</h6>
-                    <p class="text-muted mb-0" style="font-size:12px; margin-top:2px;">
-                        Click vào danh mục gốc để xem / ẩn các danh mục con
-                    </p>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="cat-search-wrap">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text"
-                            id="catSearchInput"
-                            class="cat-search"
-                            placeholder="Tìm danh mục...">
-                    </div>
-                    <button type="button" id="btnAddCategory" class="btn-cat-add">
-                        <i class="fa-solid fa-plus"></i>
-                        Thêm danh mục
-                    </button>
-                </div>
+        {{-- ===== Toolbar ===== --}}
+        <div class="cat-toolbar-bar">
+            <div class="cat-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="catSearchInput" class="cat-search" placeholder="Tìm theo tên danh mục...">
+            </div>
+            <div class="cat-filter-chips">
+                <button class="cat-chip active" id="chipAll" data-filter="all">Tất cả</button>
+                <button class="cat-chip" id="chipActive" data-filter="active">
+                    <span class="chip-dot green"></span>Hoạt động
+                </button>
+                <button class="cat-chip" id="chipHidden" data-filter="hidden">
+                    <span class="chip-dot red"></span>Đã ẩn
+                </button>
+                <button class="cat-chip" id="chipParent" data-filter="parent">
+                    <i class="fa-solid fa-folder me-1" style="font-size:11px;"></i>Danh mục gốc
+                </button>
             </div>
         </div>
 
-        {{-- Tree --}}
-        <div id="categoryTree" class="cat-tree-wrap">
-            {{-- Rendered by categories.js --}}
+        {{-- ===== Table ===== --}}
+        <div class="table-responsive">
+            <table class="cat-table" id="catTable">
+                <thead>
+                    <tr>
+                        <th class="col-check">
+                            <input type="checkbox" class="cat-checkbox" id="checkAll">
+                        </th>
+                        <th class="col-name">TÊN DANH MỤC</th>
+                        <th class="col-slug">SLUG</th>
+                        <th class="col-children">CON</th>
+                        <th class="col-status">HIỂN THỊ</th>
+                        <th class="col-actions">HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody id="catTableBody">
+                    <tr>
+                        <td colspan="6" class="cat-loading-cell">
+                            <span class="cat-spinner"></span>
+                            Đang tải dữ liệu...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {{-- ===== Footer: select info + pagination ===== --}}
+        <div class="cat-table-footer" id="catTableFooter">
+            <span class="cat-select-info" id="catSelectInfo">0 dòng đã chọn</span>
+            <div class="cat-pagination" id="catPagination"></div>
         </div>
 
     </div>
 
-    {{-- ===== Modal: Tạo / Sửa danh mục ===== --}}
-    <div class="modal fade" id="catModal" tabindex="-1" aria-labelledby="catModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-cat" style="max-width: 440px;">
-            <div class="modal-content" style="border-radius:12px; border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+    {{-- ===== Modal: Tạo / Sửa ===== --}}
+    <div class="modal fade" id="catModal" tabindex="-1" aria-labelledby="catModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+            <div class="modal-content cat-modal-content">
 
-                <div class="modal-header">
-                    <h5 class="modal-title" id="catModalTitle">Thêm danh mục mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="cat-modal-header">
+                    <h5 class="modal-title" id="catModalLabel">Thêm danh mục mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body modal-cat">
+                <div class="cat-modal-body">
                     <form id="catForm" novalidate>
 
-                        <div class="mb-3">
-                            <label class="form-label" for="catName">
+                        <div class="cat-field">
+                            <label for="catName" class="cat-label">
                                 Tên danh mục <span class="text-danger">*</span>
                             </label>
-                            <input type="text"
-                                id="catName"
-                                class="form-control"
-                                placeholder="VD: Thời trang, Điện tử, Đồ gia dụng..."
-                                maxlength="255">
-                            <div class="invalid-feedback">Vui lòng nhập tên danh mục.</div>
+                            <input type="text" id="catName" class="cat-input"
+                                placeholder="VD: Thời trang, Điện tử..." maxlength="255">
+                            <span class="cat-invalid" id="catNameError"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label" for="catParentId">Danh mục cha</label>
-                            <select id="catParentId" class="form-select">
-                                <option value="">-- Là danh mục gốc --</option>
+                        <div class="cat-field">
+                            <label for="catParentId" class="cat-label">Danh mục cha</label>
+                            <select id="catParentId" class="cat-select">
+                                <option value="">— Là danh mục gốc —</option>
                             </select>
-                            <div class="form-text">Để trống nếu đây là danh mục cấp cao nhất.</div>
+                            <p class="cat-hint">Để trống nếu đây là danh mục cấp cao nhất.</p>
                         </div>
 
-                        <div class="mb-1">
-                            <label class="form-label" for="catStatus">Trạng thái</label>
-                            <select id="catStatus" class="form-select">
-                                <option value="1">Hoạt động</option>
-                                <option value="0">Ẩn</option>
-                            </select>
+                        <div class="cat-field">
+                            <label class="cat-label">Trạng thái</label>
+                            <div class="cat-toggle-row">
+                                <label class="cat-toggle-switch">
+                                    <input type="checkbox" id="catStatusToggle" checked>
+                                    <span class="cat-toggle-track"></span>
+                                </label>
+                                <span class="cat-toggle-label" id="catStatusLabel">Hiển thị</span>
+                            </div>
                         </div>
 
                     </form>
                 </div>
 
-                <div class="modal-footer border-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" id="btnCatSave" class="btn-modal-save">Lưu</button>
+                <div class="cat-modal-footer">
+                    <button type="button" class="btn-cat-cancel" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" id="btnCatSave" class="btn-cat-primary">Lưu</button>
                 </div>
 
             </div>
@@ -148,10 +143,10 @@
     </div>
 
     {{-- ===== Toast ===== --}}
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
-        <div id="catToast" class="toast align-items-center border-0" role="alert">
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100;">
+        <div id="catToast" class="toast align-items-center border-0" role="alert" aria-live="assertive">
             <div class="d-flex">
-                <div class="toast-body" id="catToastMsg"></div>
+                <div class="toast-body fw-500" id="catToastMsg"></div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>

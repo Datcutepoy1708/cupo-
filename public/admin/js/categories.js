@@ -1,263 +1,377 @@
 /**
- * CUPO ADMIN — Quản lý Danh mục
+ * CUPO ADMIN — Quản lý Danh mục (table layout)
  * File: public/admin/js/categories.js
  *
- * Data context được đọc từ data-* attributes trên #categoriesApp
- * (xem admin/categories/index.blade.php)
+ * Data context từ data-* attributes trên #categoriesApp
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    /* -------------------------------------------------------
-       0. Config từ data-* attributes (Rule 20: không inline JS)
-    ------------------------------------------------------- */
-    const app      = document.getElementById('categoriesApp');
-    const ROUTES   = {
+
+    /* ─── 0. Config ─────────────────────────────────────────── */
+    const app    = document.getElementById('categoriesApp');
+    const ROUTES = {
         data:    app.dataset.dataUrl,
         store:   app.dataset.storeUrl,
-        update:  app.dataset.updateUrl,   // __ID__ placeholder
-        destroy: app.dataset.destroyUrl,  // __ID__ placeholder
+        update:  app.dataset.updateUrl,   // chứa __ID__
+        destroy: app.dataset.destroyUrl,  // chứa __ID__
         csrf:    app.dataset.csrf,
     };
 
-    /* -------------------------------------------------------
-       1. DOM references
-    ------------------------------------------------------- */
-    const treeWrap    = document.getElementById('categoryTree');
-    const searchInput = document.getElementById('catSearchInput');
-    const modalEl     = document.getElementById('catModal');
-    const modal       = new bootstrap.Modal(modalEl);
-    const modalTitle  = document.getElementById('catModalTitle');
-    const modalForm   = document.getElementById('catForm');
-    const inputName   = document.getElementById('catName');
-    const selParent   = document.getElementById('catParentId');
-    const selStatus   = document.getElementById('catStatus');
-    const btnSave     = document.getElementById('btnCatSave');
-    const toastEl     = document.getElementById('catToast');
-    const toastMsg    = document.getElementById('catToastMsg');
-    const bsToast     = new bootstrap.Toast(toastEl, { delay: 3000 });
+    /* ─── 1. DOM refs ───────────────────────────────────────── */
+    const tableBody    = document.getElementById('catTableBody');
+    const searchInput  = document.getElementById('catSearchInput');
+    const checkAll     = document.getElementById('checkAll');
+    const selectInfo   = document.getElementById('catSelectInfo');
+    const paginationEl = document.getElementById('catPagination');
 
-    // Stat elements
-    const statTotal    = document.getElementById('statTotal');
-    const statParent   = document.getElementById('statParent');
-    const statChildren = document.getElementById('statChildren');
+    const modalEl      = document.getElementById('catModal');
+    const modal        = new bootstrap.Modal(modalEl);
+    const modalTitle   = document.getElementById('catModalLabel');
+    const inputName    = document.getElementById('catName');
+    const nameError    = document.getElementById('catNameError');
+    const selParent    = document.getElementById('catParentId');
+    const statusToggle = document.getElementById('catStatusToggle');
+    const statusLabel  = document.getElementById('catStatusLabel');
+    const btnSave      = document.getElementById('btnCatSave');
 
-    /* -------------------------------------------------------
-       2. State
-    ------------------------------------------------------- */
-    let allCategories = [];   // raw data từ API
-    let editingId     = null; // null = create mode, số = edit mode
-    let openNodes     = new Set(); // lưu id của node đang mở
+    const toastEl      = document.getElementById('catToast');
+    const toastMsg     = document.getElementById('catToastMsg');
+    const bsToast      = new bootstrap.Toast(toastEl, { delay: 3000 });
 
-    /* -------------------------------------------------------
-       3. Utilities
-    ------------------------------------------------------- */
-    function showToast(message, type = 'success') {
-        toastEl.className = 'toast align-items-center border-0 toast-' + type;
-        toastMsg.textContent = message;
+    /* ─── 2. State ──────────────────────────────────────────── */
+    let allCategories  = [];
+    let filteredRows   = [];  // flat list sau khi filter/search
+    let openNodes      = new Set();
+    let selectedIds    = new Set();
+    let editingId      = null;
+    let activeFilter   = 'all';
+
+    // Pagination
+    const PER_PAGE     = 10;
+    let currentPage    = 1;
+
+    /* ─── 3. Helpers ────────────────────────────────────────── */
+    const apiUrl = (tpl, id) => tpl.replace('__ID__', id);
+
+    const headers = () => ({
+        'Content-Type': 'application/json',
+        'Accept':       'application/json',
+        'X-CSRF-TOKEN': ROUTES.csrf,
+    });
+
+    function showToast(msg, type = 'success') {
+        toastEl.className = `toast align-items-center border-0 toast-${type}`;
+        toastMsg.textContent = msg;
         bsToast.show();
     }
 
-    function apiUrl(template, id) {
-        return template.replace('__ID__', id);
+    function escHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    function headers() {
-        return {
-            'Content-Type': 'application/json',
-            'Accept':       'application/json',
-            'X-CSRF-TOKEN': ROUTES.csrf,
-        };
+    function escAttr(str) {
+        return String(str ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     }
 
-    /* -------------------------------------------------------
-       4. Load + render tree
-    ------------------------------------------------------- */
+    /* ─── 4. Load data ──────────────────────────────────────── */
     function loadCategories() {
-        renderSkeleton();
-        fetch(ROUTES.data, { headers: { 'Accept': 'application/json' } })
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="cat-loading-cell">
+                    <span class="cat-spinner"></span>Đang tải dữ liệu...
+                </td>
+            </tr>`;
+
+        fetch(ROUTES.data, { headers: { Accept: 'application/json' } })
             .then(r => r.json())
             .then(res => {
                 allCategories = res.data || [];
-                renderStats();
-                renderTree(allCategories);
-                buildParentDropdown(allCategories);
+                buildParentDropdown();
+                applyFilterAndRender();
             })
             .catch(() => {
-                treeWrap.innerHTML = '<div class="cat-empty"><i class="fa-solid fa-circle-exclamation"></i><p>Không thể tải dữ liệu.</p></div>';
+                tableBody.innerHTML = `
+                    <tr><td colspan="6" class="cat-empty-cell">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <p>Không thể tải dữ liệu.</p>
+                    </td></tr>`;
             });
     }
 
-    function renderSkeleton() {
-        let html = '';
-        for (let i = 0; i < 5; i++) {
-            html += `
-            <div class="cat-skeleton-row">
-                <div class="skeleton-box" style="width:36px;height:36px;border-radius:8px;"></div>
-                <div style="flex:1;">
-                    <div class="skeleton-box" style="height:13px;width:160px;margin-bottom:6px;"></div>
-                    <div class="skeleton-box" style="height:10px;width:90px;"></div>
-                </div>
-                <div class="skeleton-box" style="height:22px;width:60px;border-radius:20px;"></div>
-            </div>`;
-        }
-        treeWrap.innerHTML = html;
+    /* ─── 5. Filter + search → filteredRows ────────────────── */
+    function applyFilterAndRender() {
+        const kw = searchInput.value.trim().toLowerCase();
+
+        // Danh sách root sau khi filter
+        const roots = allCategories.filter(cat => {
+            if (activeFilter === 'active'  && !cat.status) return false;
+            if (activeFilter === 'hidden'  && cat.status)  return false;
+            if (activeFilter === 'parent')                 return true; // chỉ root
+
+            // search
+            if (kw) {
+                const matchSelf     = cat.name.toLowerCase().includes(kw);
+                const matchChildren = (cat.children || []).some(c => c.name.toLowerCase().includes(kw));
+                return matchSelf || matchChildren;
+            }
+            return true;
+        });
+
+        filteredRows = roots;
+        currentPage  = 1;
+        selectedIds.clear();
+        updateSelectInfo();
+        renderTable();
     }
 
-    function renderStats() {
-        const parentCount   = allCategories.length;
-        const childrenCount = allCategories.reduce((sum, c) => sum + (c.children_count || 0), 0);
-        statTotal.textContent    = parentCount + childrenCount;
-        statParent.textContent   = parentCount;
-        statChildren.textContent = childrenCount;
-    }
-
-    function renderTree(categories, keyword = '') {
-        const kw = keyword.trim().toLowerCase();
-
-        if (categories.length === 0) {
-            treeWrap.innerHTML = '<div class="cat-empty"><i class="fa-solid fa-folder-open"></i><p>Chưa có danh mục nào.</p></div>';
+    /* ─── 6. Render table (paginated) ──────────────────────── */
+    function renderTable() {
+        if (filteredRows.length === 0) {
+            tableBody.innerHTML = `
+                <tr><td colspan="6" class="cat-empty-cell">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <p>Không tìm thấy danh mục nào.</p>
+                </td></tr>`;
+            renderPagination(0);
             return;
         }
 
+        const total      = filteredRows.length;
+        const start      = (currentPage - 1) * PER_PAGE;
+        const pageItems  = filteredRows.slice(start, start + PER_PAGE);
+        const kw         = searchInput.value.trim().toLowerCase();
+
         let html = '';
-        let visibleCount = 0;
 
-        categories.forEach(cat => {
-            const matchParent = cat.name.toLowerCase().includes(kw);
-            const matchChildren = (cat.children || []).some(ch => ch.name.toLowerCase().includes(kw));
-
-            if (kw && !matchParent && !matchChildren) return;
-            visibleCount++;
-
+        pageItems.forEach(cat => {
             const hasChildren = cat.children && cat.children.length > 0;
-            const isOpen      = openNodes.has(cat.id) || (kw && matchChildren);
-            const statusClass = cat.status ? 'active' : 'inactive';
-            const statusLabel = cat.status ? 'Hoạt động' : 'Ẩn';
+            const isOpen      = openNodes.has(cat.id) || (kw && hasChildren && cat.children.some(c => c.name.toLowerCase().includes(kw)));
+            const isSelected  = selectedIds.has(cat.id);
 
-            html += `
-            <div class="cat-node" data-id="${cat.id}">
-                <div class="cat-root-row" onclick="catToggle(${cat.id})">
-                    <span class="cat-toggle ${hasChildren ? '' : 'no-children'} ${isOpen ? 'open' : ''}">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </span>
-                    <div class="cat-icon">${cat.name.charAt(0).toUpperCase()}</div>
-                    <div style="flex:1; min-width:0;">
-                        <div class="cat-name">${escHtml(cat.name)}</div>
-                        <div class="cat-meta">/${escHtml(cat.slug || '')} &bull; ${cat.children_count || 0} danh mục con &bull; ${cat.seller_profiles_count || 0} gian hàng</div>
-                    </div>
-                    <div class="cat-badge-wrap">
-                        <span class="cat-status-badge ${statusClass}">${statusLabel}</span>
-                        <div class="cat-row-actions" onclick="event.stopPropagation()">
-                            <button class="btn-row-icon add" title="Thêm danh mục con" onclick="catOpenCreateChild(${cat.id}, '${escAttr(cat.name)}')">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                            <button class="btn-row-icon edit" title="Sửa" onclick="catOpenEdit(${cat.id})">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="btn-row-icon del" title="Xóa" onclick="catDelete(${cat.id}, '${escAttr(cat.name)}')">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>`;
+            html += renderParentRow(cat, hasChildren, isOpen, isSelected);
 
-            if (hasChildren) {
-                html += `<div class="cat-children-wrap ${isOpen ? 'open' : ''}" id="children-${cat.id}">`;
-                (cat.children || []).forEach(child => {
-                    if (kw && !child.name.toLowerCase().includes(kw) && !matchParent) return;
-                    const cStatusClass = child.status ? 'active' : 'inactive';
-                    const cStatusLabel = child.status ? 'Hoạt động' : 'Ẩn';
-                    html += `
-                    <div class="cat-child-row">
-                        <div class="cat-icon child">${child.name.charAt(0).toUpperCase()}</div>
-                        <div style="flex:1; min-width:0;">
-                            <div class="cat-child-name">${escHtml(child.name)}</div>
-                            <div class="cat-meta">/${escHtml(child.slug || '')}</div>
-                        </div>
-                        <div class="cat-badge-wrap">
-                            <span class="cat-status-badge ${cStatusClass}">${cStatusLabel}</span>
-                            <div class="cat-row-actions">
-                                <button class="btn-row-icon edit" title="Sửa" onclick="catOpenEdit(${child.id})">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button class="btn-row-icon del" title="Xóa" onclick="catDelete(${child.id}, '${escAttr(child.name)}')">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>`;
+            if (hasChildren && isOpen) {
+                cat.children.forEach(child => {
+                    if (kw && !child.name.toLowerCase().includes(kw) && !cat.name.toLowerCase().includes(kw)) return;
+                    html += renderChildRow(child, selectedIds.has(child.id));
                 });
-                html += `</div>`;
             }
-
-            html += `</div>`;
         });
 
-        if (visibleCount === 0) {
-            treeWrap.innerHTML = '<div class="cat-empty"><i class="fa-solid fa-magnifying-glass"></i><p>Không tìm thấy danh mục phù hợp.</p></div>';
-        } else {
-            treeWrap.innerHTML = html;
-        }
+        tableBody.innerHTML = html;
+        renderPagination(total);
+        syncCheckAll();
     }
 
-    function buildParentDropdown(categories) {
-        selParent.innerHTML = '<option value="">-- Là danh mục gốc --</option>';
-        categories.forEach(cat => {
-            const opt = document.createElement('option');
-            opt.value = cat.id;
-            opt.textContent = cat.name;
-            selParent.appendChild(opt);
-        });
+    /* ─── 7. Row builders ───────────────────────────────────── */
+    function renderParentRow(cat, hasChildren, isOpen, isSelected) {
+        const statusChecked = cat.status ? 'checked' : '';
+        const initial       = escHtml(cat.name.charAt(0).toUpperCase());
+
+        return `
+        <tr data-id="${cat.id}" class="${isSelected ? 'selected' : ''}">
+            <td class="col-check">
+                <input type="checkbox" class="cat-checkbox row-check"
+                    data-id="${cat.id}" ${isSelected ? 'checked' : ''}>
+            </td>
+            <td>
+                <div class="cat-name-cell">
+                    <button class="cat-expand-btn ${hasChildren ? (isOpen ? 'open' : '') : 'invisible'}"
+                        onclick="catToggle(${cat.id})" title="${isOpen ? 'Thu gọn' : 'Mở rộng'}">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <div class="cat-row-icon parent">${initial}</div>
+                    <div>
+                        <div class="cat-row-name">${escHtml(cat.name)}</div>
+                        <div class="cat-row-meta">${cat.children_count ?? 0} danh mục con</div>
+                    </div>
+                </div>
+            </td>
+            <td><span class="cat-slug-text">/${escHtml(cat.slug ?? '')}</span></td>
+            <td class="text-center">
+                <span class="cat-children-badge">${cat.children_count ?? 0}</span>
+            </td>
+            <td class="text-center">
+                <label class="cat-toggle-switch" title="${cat.status ? 'Đang hiển thị' : 'Đang ẩn'}">
+                    <input type="checkbox" ${statusChecked}
+                        onchange="catToggleStatus(${cat.id}, this.checked)">
+                    <span class="cat-toggle-track"></span>
+                </label>
+            </td>
+            <td class="text-center">
+                <div class="dropdown">
+                    <button class="cat-action-btn" data-bs-toggle="dropdown" title="Hành động">
+                        •••
+                    </button>
+                    <ul class="dropdown-menu cat-dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button class="dropdown-item" onclick="catOpenCreateChild(${cat.id}, '${escAttr(cat.name)}')">
+                                <i class="fa-solid fa-plus" style="color:#2e7d32;width:14px;"></i>
+                                Thêm danh mục con
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" onclick="catOpenEdit(${cat.id})">
+                                <i class="fa-solid fa-pen" style="color:#e65100;width:14px;"></i>
+                                Sửa
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <button class="dropdown-item text-danger" onclick="catDelete(${cat.id}, '${escAttr(cat.name)}')">
+                                <i class="fa-solid fa-trash" style="width:14px;"></i>
+                                Xóa
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>`;
     }
 
-    /* -------------------------------------------------------
-       5. Toggle expand node (exposed globally for onclick)
-    ------------------------------------------------------- */
-    window.catToggle = function (id) {
-        const childrenDiv = document.getElementById('children-' + id);
-        const toggleBtn   = document.querySelector(`.cat-node[data-id="${id}"] .cat-toggle`);
-        if (!childrenDiv) return;
+    function renderChildRow(child, isSelected) {
+        const statusChecked = child.status ? 'checked' : '';
+        const initial       = escHtml(child.name.charAt(0).toUpperCase());
 
-        if (openNodes.has(id)) {
-            openNodes.delete(id);
-            childrenDiv.classList.remove('open');
-            toggleBtn && toggleBtn.classList.remove('open');
-        } else {
-            openNodes.add(id);
-            childrenDiv.classList.add('open');
-            toggleBtn && toggleBtn.classList.add('open');
+        return `
+        <tr data-id="${child.id}" class="cat-child-row ${isSelected ? 'selected' : ''}">
+            <td class="col-check">
+                <input type="checkbox" class="cat-checkbox row-check"
+                    data-id="${child.id}" ${isSelected ? 'checked' : ''}>
+            </td>
+            <td>
+                <div class="cat-name-cell">
+                    <span style="display:inline-block;width:28px;flex-shrink:0;"></span>
+                    <span class="cat-expand-btn invisible"></span>
+                    <div class="cat-row-icon child">${initial}</div>
+                    <div>
+                        <div class="cat-row-name" style="font-weight:500;">${escHtml(child.name)}</div>
+                    </div>
+                </div>
+            </td>
+            <td><span class="cat-slug-text">/${escHtml(child.slug ?? '')}</span></td>
+            <td class="text-center"><span class="cat-children-badge">—</span></td>
+            <td class="text-center">
+                <label class="cat-toggle-switch" title="${child.status ? 'Đang hiển thị' : 'Đang ẩn'}">
+                    <input type="checkbox" ${statusChecked}
+                        onchange="catToggleStatus(${child.id}, this.checked)">
+                    <span class="cat-toggle-track"></span>
+                </label>
+            </td>
+            <td class="text-center">
+                <div class="dropdown">
+                    <button class="cat-action-btn" data-bs-toggle="dropdown" title="Hành động">
+                        •••
+                    </button>
+                    <ul class="dropdown-menu cat-dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button class="dropdown-item" onclick="catOpenEdit(${child.id})">
+                                <i class="fa-solid fa-pen" style="color:#e65100;width:14px;"></i>
+                                Sửa
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <button class="dropdown-item text-danger" onclick="catDelete(${child.id}, '${escAttr(child.name)}')">
+                                <i class="fa-solid fa-trash" style="width:14px;"></i>
+                                Xóa
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>`;
+    }
+
+    /* ─── 8. Pagination ─────────────────────────────────────── */
+    function renderPagination(total) {
+        const totalPages = Math.ceil(total / PER_PAGE);
+        if (totalPages <= 1) { paginationEl.innerHTML = ''; return; }
+
+        const start = (currentPage - 1) * PER_PAGE + 1;
+        const end   = Math.min(currentPage * PER_PAGE, total);
+
+        let html = `<span class="cat-page-info">${start}–${end} / ${total}</span>`;
+        html += `<button class="cat-page-btn" onclick="catGoPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fa-solid fa-chevron-left" style="font-size:10px;"></i>
+                 </button>`;
+
+        for (let p = 1; p <= totalPages; p++) {
+            if (totalPages > 7 && Math.abs(p - currentPage) > 2 && p !== 1 && p !== totalPages) {
+                if (p === currentPage - 3 || p === currentPage + 3) html += `<span class="cat-page-info">…</span>`;
+                continue;
+            }
+            html += `<button class="cat-page-btn ${p === currentPage ? 'active' : ''}" onclick="catGoPage(${p})">${p}</button>`;
         }
+
+        html += `<button class="cat-page-btn" onclick="catGoPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                 </button>`;
+
+        paginationEl.innerHTML = html;
+    }
+
+    window.catGoPage = function (page) {
+        const totalPages = Math.ceil(filteredRows.length / PER_PAGE);
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        renderTable();
     };
 
-    /* -------------------------------------------------------
-       6. Modal: Create root
-    ------------------------------------------------------- */
+    /* ─── 9. Expand / collapse ──────────────────────────────── */
+    window.catToggle = function (id) {
+        if (openNodes.has(id)) openNodes.delete(id);
+        else openNodes.add(id);
+        renderTable();
+    };
+
+    /* ─── 10. Toggle status inline ──────────────────────────── */
+    window.catToggleStatus = function (id, checked) {
+        fetch(apiUrl(ROUTES.update, id), {
+            method:  'PATCH',
+            headers: headers(),
+            body:    JSON.stringify({ status: checked }),
+        })
+            .then(r => r.json())
+            .then(res => {
+                showToast(res.message ?? 'Đã cập nhật trạng thái.', 'success');
+                // Cập nhật local data
+                allCategories.forEach(cat => {
+                    if (cat.id === id) cat.status = checked;
+                    (cat.children || []).forEach(ch => { if (ch.id === id) ch.status = checked; });
+                });
+            })
+            .catch(() => showToast('Lỗi kết nối.', 'error'));
+    };
+
+    /* ─── 11. Modal: create root ────────────────────────────── */
     document.getElementById('btnAddCategory').addEventListener('click', () => {
         editingId = null;
         modalTitle.textContent = 'Thêm danh mục mới';
-        modalForm.reset();
-        selParent.value = '';
-        selStatus.value = '1';
+        inputName.value        = '';
+        selParent.value        = '';
+        statusToggle.checked   = true;
+        updateStatusLabel();
+        clearModalError();
         modal.show();
     });
 
-    /* -------------------------------------------------------
-       7. Modal: Create child (exposed globally for onclick)
-    ------------------------------------------------------- */
+    /* ─── 12. Modal: create child ───────────────────────────── */
     window.catOpenCreateChild = function (parentId, parentName) {
         editingId = null;
-        modalTitle.textContent = `Thêm danh mục con vào "${parentName}"`;
-        modalForm.reset();
-        selParent.value = parentId;
-        selStatus.value = '1';
+        modalTitle.textContent = `Thêm con vào "${parentName}"`;
+        inputName.value        = '';
+        selParent.value        = parentId;
+        statusToggle.checked   = true;
+        updateStatusLabel();
+        clearModalError();
         modal.show();
     };
 
-    /* -------------------------------------------------------
-       8. Modal: Edit (exposed globally for onclick)
-    ------------------------------------------------------- */
+    /* ─── 13. Modal: edit ───────────────────────────────────── */
     window.catOpenEdit = function (id) {
-        // Tìm category trong data đã tải
         let found = null;
         allCategories.forEach(cat => {
             if (cat.id === id) found = cat;
@@ -265,33 +379,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         if (!found) return;
 
-        editingId = id;
+        editingId            = id;
         modalTitle.textContent = 'Sửa danh mục';
-        inputName.value        = found.name;
-        selParent.value        = found.parent_id ?? '';
-        selStatus.value        = found.status ? '1' : '0';
+        inputName.value      = found.name;
+        selParent.value      = found.parent_id ?? '';
+        statusToggle.checked = !!found.status;
+        updateStatusLabel();
+        clearModalError();
         modal.show();
     };
 
-    /* -------------------------------------------------------
-       9. Save (Create / Update)
-    ------------------------------------------------------- */
+    /* ─── 14. Save ──────────────────────────────────────────── */
     btnSave.addEventListener('click', () => {
         const name     = inputName.value.trim();
         const parentId = selParent.value || null;
-        const status   = selStatus.value === '1';
+        const status   = statusToggle.checked;
 
         if (!name) {
-            inputName.focus();
             inputName.classList.add('is-invalid');
+            nameError.textContent = 'Vui lòng nhập tên danh mục.';
+            inputName.focus();
             return;
         }
-        inputName.classList.remove('is-invalid');
+        clearModalError();
 
         const url    = editingId ? apiUrl(ROUTES.update, editingId) : ROUTES.store;
         const method = editingId ? 'PATCH' : 'POST';
 
-        btnSave.disabled = true;
+        btnSave.disabled    = true;
         btnSave.textContent = 'Đang lưu...';
 
         fetch(url, {
@@ -301,68 +416,116 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(r => r.json())
             .then(res => {
-                if (res.message) {
-                    modal.hide();
-                    showToast(res.message, 'success');
-                    loadCategories();
-                } else {
-                    showToast('Có lỗi xảy ra, vui lòng thử lại.', 'error');
+                if (res.errors) {
+                    const msgs = Object.values(res.errors).flat();
+                    nameError.textContent = msgs[0] ?? 'Có lỗi.';
+                    inputName.classList.add('is-invalid');
+                    return;
                 }
+                modal.hide();
+                showToast(res.message ?? 'Đã lưu thành công.', 'success');
+                loadCategories();
             })
             .catch(() => showToast('Lỗi kết nối.', 'error'))
             .finally(() => {
-                btnSave.disabled = false;
+                btnSave.disabled    = false;
                 btnSave.textContent = 'Lưu';
             });
     });
 
-    /* -------------------------------------------------------
-       10. Delete (exposed globally for onclick)
-    ------------------------------------------------------- */
+    /* ─── 15. Delete ────────────────────────────────────────── */
     window.catDelete = function (id, name) {
-        if (!confirm(`Xóa danh mục "${name}"?\n\nDanh mục con và liên kết với gian hàng sẽ bị ảnh hưởng.`)) return;
+        if (!confirm(`Xóa danh mục "${name}"?\n\nCác danh mục con và liên kết gian hàng có thể bị ảnh hưởng.`)) return;
 
         fetch(apiUrl(ROUTES.destroy, id), {
-            method: 'DELETE',
+            method:  'DELETE',
             headers: headers(),
         })
             .then(r => r.json())
             .then(res => {
-                showToast(res.message || 'Đã xóa.', 'success');
+                showToast(res.message ?? 'Đã xóa.', 'success');
                 openNodes.delete(id);
+                selectedIds.delete(id);
                 loadCategories();
             })
             .catch(() => showToast('Lỗi kết nối.', 'error'));
     };
 
-    /* -------------------------------------------------------
-       11. Search debounce
-    ------------------------------------------------------- */
+    /* ─── 16. Checkbox select ───────────────────────────────── */
+    tableBody.addEventListener('change', e => {
+        const cb = e.target.closest('.row-check');
+        if (!cb) return;
+        const id = Number(cb.dataset.id);
+        if (cb.checked) selectedIds.add(id);
+        else selectedIds.delete(id);
+        updateSelectInfo();
+        syncCheckAll();
+        cb.closest('tr').classList.toggle('selected', cb.checked);
+    });
+
+    checkAll.addEventListener('change', () => {
+        const checked = checkAll.checked;
+        tableBody.querySelectorAll('.row-check').forEach(cb => {
+            cb.checked = checked;
+            const id   = Number(cb.dataset.id);
+            if (checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+            cb.closest('tr').classList.toggle('selected', checked);
+        });
+        updateSelectInfo();
+    });
+
+    function syncCheckAll() {
+        const all    = tableBody.querySelectorAll('.row-check');
+        const ticked = tableBody.querySelectorAll('.row-check:checked');
+        checkAll.indeterminate = ticked.length > 0 && ticked.length < all.length;
+        checkAll.checked       = all.length > 0 && ticked.length === all.length;
+    }
+
+    function updateSelectInfo() {
+        selectInfo.textContent = `${selectedIds.size} dòng đã chọn`;
+    }
+
+    /* ─── 17. Filter chips ──────────────────────────────────── */
+    document.querySelectorAll('.cat-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            activeFilter = chip.dataset.filter;
+            applyFilterAndRender();
+        });
+    });
+
+    /* ─── 18. Search debounce ───────────────────────────────── */
     let searchTimer;
     searchInput.addEventListener('input', () => {
         clearTimeout(searchTimer);
-        searchTimer = setTimeout(() => {
-            renderTree(allCategories, searchInput.value);
-        }, 220);
+        searchTimer = setTimeout(applyFilterAndRender, 220);
     });
 
-    /* -------------------------------------------------------
-       12. Escape helpers
-    ------------------------------------------------------- */
-    function escHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+    /* ─── 19. Modal toggle label ────────────────────────────── */
+    statusToggle.addEventListener('change', updateStatusLabel);
+
+    function updateStatusLabel() {
+        statusLabel.textContent = statusToggle.checked ? 'Hiển thị' : 'Đã ẩn';
     }
 
-    function escAttr(str) {
-        return String(str).replace(/'/g, "\\'");
+    function clearModalError() {
+        inputName.classList.remove('is-invalid');
+        nameError.textContent = '';
     }
 
-    /* -------------------------------------------------------
-       13. Bootstrap
-    ------------------------------------------------------- */
+    /* ─── 20. Parent dropdown ───────────────────────────────── */
+    function buildParentDropdown() {
+        selParent.innerHTML = '<option value="">— Là danh mục gốc —</option>';
+        allCategories.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat.id;
+            opt.textContent = cat.name;
+            selParent.appendChild(opt);
+        });
+    }
+
+    /* ─── Boot ──────────────────────────────────────────────── */
     loadCategories();
 });
