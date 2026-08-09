@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
         export:     app.dataset.exportUrl,
         bulkStatus: app.dataset.bulkStatusUrl,
         bulkDelete: app.dataset.bulkDeleteUrl,
+        upload:     app.dataset.uploadUrl,
         csrf:       app.dataset.csrf,
     };
 
@@ -41,6 +42,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputName    = document.getElementById('catName');
     const nameError    = document.getElementById('catNameError');
     const selParent    = document.getElementById('catParentId');
+    const inputImage   = document.getElementById('catImage');
+    const filePicker   = document.getElementById('catFilePicker');
+    const btnUploadImg = document.getElementById('btnUploadCatImage');
+    const imgPreviewWrap = document.getElementById('catImagePreviewWrap');
+    const imgPreview   = document.getElementById('catImagePreview');
+    const btnClearImg  = document.getElementById('btnClearCatImage');
     const statusToggle = document.getElementById('catStatusToggle');
     const statusLabel  = document.getElementById('catStatusLabel');
     const btnSave      = document.getElementById('btnCatSave');
@@ -84,6 +91,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function escAttr(str) {
         return String(str ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function formatImgUrl(path) {
+        if (!path) return '';
+        const p = String(path).trim();
+        if (p.includes('/storage/')) return '/storage/' + p.split('/storage/')[1];
+        if (p.startsWith('http://') || p.startsWith('https://') || p.startsWith('/')) return p;
+        return '/storage/' + p;
+    }
+
+    function showImgPreview(url) {
+        const formatted = formatImgUrl(url);
+        if (formatted) {
+            imgPreview.src = formatted;
+            imgPreviewWrap.classList.remove('d-none');
+            imgPreview.onerror = () => imgPreviewWrap.classList.add('d-none');
+        } else {
+            imgPreviewWrap.classList.add('d-none');
+        }
+    }
+
+    function clearImgPreview() {
+        inputImage.value = '';
+        imgPreviewWrap.classList.add('d-none');
+        imgPreview.src = '';
     }
 
     /* ─── 4. Load data ──────────────────────────────────────── */
@@ -179,7 +211,12 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ─── 7. Row builders ───────────────────────────────────── */
     function renderParentRow(cat, hasChildren, isOpen, isSelected) {
         const statusChecked = cat.status ? 'checked' : '';
-        const initial       = escHtml(cat.name.charAt(0).toUpperCase());
+        const imgUrl = cat.image ? formatImgUrl(cat.image) : '';
+        const initial = escHtml(cat.name.charAt(0).toUpperCase());
+        const avatarHtml = imgUrl
+            ? `<img src="${escHtml(imgUrl)}" class="cat-row-img" alt="${escHtml(cat.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+               <div class="cat-row-icon parent" style="display:none;">${initial}</div>`
+            : `<div class="cat-row-icon parent">${initial}</div>`;
 
         return `
         <tr data-id="${cat.id}" class="${isSelected ? 'selected' : ''}">
@@ -193,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         onclick="catToggle(${cat.id})" title="${isOpen ? 'Thu gọn' : 'Mở rộng'}">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
-                    <div class="cat-row-icon parent">${initial}</div>
+                    <div class="cat-row-avatar">${avatarHtml}</div>
                     <div>
                         <div class="cat-row-name">${escHtml(cat.name)}</div>
                         <div class="cat-row-meta">${cat.children_count ?? 0} danh mục con</div>
@@ -244,7 +281,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderChildRow(child, isSelected) {
         const statusChecked = child.status ? 'checked' : '';
-        const initial       = escHtml(child.name.charAt(0).toUpperCase());
+        const imgUrl = child.image ? formatImgUrl(child.image) : '';
+        const initial = escHtml(child.name.charAt(0).toUpperCase());
+        const avatarHtml = imgUrl
+            ? `<img src="${escHtml(imgUrl)}" class="cat-row-img child-img" alt="${escHtml(child.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+               <div class="cat-row-icon child" style="display:none;">${initial}</div>`
+            : `<div class="cat-row-icon child">${initial}</div>`;
 
         return `
         <tr data-id="${child.id}" class="cat-child-row ${isSelected ? 'selected' : ''}">
@@ -256,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="cat-name-cell">
                     <span style="display:inline-block;width:28px;flex-shrink:0;"></span>
                     <span class="cat-expand-btn invisible"></span>
-                    <div class="cat-row-icon child">${initial}</div>
+                    <div class="cat-row-avatar">${avatarHtml}</div>
                     <div>
                         <div class="cat-row-name" style="font-weight:500;">${escHtml(child.name)}</div>
                     </div>
@@ -363,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalTitle.textContent = 'Thêm danh mục mới';
         inputName.value        = '';
         selParent.value        = '';
+        clearImgPreview();
         statusToggle.checked   = true;
         updateStatusLabel();
         clearModalError();
@@ -375,6 +418,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalTitle.textContent = `Thêm con vào "${parentName}"`;
         inputName.value        = '';
         selParent.value        = parentId;
+        clearImgPreview();
         statusToggle.checked   = true;
         updateStatusLabel();
         clearModalError();
@@ -390,11 +434,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         if (!found) return;
 
-        editingId            = id;
+        editingId              = id;
         modalTitle.textContent = 'Sửa danh mục';
-        inputName.value      = found.name;
-        selParent.value      = found.parent_id ?? '';
-        statusToggle.checked = !!found.status;
+        inputName.value        = found.name;
+        selParent.value        = found.parent_id ?? '';
+        inputImage.value       = found.image ? formatImgUrl(found.image) : '';
+        showImgPreview(found.image);
+        statusToggle.checked   = !!found.status;
         updateStatusLabel();
         clearModalError();
         modal.show();
@@ -405,6 +451,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const name     = inputName.value.trim();
         const parentId = selParent.value || null;
         const status   = statusToggle.checked;
+        const image    = inputImage.value.trim() || null;
 
         if (!name) {
             inputName.classList.add('is-invalid');
@@ -423,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(url, {
             method,
             headers: headers(),
-            body: JSON.stringify({ name, parent_id: parentId, status }),
+            body: JSON.stringify({ name, parent_id: parentId, status, image }),
         })
             .then(r => r.json())
             .then(res => {
@@ -443,6 +490,55 @@ document.addEventListener('DOMContentLoaded', function () {
                 btnSave.textContent = 'Lưu';
             });
     });
+
+    /* ─── 14b. Image upload & preview ───────────────────────── */
+    if (inputImage) {
+        inputImage.addEventListener('input', function () {
+            showImgPreview(this.value.trim());
+        });
+    }
+
+    if (btnUploadImg && filePicker) {
+        btnUploadImg.addEventListener('click', () => filePicker.click());
+
+        filePicker.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', 'categories');
+
+            btnUploadImg.disabled = true;
+            btnUploadImg.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang tải...';
+
+            fetch(ROUTES.upload, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': ROUTES.csrf },
+                body: formData,
+            })
+                .then(r => r.json())
+                .then(json => {
+                    if (json.status === 'success' && json.url) {
+                        inputImage.value = json.url;
+                        showImgPreview(json.url);
+                        showToast('Tải ảnh lên thành công!', 'success');
+                    } else {
+                        showToast(json.message ?? 'Lỗi tải ảnh.', 'error');
+                    }
+                })
+                .catch(() => showToast('Có lỗi xảy ra khi tải tệp ảnh.', 'error'))
+                .finally(() => {
+                    btnUploadImg.disabled = false;
+                    btnUploadImg.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-1"></i> Tải lên';
+                    filePicker.value = '';
+                });
+        });
+    }
+
+    if (btnClearImg) {
+        btnClearImg.addEventListener('click', clearImgPreview);
+    }
 
     /* ─── 15. Delete ────────────────────────────────────────── */
     window.catDelete = function (id, name) {

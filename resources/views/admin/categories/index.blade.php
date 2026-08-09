@@ -21,6 +21,7 @@
         data-export-url="{{ route('admin.categories.export') }}"
         data-bulk-status-url="{{ route('admin.categories.bulk-status') }}"
         data-bulk-delete-url="{{ route('admin.categories.bulk-delete') }}"
+        data-upload-url="{{ route('admin.upload') }}"
         data-csrf="{{ csrf_token() }}"
         style="display:none;"></div>
 
@@ -147,7 +148,28 @@
                             <select id="catParentId" class="cat-select">
                                 <option value="">— Là danh mục gốc —</option>
                             </select>
-                            <p class="cat-hint">Để trống nếu đây là danh mục cấp cao nhất.</p>
+                            <p class="cat-hint">Dể trống nếu đây là danh mục cấp cao nhất.</p>
+                        </div>
+
+                        {{-- Hình ảnh danh mục --}}
+                        <div class="cat-field">
+                            <label class="cat-label">Hình ảnh danh mục</label>
+                            <div class="input-group">
+                                <input type="text" id="catImage" class="cat-input" style="border-radius: 8px 0 0 8px;"
+                                    placeholder="Dán URL ảnh hoặc bấm chọn tệp...">
+                                <input type="file" id="catFilePicker" class="d-none" accept="image/jpeg,image/png,image/jpg,image/webp,image/gif">
+                                <button type="button" id="btnUploadCatImage" class="btn btn-outline-secondary" style="border-radius: 0 8px 8px 0;" title="Tải ảnh lên từ máy tính">
+                                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Tải lên
+                                </button>
+                            </div>
+                            <div id="catImagePreviewWrap" class="d-none mt-2">
+                                <div class="cat-img-preview-box">
+                                    <img id="catImagePreview" src="" alt="Preview" class="img-fluid rounded">
+                                    <button type="button" id="btnClearCatImage" class="cat-img-clear-btn" title="Xóa ảnh">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="cat-field">

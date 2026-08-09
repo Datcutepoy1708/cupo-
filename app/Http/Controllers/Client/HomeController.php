@@ -20,7 +20,7 @@ class HomeController extends Controller
         $midBanners = Banner::active()->atPosition('homepage_mid')->get();
         $sideBanners = Banner::active()->atPosition('sidebar')->get();
 
-        $featuredCategories = Category::withCount('sellerProfiles')
+        $featuredCategories = Category::withCount(['sellerProfiles', 'children'])
             ->whereNull('parent_id')
             ->where('status', true)
             ->take(8)
