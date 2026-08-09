@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\SellerOrder;
 use App\Models\Review;
+use App\Models\SellerOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +16,7 @@ class SellerProfileController extends Controller
     {
         $shop = Auth::user()->sellerProfile;
 
-        abort_if(!$shop, 404, 'Bạn chưa đăng ký gian hàng.');
+        abort_if(! $shop, 404, 'Bạn chưa đăng ký gian hàng.');
 
         $allCategories = collect();
 
@@ -50,8 +50,8 @@ class SellerProfileController extends Controller
                 ->get();
 
             $shop->reviews = Review::whereHas('product', function ($q) use ($shop) {
-                    $q->where('seller_id', $shop->id);
-                })
+                $q->where('seller_id', $shop->id);
+            })
                 ->latest()
                 ->get();
 
