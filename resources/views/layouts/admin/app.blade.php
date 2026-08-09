@@ -101,7 +101,7 @@
                 {{-- Marketing --}}
                 <div class="sidebar-nav-label">Marketing</div>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.banners.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-image"></i>
                     Banner trang chủ
                 </a>

@@ -1,23 +1,26 @@
 /**
- * CUPO ADMIN — Trang Quản lý Seller
- * Xu ly: tai danh sach, tab filter, tim kiem, checkbox bulk, export CSV,
- *         modal chi tiet, cac hanh dong approve/reject/block
+ * CUPO ADMIN — Trang Quản lý Sản phẩm
+ * Xử lý: tải danh sách, tab filter, tìm kiếm, checkbox bulk, export CSV,
+ *         modal chi tiết, các hành động approve/reject
  *
- * Data context tu data-* attributes tren #sellersAppConfig (Rule 20)
+ * Data context từ data-* attributes trên #productsAppConfig (Rule 20)
  */
 
 (function () {
     'use strict';
 
-    /* ---- Config: lay tu data-* (khong dung window.* global) ---- */
-    const cfg = document.getElementById('sellersAppConfig').dataset;
+    /* ---- Config: lấy từ data-* (không dùng window.* global) ---- */
+    const appEl = document.getElementById('productsAppConfig');
+    if (!appEl) return;
+
+    const cfg = appEl.dataset;
     const ROUTES = {
         index:       cfg.indexUrl,
         export:      cfg.exportUrl,
         bulkApprove: cfg.bulkApproveUrl,
-        approve:     cfg.approveUrl,   // chua __ID__
-        reject:      cfg.rejectUrl,    // chua __ID__
-        block:       cfg.blockUrl,     // chua __ID__
+        bulkReject:  cfg.bulkRejectUrl,
+        approve:     cfg.approveUrl,   // chứa __ID__
+        reject:      cfg.rejectUrl,    // chứa __ID__
         csrf:        cfg.csrf,
     };
 
@@ -26,39 +29,39 @@
         pending:  { label: 'Chờ duyệt', cls: 'badge-pending' },
         approved: { label: 'Đã duyệt',  cls: 'badge-approved' },
         rejected: { label: 'Từ chối',   cls: 'badge-rejected' },
-        blocked:  { label: 'Đã khóa',   cls: 'badge-blocked' },
     };
 
     /* ---- State ---- */
-    let currentStatus = 'pending';   // Mac dinh tab "Cho duyet"
-    let currentPage   = 1;
-    let searchTimer   = null;
-    let currentSeller = null;        // seller dang mo trong modal chi tiet
-    let pendingAction = null;        // { action, sellerId, requireNote }
-    let selectedIds   = new Set();   // ID da chon qua checkbox
+    let currentStatus  = 'pending';   // Mặc định tab "Chờ duyệt"
+    let currentPage    = 1;
+    let searchTimer    = null;
+    let currentProduct = null;        // product đang mở trong modal chi tiết
+    let pendingAction  = null;        // { action, productId, requireNote, isBulk }
+    let selectedIds    = new Set();   // ID đã chọn qua checkbox
 
     /* ---- DOM refs ---- */
-    const tbody         = document.getElementById('sellersTableBody');
-    const paginationWrap  = document.getElementById('paginationWrap');
-    const paginationInfo  = document.getElementById('paginationInfo');
-    const paginationLinks = document.getElementById('paginationLinks');
-    const searchInput   = document.getElementById('sellerSearchInput');
-    const tabButtons    = document.querySelectorAll('.seller-tab');
-    const checkAll      = document.getElementById('checkAllSellers');
-    const bulkToolbar   = document.getElementById('bulkToolbar');
-    const bulkCount     = document.getElementById('bulkCount');
+    const tbody          = document.getElementById('productsTableBody');
+    const paginationWrap   = document.getElementById('paginationWrap');
+    const paginationInfo   = document.getElementById('paginationInfo');
+    const paginationLinks  = document.getElementById('paginationLinks');
+    const searchInput    = document.getElementById('productSearchInput');
+    const tabButtons     = document.querySelectorAll('.seller-tab');
+    const checkAll       = document.getElementById('checkAllProducts');
+    const bulkToolbar    = document.getElementById('bulkToolbar');
+    const bulkCount      = document.getElementById('bulkCount');
     const btnBulkApprove = document.getElementById('btnBulkApprove');
+    const btnBulkReject  = document.getElementById('btnBulkReject');
     const btnBulkClear   = document.getElementById('btnBulkClear');
-    const btnExport      = document.getElementById('btnExportCsv');
+    const btnExport      = document.getElementById('btnExportProductCsv');
 
-    const detailModal = new bootstrap.Modal(document.getElementById('sellerDetailModal'));
-    const actionModal = new bootstrap.Modal(document.getElementById('sellerActionModal'));
+    const detailModal = new bootstrap.Modal(document.getElementById('productDetailModal'));
+    const actionModal = new bootstrap.Modal(document.getElementById('productActionModal'));
     const actionToast = new bootstrap.Toast(document.getElementById('actionToast'), { delay: 3000 });
 
     /* ================================================================
        LOAD DATA
        ================================================================ */
-    function loadSellers(page = 1) {
+    function loadProducts(page = 1) {
         currentPage = page;
         showLoading();
         clearCheckboxState();
@@ -83,7 +86,7 @@
     function showLoading() {
         tbody.innerHTML = `
             <tr>
-                <td colspan="9" class="text-center py-4">
+                <td colspan="10" class="text-center py-4">
                     <div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>
                     Đang tải dữ liệu .....
                 </td>
@@ -94,7 +97,7 @@
     function showError() {
         tbody.innerHTML = `
             <tr>
-                <td colspan="9" class="text-center py-4 text-danger">
+                <td colspan="10" class="text-center py-4 text-danger">
                     <i class="fa-solid fa-triangle-exclamation me-2"></i>
                     Không thể tải dữ liệu. Vui lòng thử lại
                 </td>
@@ -104,61 +107,65 @@
     /* ================================================================
        RENDER TABLE
        ================================================================ */
-    function renderTable(sellers) {
-        if (!sellers || sellers.length === 0) {
+    function renderTable(products) {
+        if (!products || products.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="9">
-                        <div class="sellers-empty">
-                            <i class="fa-solid fa-store-slash"></i>
-                            <p>Không có gian hàng nào phù hợp</p>
+                    <td colspan="10">
+                        <div class="products-empty">
+                            <i class="fa-solid fa-box-open"></i>
+                            <p>Không có sản phẩm nào phù hợp</p>
                         </div>
                     </td>
                 </tr>`;
             return;
         }
 
-        tbody.innerHTML = sellers.map((s, i) => {
-            const st = STATUS_MAP[s.status] || { label: s.status, cls: '' };
-            const logo = s.logo
-                ? `<img src="${s.logo}" class="shop-logo-sm" alt="${s.shop_name}">`
-                : `<div class="shop-logo-letter">${s.shop_name.charAt(0).toUpperCase()}</div>`;
+        tbody.innerHTML = products.map((p, i) => {
+            const st = STATUS_MAP[p.status] || { label: p.status, cls: '' };
+            const thumb = p.thumbnail
+                ? `<img src="${p.thumbnail}" class="product-thumb-sm" alt="${escHtml(p.name)}">`
+                : `<div class="product-thumb-letter">${p.name.charAt(0).toUpperCase()}</div>`;
 
-            const bizLabel  = s.business_type === 'company' ? 'Doanh nghiệp' : 'Cá nhân';
-            const commRate  = s.commission_rate ? s.commission_rate + '%' : '--';
-            const regDate   = s.created_at ? s.created_at.substring(0, 10) : '--';
-            const waitBadge = s.status === 'pending' ? daysBadge(s.created_at) : '';
-            const isChecked = selectedIds.has(s.id) ? 'checked' : '';
+            const shopName  = escHtml(p.seller?.seller_profile?.shop_name ?? p.seller?.name ?? 'N/A');
+            const sellerEmail = escHtml(p.seller?.email ?? '');
+            const categoryName = escHtml(p.category?.name ?? 'Chưa chọn');
+            const price = formatVnd(p.price);
+            const stock = p.stock ?? 0;
+            const regDate = p.created_at ? p.created_at.substring(0, 10) : '--';
+            const waitBadge = p.status === 'pending' ? daysBadge(p.created_at) : '';
+            const isChecked = selectedIds.has(p.id) ? 'checked' : '';
 
             return `
-                <tr data-id="${s.id}">
+                <tr data-id="${p.id}">
                     <td style="text-align:center;">
-                        <input type="checkbox" class="seller-checkbox row-seller-check"
-                            data-id="${s.id}" ${isChecked}>
+                        <input type="checkbox" class="seller-checkbox row-product-check"
+                            data-id="${p.id}" ${isChecked}>
                     </td>
                     <td class="text-muted" style="font-size: 12px;">${(currentPage - 1) * 10 + i + 1}</td>
                     <td>
-                        <div class="shop-cell">
-                            ${logo}
+                        <div class="product-cell">
+                            ${thumb}
                             <div>
-                                <div class="shop-name-text">${escHtml(s.shop_name)}</div>
-                                <div class="shop-slug-text">@${escHtml(s.slug)}</div>
+                                <div class="product-name-text" title="${escHtml(p.name)}">${escHtml(p.name)}</div>
+                                <div class="product-sku-text">SKU: ${escHtml(p.sku ?? '--')}</div>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <div class="owner-name">${escHtml(s.user?.name ?? '--')}</div>
-                        <div class="owner-email">${escHtml(s.user?.email ?? '')}</div>
+                        <div class="shop-name-sub">${shopName}</div>
+                        <div class="seller-name-sub">${sellerEmail}</div>
                     </td>
-                    <td style="font-size: 13px;">${bizLabel}</td>
-                    <td style="font-size: 13px;">${commRate}</td>
+                    <td style="font-size: 13px;">${categoryName}</td>
+                    <td style="font-size: 13px; font-weight: 600;" class="text-danger">${price}</td>
+                    <td style="font-size: 13px;">${stock}</td>
                     <td style="font-size: 13px; color: #6c757d;">
                         ${regDate}
                         ${waitBadge}
                     </td>
                     <td><span class="badge-status ${st.cls}">${st.label}</span></td>
                     <td style="text-align: center;">
-                        <button class="btn-row-detail" title="Xem chi tiết" onclick="openSellerDetail(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+                        <button class="btn-row-detail" title="Xem chi tiết" onclick="openProductDetail(${JSON.stringify(p).replace(/"/g, '&quot;')})">
                             <i class="fa-solid fa-eye"></i>
                         </button>
                     </td>
@@ -166,7 +173,7 @@
         }).join('');
 
         // Re-attach checkbox listeners
-        tbody.querySelectorAll('.row-seller-check').forEach(cb => {
+        tbody.querySelectorAll('.row-product-check').forEach(cb => {
             cb.addEventListener('change', onRowCheckChange);
         });
         syncCheckAll();
@@ -186,10 +193,10 @@
         paginationWrap.style.display = '';
         const from = (page - 1) * perPage + 1;
         const to   = Math.min(page * perPage, total);
-        paginationInfo.textContent = `Hiển thị ${from}–${to} / ${total} gian hàng`;
+        paginationInfo.textContent = `Hiển thị ${from}–${to} / ${total} sản phẩm`;
 
         let btns = '';
-        btns += `<button class="page-btn" onclick="goPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>
+        btns += `<button class="page-btn" onclick="goProductPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>
                     <i class="fa-solid fa-chevron-left" style="font-size:11px;"></i>
                  </button>`;
 
@@ -199,32 +206,32 @@
                     btns += `<span class="page-btn" style="cursor:default; border:none;">...</span>`;
                 continue;
             }
-            btns += `<button class="page-btn ${p === page ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+            btns += `<button class="page-btn ${p === page ? 'active' : ''}" onclick="goProductPage(${p})">${p}</button>`;
         }
 
-        btns += `<button class="page-btn" onclick="goPage(${page + 1})" ${page === lastPage ? 'disabled' : ''}>
+        btns += `<button class="page-btn" onclick="goProductPage(${page + 1})" ${page === lastPage ? 'disabled' : ''}>
                     <i class="fa-solid fa-chevron-right" style="font-size:11px;"></i>
                  </button>`;
 
         paginationLinks.innerHTML = btns;
     }
 
-    window.goPage = function (page) { loadSellers(page); };
+    window.goProductPage = function (page) { loadProducts(page); };
 
     /* ================================================================
        STAT COUNTS
        ================================================================ */
     function updateStatCounts(meta) {
         if (!meta) return;
-        safeSet('count-all',      meta.total_all     ?? meta.total ?? '--');
+        safeSet('count-all',      meta.total_all      ?? meta.total ?? '--');
         safeSet('count-pending',  meta.total_pending  ?? '--');
         safeSet('count-approved', meta.total_approved ?? '--');
-        safeSet('count-blocked',  meta.total_blocked  ?? '--');
+        safeSet('count-rejected', meta.total_rejected ?? '--');
 
         const badgePending = document.getElementById('tab-badge-pending');
         if (badgePending && meta.total_pending != null) {
-            badgePending.textContent    = meta.total_pending;
-            badgePending.style.display  = meta.total_pending > 0 ? '' : 'none';
+            badgePending.textContent   = meta.total_pending;
+            badgePending.style.display = meta.total_pending > 0 ? '' : 'none';
         }
     }
 
@@ -236,7 +243,7 @@
             tabButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             currentStatus = this.dataset.status;
-            loadSellers(1);
+            loadProducts(1);
         });
     });
 
@@ -245,7 +252,7 @@
        ================================================================ */
     searchInput.addEventListener('input', function () {
         clearTimeout(searchTimer);
-        searchTimer = setTimeout(() => loadSellers(1), 350);
+        searchTimer = setTimeout(() => loadProducts(1), 350);
     });
 
     /* ================================================================
@@ -262,7 +269,7 @@
 
     checkAll.addEventListener('change', function () {
         const checked = this.checked;
-        tbody.querySelectorAll('.row-seller-check').forEach(cb => {
+        tbody.querySelectorAll('.row-product-check').forEach(cb => {
             cb.checked = checked;
             const id   = Number(cb.dataset.id);
             if (checked) selectedIds.add(id);
@@ -273,8 +280,8 @@
     });
 
     function syncCheckAll() {
-        const all    = tbody.querySelectorAll('.row-seller-check');
-        const ticked = tbody.querySelectorAll('.row-seller-check:checked');
+        const all    = tbody.querySelectorAll('.row-product-check');
+        const ticked = tbody.querySelectorAll('.row-product-check:checked');
         checkAll.indeterminate = ticked.length > 0 && ticked.length < all.length;
         checkAll.checked       = all.length > 0 && ticked.length === all.length;
     }
@@ -293,11 +300,11 @@
     }
 
     /* ================================================================
-       BULK APPROVE
+       BULK APPROVE / BULK REJECT
        ================================================================ */
     btnBulkApprove.addEventListener('click', function () {
         if (selectedIds.size === 0) return;
-        if (!confirm(`Duyệt ${selectedIds.size} gian hàng đã chọn?\n\nChỉ những gian hàng ở trạng thái chờ duyệt / từ chối / bị khóa mới được cập nhật.`)) return;
+        if (!confirm(`Duyệt ${selectedIds.size} sản phẩm đã chọn?\n\nSản phẩm sẽ được hiển thị công khai trên sàn.`)) return;
 
         this.disabled    = true;
         this.textContent = 'Đang xử lý...';
@@ -314,18 +321,38 @@
             .then(r => r.json())
             .then(json => {
                 showToast(json.message ?? 'Đã duyệt thành công!', 'success');
-                loadSellers(currentPage);
+                loadProducts(currentPage);
             })
             .catch(() => showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error'))
             .finally(() => {
-                this.disabled    = false;
-                this.innerHTML   = '<i class="fa-solid fa-check-double"></i> Duyệt tất cả đã chọn';
+                this.disabled  = false;
+                this.innerHTML = '<i class="fa-solid fa-check-double"></i> Duyệt tất cả đã chọn';
             });
+    });
+
+    btnBulkReject.addEventListener('click', function () {
+        if (selectedIds.size === 0) return;
+
+        pendingAction = { action: 'reject', isBulk: true };
+
+        document.getElementById('productActionModalTitle').textContent = 'Từ chối hàng loạt sản phẩm';
+        document.getElementById('productActionModalDesc').textContent  = `Từ chối ${selectedIds.size} sản phẩm đã chọn. Người bán sẽ nhận được lý do bên dưới.`;
+        document.getElementById('productActionNote').value             = '';
+        document.getElementById('productActionNoteError').classList.add('d-none');
+
+        const noteWrap = document.getElementById('productActionNoteWrap');
+        if (noteWrap) noteWrap.style.display = '';
+
+        const confirmBtn = document.getElementById('confirmProductActionBtn');
+        confirmBtn.className   = 'btn btn-sm btn-danger';
+        confirmBtn.textContent = 'Xác nhận từ chối tất cả';
+
+        actionModal.show();
     });
 
     btnBulkClear.addEventListener('click', function () {
         clearCheckboxState();
-        tbody.querySelectorAll('.row-seller-check').forEach(cb => {
+        tbody.querySelectorAll('.row-product-check').forEach(cb => {
             cb.checked = false;
             cb.closest('tr').classList.remove('seller-row-selected');
         });
@@ -344,7 +371,6 @@
         if (keyword)       params.push('search=' + encodeURIComponent(keyword));
         if (params.length) url += '?' + params.join('&');
 
-        // Trigger download bang iframe an
         const a = document.createElement('a');
         a.href  = url;
         a.download = '';
@@ -356,76 +382,73 @@
     });
 
     /* ================================================================
-       MODAL CHI TIET SELLER
+       MODAL CHI TIẾT SẢN PHẨM
        ================================================================ */
-    window.openSellerDetail = function (seller) {
-        currentSeller = seller;
-        const st = STATUS_MAP[seller.status] || { label: seller.status, cls: '' };
+    window.openProductDetail = function (product) {
+        currentProduct = product;
+        const st = STATUS_MAP[product.status] || { label: product.status, cls: '' };
 
-        const logoEl = document.getElementById('modalShopLogo');
-        if (seller.logo) {
-            logoEl.innerHTML = `<img src="${seller.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" alt="">`;
+        const thumbEl = document.getElementById('modalProductThumb');
+        if (product.thumbnail) {
+            thumbEl.innerHTML = `<img src="${product.thumbnail}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
         } else {
-            logoEl.textContent = seller.shop_name.charAt(0).toUpperCase();
+            thumbEl.textContent = product.name.charAt(0).toUpperCase();
         }
 
-        setText('modalShopName', seller.shop_name);
-        setText('modalShopSlug', '@' + seller.slug);
+        setText('modalProductName', product.name);
+        setText('modalProductSku',  'SKU: ' + (product.sku ?? '--'));
 
         const noteWrapEl = document.getElementById('adminNoteWrap');
-        if (seller.admin_note) {
+        if (product.admin_note) {
             noteWrapEl.classList.remove('d-none');
-            setText('adminNoteText', 'Ghi chú Admin: ' + seller.admin_note);
+            setText('adminNoteText', 'Ghi chú Admin: ' + product.admin_note);
         } else {
             noteWrapEl.classList.add('d-none');
         }
 
-        setText('dOwnerName',     seller.user?.name    ?? '--');
-        setText('dOwnerEmail',    seller.user?.email   ?? '--');
-        setText('dBusinessType',  seller.business_type === 'company' ? 'Doanh nghiệp' : 'Cá nhân');
+        setText('dProductName', product.name);
+        setText('dProductSku',  product.sku ?? '--');
+        setText('dCategory',    product.category?.name ?? 'Chưa chọn');
+        setText('dPrice',       formatVnd(product.price));
+        setText('dStock',       product.stock ?? 0);
+        setText('dHasVariants', product.has_variants ? 'Có biến thể' : 'Sản phẩm thường');
+        setText('dViewsCount',  (product.views_count ?? 0) + ' lượt');
+        setText('dShortDesc',   product.short_description ?? '--');
+        setText('dFullDesc',    product.description ?? 'Không có mô tả chi tiết');
 
-        const catNames = (seller.categories && seller.categories.length > 0)
-            ? seller.categories.map(c => c.name).join(', ')
-            : 'Chưa chọn';
-        setText('dCategories',    catNames);
-        setText('dFollowersCount', (seller.followers_count ?? 0) + ' lượt');
-        setText('dAddress',       seller.address     ?? '--');
-        setText('dNationalId',    seller.national_id ?? '--');
-        setText('dCommission',    seller.commission_rate ? seller.commission_rate + '%' : '--');
-        setText('dBalance',       seller.balance != null ? formatVnd(seller.balance) : '--');
-        setText('dBankName',      seller.bank_name    ?? '--');
-        setText('dBankAccount',   seller.bank_account ?? '--');
-        setText('dBankOwner',     seller.bank_owner   ?? '--');
+        const shopName  = product.seller?.seller_profile?.shop_name ?? product.seller?.name ?? '--';
+        const ownerName = product.seller?.name ?? '--';
+        const ownerMail = product.seller?.email ?? '--';
+        setText('dShopName',    shopName);
+        setText('dSellerName',  ownerName);
+        setText('dSellerEmail', ownerMail);
 
-        // Ngay dang ky + so ngay cho
-        const regDate = seller.created_at ? seller.created_at.substring(0, 10) : '--';
-        const waitTxt = seller.status === 'pending' ? ' ' + daysText(seller.created_at) : '';
-        setText('dRegDate', regDate + waitTxt);
+        const regDate = product.created_at ? product.created_at.substring(0, 10) : '--';
+        const waitTxt = product.status === 'pending' ? ' ' + daysText(product.created_at) : '';
+        setText('dCreatedAt', regDate + waitTxt);
 
-        // Status badge
         document.getElementById('modalStatusBadge').innerHTML =
             `<span class="badge-status ${st.cls}">${st.label}</span>`;
 
-        // Action buttons
         const btnsEl = document.getElementById('modalActionBtns');
         btnsEl.innerHTML = '';
-        if (seller.status === 'pending') {
+        if (product.status === 'pending') {
             btnsEl.innerHTML += `
-                <button class="btn-action-reject" onclick="openActionModal('reject')">
+                <button class="btn-action-reject" onclick="openProductActionModal('reject')">
                     <i class="fa-solid fa-xmark"></i> Từ chối
                 </button>
-                <button class="btn-action-approve" onclick="openActionModal('approve')">
-                    <i class="fa-solid fa-check"></i> Duyệt gian hàng
+                <button class="btn-action-approve" onclick="openProductActionModal('approve')">
+                    <i class="fa-solid fa-check"></i> Duyệt sản phẩm
                 </button>`;
-        } else if (seller.status === 'approved') {
+        } else if (product.status === 'approved') {
             btnsEl.innerHTML += `
-                <button class="btn-action-block" onclick="openActionModal('block')">
-                    <i class="fa-solid fa-ban"></i> Khóa gian hàng
+                <button class="btn-action-reject" onclick="openProductActionModal('reject')">
+                    <i class="fa-solid fa-ban"></i> Gỡ sản phẩm vi phạm
                 </button>`;
-        } else if (seller.status === 'blocked' || seller.status === 'rejected') {
+        } else if (product.status === 'rejected') {
             btnsEl.innerHTML += `
-                <button class="btn-action-approve" onclick="openActionModal('approve')">
-                    <i class="fa-solid fa-rotate-left"></i> Mở khóa / Duyệt lại
+                <button class="btn-action-approve" onclick="openProductActionModal('approve')">
+                    <i class="fa-solid fa-rotate-left"></i> Duyệt lại
                 </button>`;
         }
 
@@ -433,33 +456,26 @@
     };
 
     /* ================================================================
-       HANH DONG: APPROVE / REJECT / BLOCK
+       HÀNH ĐỘNG: APPROVE / REJECT
        ================================================================ */
-    window.openActionModal = function (action) {
-        pendingAction = { action, sellerId: currentSeller.id };
+    window.openProductActionModal = function (action) {
+        pendingAction = { action, productId: currentProduct.id, isBulk: false };
 
-        const shopName = escHtml(currentSeller.shop_name);
+        const prodName = escHtml(currentProduct.name);
 
         const cfgMap = {
             approve: {
-                title:       'Xác nhận duyệt gian hàng',
-                desc:        `Bạn chắc chắn muốn duyệt gian hàng "${shopName}"? Sau khi duyệt, người bán có thể bắt đầu kinh doanh trên Cupo.`,
+                title:       'Xác nhận duyệt sản phẩm',
+                desc:        `Bạn chắc chắn muốn duyệt sản phẩm "${prodName}"? Sau khi duyệt, sản phẩm sẽ được hiển thị công khai trên sàn.`,
                 btnCls:      'btn-success',
                 btnText:     'Xác nhận duyệt',
                 requireNote: false,
             },
             reject: {
-                title:       'Từ chối gian hàng',
-                desc:        'Gian hàng sẽ bị từ chối. Người bán sẽ nhận được thông báo kèm lí do bên dưới.',
+                title:       'Từ chối / Gỡ sản phẩm',
+                desc:        `Sản phẩm "${prodName}" sẽ bị chuyển thành trạng thái từ chối. Người bán sẽ nhận được lý do bên dưới.`,
                 btnCls:      'btn-danger',
                 btnText:     'Xác nhận từ chối',
-                requireNote: true,
-            },
-            block: {
-                title:       'Khóa gian hàng',
-                desc:        'Gian hàng sẽ bị khóa ngay lập tức. Người bán không thể bán hàng cho đến khi mở khóa.',
-                btnCls:      'btn-danger',
-                btnText:     'Xác nhận khóa',
                 requireNote: true,
             },
         };
@@ -467,15 +483,15 @@
         const c = cfgMap[action];
         pendingAction.requireNote = c.requireNote;
 
-        document.getElementById('actionModalTitle').textContent = c.title;
-        document.getElementById('actionModalDesc').textContent  = c.desc;
-        document.getElementById('actionNote').value             = '';
-        document.getElementById('actionNoteError').classList.add('d-none');
+        document.getElementById('productActionModalTitle').textContent = c.title;
+        document.getElementById('productActionModalDesc').textContent  = c.desc;
+        document.getElementById('productActionNote').value             = '';
+        document.getElementById('productActionNoteError').classList.add('d-none');
 
-        const noteWrap = document.getElementById('actionNoteWrap');
+        const noteWrap = document.getElementById('productActionNoteWrap');
         if (noteWrap) noteWrap.style.display = c.requireNote ? '' : 'none';
 
-        const confirmBtn = document.getElementById('confirmActionBtn');
+        const confirmBtn = document.getElementById('confirmProductActionBtn');
         confirmBtn.className   = 'btn btn-sm ' + c.btnCls;
         confirmBtn.textContent = c.btnText;
 
@@ -483,27 +499,55 @@
         setTimeout(() => actionModal.show(), 300);
     };
 
-    document.getElementById('confirmActionBtn').addEventListener('click', function () {
+    document.getElementById('confirmProductActionBtn').addEventListener('click', function () {
         if (!pendingAction) return;
 
-        if (pendingAction.requireNote) {
-            const note = document.getElementById('actionNote').value.trim();
+        if (pendingAction.isBulk) {
+            // Bulk reject
+            const note = document.getElementById('productActionNote').value.trim();
             if (note.length < 10) {
-                document.getElementById('actionNoteError').classList.remove('d-none');
+                document.getElementById('productActionNoteError').classList.remove('d-none');
                 return;
             }
-            document.getElementById('actionNoteError').classList.add('d-none');
-            sendAction(pendingAction.action, pendingAction.sellerId, note);
+            document.getElementById('productActionNoteError').classList.add('d-none');
+
+            fetch(ROUTES.bulkReject, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept':       'application/json',
+                    'X-CSRF-TOKEN': ROUTES.csrf,
+                },
+                body: JSON.stringify({ ids: [...selectedIds], admin_note: note }),
+            })
+                .then(r => r.json())
+                .then(json => {
+                    actionModal.hide();
+                    showToast(json.message ?? 'Đã từ chối hàng loạt sản phẩm!', 'success');
+                    loadProducts(currentPage);
+                })
+                .catch(() => showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error'));
+            return;
+        }
+
+        if (pendingAction.requireNote) {
+            const note = document.getElementById('productActionNote').value.trim();
+            if (note.length < 10) {
+                document.getElementById('productActionNoteError').classList.remove('d-none');
+                return;
+            }
+            document.getElementById('productActionNoteError').classList.add('d-none');
+            sendProductAction(pendingAction.action, pendingAction.productId, note);
         } else {
-            sendAction(pendingAction.action, pendingAction.sellerId, null);
+            sendProductAction(pendingAction.action, pendingAction.productId, null);
         }
     });
 
     /* ================================================================
-       GUI REQUEST LEN BACKEND
+       GỬI REQUEST LÊN BACKEND
        ================================================================ */
-    function sendAction(action, sellerId, note) {
-        const url  = ROUTES[action].replace('__ID__', sellerId);
+    function sendProductAction(action, productId, note) {
+        const url  = ROUTES[action].replace('__ID__', productId);
         const body = {};
         if (note) body.admin_note = note;
 
@@ -521,7 +565,7 @@
                 actionModal.hide();
                 detailModal.hide();
                 showToast(json.message ?? 'Thành công!', 'success');
-                loadSellers(currentPage);
+                loadProducts(currentPage);
             })
             .catch(() => {
                 showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
@@ -529,7 +573,7 @@
     }
 
     /* ================================================================
-       TOAST
+       TOAST & UTILS
        ================================================================ */
     function showToast(msg, type) {
         const toastEl = document.getElementById('actionToast');
@@ -538,9 +582,6 @@
         actionToast.show();
     }
 
-    /* ================================================================
-       UTILS
-       ================================================================ */
     function setText(id, val) {
         const el = document.getElementById(id);
         if (el) el.textContent = val ?? '--';
@@ -559,6 +600,7 @@
     }
 
     function formatVnd(amount) {
+        if (amount == null) return '--';
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     }
 
@@ -580,7 +622,7 @@
     }
 
     /* ================================================================
-       KHOI DONG — Mac dinh tab "Cho duyet"
+       KHỞI ĐỘNG — Mặc định tab "Chờ duyệt"
        ================================================================ */
     (function initDefaultTab() {
         tabButtons.forEach(btn => {
@@ -588,6 +630,6 @@
         });
     })();
 
-    loadSellers(1);
+    loadProducts(1);
 
 })();

@@ -1,19 +1,19 @@
 @extends('layouts.admin.app')
 
-@section('page-title', 'Quản lý Seller')
+@section('page-title', 'Quản lý Sản phẩm')
 
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Quản lý Seller</li>
+    <li class="breadcrumb-item active">Sản phẩm</li>
 @endsection
 
 @push('styles')
-    <link href="{{ asset('admin/css/sellers.css') }}" rel="stylesheet">
+    <link href="{{ asset('admin/css/products.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
 
     {{-- Stat cards --}}
-    @include('admin.sellers.partials.stat-cards')
+    @include('admin.products.partials.stat-cards')
 
     {{-- Bảng danh sách --}}
     <div class="admin-card">
@@ -28,20 +28,19 @@
                     <span class="tab-badge pending" id="tab-badge-pending">0</span>
                 </button>
                 <button class="seller-tab" data-status="approved">Đã duyệt</button>
-                <button class="seller-tab" data-status="rejected">Từ chối</button>
-                <button class="seller-tab" data-status="blocked">Đã khóa</button>
+                <button class="seller-tab" data-status="rejected">Từ chối / Gỡ</button>
             </div>
 
             <div class="ms-auto d-flex gap-2">
                 <div class="seller-search-wrap">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text"
-                           id="sellerSearchInput"
+                           id="productSearchInput"
                            class="seller-search"
-                           placeholder="Tìm tên shop, email...">
+                           placeholder="Tìm tên sản phẩm, SKU, gian hàng...">
                 </div>
                 {{-- Export button --}}
-                <a href="#" id="btnExportCsv" class="btn-seller-export" title="Xuất CSV">
+                <a href="#" id="btnExportProductCsv" class="btn-seller-export" title="Xuất CSV">
                     <i class="fa-solid fa-file-csv"></i>
                     Export CSV
                 </a>
@@ -53,12 +52,16 @@
         <div class="bulk-toolbar" id="bulkToolbar" style="display:none;">
             <span class="bulk-info">
                 <i class="fa-solid fa-square-check"></i>
-                Đã chọn <strong id="bulkCount">0</strong> gian hàng
+                Đã chọn <strong id="bulkCount">0</strong> sản phẩm
             </span>
             <div class="bulk-actions">
                 <button type="button" class="btn-bulk-approve" id="btnBulkApprove">
                     <i class="fa-solid fa-check-double"></i>
                     Duyệt tất cả đã chọn
+                </button>
+                <button type="button" class="btn-bulk-reject" id="btnBulkReject">
+                    <i class="fa-solid fa-ban"></i>
+                    Từ chối tất cả đã chọn
                 </button>
                 <button type="button" class="btn-bulk-clear" id="btnBulkClear">
                     <i class="fa-solid fa-xmark"></i>
@@ -69,25 +72,26 @@
 
         {{-- Table --}}
         <div class="table-responsive">
-            <table class="admin-table" id="sellersTable">
+            <table class="admin-table" id="productsTable">
                 <thead>
                     <tr>
                         <th style="width: 40px; text-align: center;">
-                            <input type="checkbox" class="seller-checkbox" id="checkAllSellers" title="Chọn tất cả">
+                            <input type="checkbox" class="seller-checkbox" id="checkAllProducts" title="Chọn tất cả">
                         </th>
                         <th style="width: 48px;">#</th>
+                        <th>Sản phẩm</th>
                         <th>Gian hàng</th>
-                        <th>Chủ shop</th>
-                        <th>Loại hình</th>
-                        <th>Hoa hồng</th>
-                        <th>Ngày đăng ký</th>
+                        <th>Danh mục</th>
+                        <th>Giá bán</th>
+                        <th>Tồn kho</th>
+                        <th>Ngày tạo</th>
                         <th>Trạng thái</th>
                         <th style="width: 80px; text-align: center;">Hành động</th>
                     </tr>
                 </thead>
-                <tbody id="sellersTableBody">
+                <tbody id="productsTableBody">
                     <tr>
-                        <td colspan="9" class="text-center py-4">
+                        <td colspan="10" class="text-center py-4">
                             <div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>
                             Đang tải dữ liệu...
                         </td>
@@ -107,8 +111,8 @@
     </div>
 
     {{-- Modals --}}
-    @include('admin.sellers.partials.detail-modal')
-    @include('admin.sellers.partials.action-modal')
+    @include('admin.products.partials.detail-modal')
+    @include('admin.products.partials.action-modal')
 
     {{-- Toast thông báo --}}
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
@@ -125,14 +129,14 @@
 @endsection
 
 @push('scripts')
-    <div id="sellersAppConfig"
-        data-index-url="{{ route('admin.sellers.index') }}"
-        data-export-url="{{ route('admin.sellers.export') }}"
-        data-bulk-approve-url="{{ route('admin.sellers.bulk-approve') }}"
-        data-approve-url="{{ url('admin/sellers') }}/__ID__/approve"
-        data-reject-url="{{ url('admin/sellers') }}/__ID__/reject"
-        data-block-url="{{ url('admin/sellers') }}/__ID__/block"
+    <div id="productsAppConfig"
+        data-index-url="{{ route('admin.products.index') }}"
+        data-export-url="{{ route('admin.products.export') }}"
+        data-bulk-approve-url="{{ route('admin.products.bulk-approve') }}"
+        data-bulk-reject-url="{{ route('admin.products.bulk-reject') }}"
+        data-approve-url="{{ url('admin/products') }}/__ID__/approve"
+        data-reject-url="{{ url('admin/products') }}/__ID__/reject"
         data-csrf="{{ csrf_token() }}"
         style="display:none;"></div>
-    <script src="{{ asset('admin/js/sellers.js') }}"></script>
+    <script src="{{ asset('admin/js/products.js') }}"></script>
 @endpush

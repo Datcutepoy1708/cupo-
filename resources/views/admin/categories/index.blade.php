@@ -18,6 +18,9 @@
         data-store-url="{{ route('admin.categories.store') }}"
         data-update-url="{{ url('admin/categories') }}/__ID__"
         data-destroy-url="{{ url('admin/categories') }}/__ID__"
+        data-export-url="{{ route('admin.categories.export') }}"
+        data-bulk-status-url="{{ route('admin.categories.bulk-status') }}"
+        data-bulk-delete-url="{{ route('admin.categories.bulk-delete') }}"
         data-csrf="{{ csrf_token() }}"
         style="display:none;"></div>
 
@@ -29,10 +32,16 @@
                 <h4 class="cat-page-title">Danh mục</h4>
                 <p class="cat-page-sub">Quản lý danh mục hàng hóa</p>
             </div>
-            <button type="button" id="btnAddCategory" class="btn-cat-primary">
-                <i class="fa-solid fa-plus"></i>
-                Thêm danh mục
-            </button>
+            <div class="d-flex gap-2">
+                <a href="#" id="btnExportCatCsv" class="btn-cat-export" title="Xuất file CSV">
+                    <i class="fa-solid fa-file-csv"></i>
+                    Export CSV
+                </a>
+                <button type="button" id="btnAddCategory" class="btn-cat-primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Thêm danh mục
+                </button>
+            </div>
         </div>
 
         {{-- ===== Toolbar ===== --}}
@@ -51,6 +60,28 @@
                 </button>
                 <button class="cat-chip" id="chipParent" data-filter="parent">
                     <i class="fa-solid fa-folder me-1" style="font-size:11px;"></i>Danh mục gốc
+                </button>
+            </div>
+        </div>
+
+        {{-- ===== Bulk Action Toolbar ===== --}}
+        <div class="cat-bulk-toolbar" id="catBulkToolbar" style="display: none;">
+            <span class="cat-bulk-info">
+                <i class="fa-solid fa-square-check"></i>
+                Đã chọn <strong id="catBulkCount">0</strong> danh mục
+            </span>
+            <div class="cat-bulk-actions">
+                <button type="button" class="btn-cat-bulk-show" id="btnBulkShow">
+                    <i class="fa-solid fa-eye me-1"></i>Hiển thị tất cả
+                </button>
+                <button type="button" class="btn-cat-bulk-hide" id="btnBulkHide">
+                    <i class="fa-solid fa-eye-slash me-1"></i>Ẩn tất cả
+                </button>
+                <button type="button" class="btn-cat-bulk-delete" id="btnBulkDelete">
+                    <i class="fa-solid fa-trash me-1"></i>Xóa tất cả
+                </button>
+                <button type="button" class="btn-cat-bulk-clear" id="btnBulkClear">
+                    <i class="fa-solid fa-xmark me-1"></i>Bỏ chọn
                 </button>
             </div>
         </div>

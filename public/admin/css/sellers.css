@@ -379,3 +379,150 @@
 
 #actionToast.toast-success { background: #2e7d32; }
 #actionToast.toast-error   { background: #c62828; }
+
+/* ===== Waiting badge (so ngay cho duyet) ===== */
+.waiting-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 20px;
+    margin-top: 3px;
+    background: #fff3e0;
+    color: #e65100;
+    white-space: nowrap;
+}
+
+.waiting-badge.new {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.waiting-badge.urgent {
+    background: #fdecea;
+    color: #c62828;
+    animation: urgentPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.6; }
+}
+
+/* ===== Export button ===== */
+.btn-seller-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1.5px solid #a5d6a7;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    white-space: nowrap;
+}
+
+.btn-seller-export:hover {
+    background: #c8e6c9;
+    border-color: #66bb6a;
+    color: #1b5e20;
+    transform: translateY(-1px);
+}
+
+.btn-seller-export i {
+    font-size: 14px;
+}
+
+/* ===== Bulk action toolbar ===== */
+.bulk-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #fff8e1;
+    border-bottom: 1px solid #ffe082;
+    animation: slideDown 0.18s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.bulk-info {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5d4037;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.bulk-info i {
+    color: #f57c00;
+    font-size: 15px;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-bulk-approve {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-bulk-approve:hover:not(:disabled) { background: #1b5e20; }
+.btn-bulk-approve:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-bulk-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-bulk-clear:hover { background: #f8f9fa; }
+
+/* ===== Checkbox column ===== */
+.seller-checkbox {
+    width: 15px;
+    height: 15px;
+    accent-color: #c62828;
+    cursor: pointer;
+}
+
+/* Row highlight when selected */
+.admin-table tbody tr.seller-row-selected {
+    background: rgba(198, 40, 40, 0.06) !important;
+}
+
+.admin-table tbody tr.seller-row-selected td {
+    border-bottom-color: rgba(198, 40, 40, 0.12);
+}

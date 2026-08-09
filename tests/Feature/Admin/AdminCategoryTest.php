@@ -94,10 +94,56 @@ class AdminCategoryTest extends TestCase
         $response = $this->actingAs($admin)->deleteJson("/admin/categories/{$category->id}");
 
         $response->assertStatus(200)
-            ->assertJsonPath('message', 'Xóa danh muc thành công');
+            ->assertJsonPath('message', 'Xóa danh mục thành công');
 
         $this->assertDatabaseMissing('categories', [
             'id' => $category->id,
         ]);
+    }
+
+    public function test_admin_can_export_categories_csv(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Category::create(['name' => 'Thời trang Export', 'slug' => 'thoi-trang-export']);
+
+        $response = $this->actingAs($admin)->get('/admin/categories/export');
+
+        $response->assertStatus(200)
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    }
+
+    public function test_admin_can_bulk_update_category_status(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $cat1 = Category::create(['name' => 'Cat 1', 'slug' => 'cat-1', 'status' => false]);
+        $cat2 = Category::create(['name' => 'Cat 2', 'slug' => 'cat-2', 'status' => false]);
+
+        $response = $this->actingAs($admin)->postJson('/admin/categories/bulk-status', [
+            'ids' => [$cat1->id, $cat2->id],
+            'status' => true,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('count', 2);
+
+        $this->assertTrue($cat1->fresh()->status);
+        $this->assertTrue($cat2->fresh()->status);
+    }
+
+    public function test_admin_can_bulk_delete_categories(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $cat1 = Category::create(['name' => 'Cat Del 1', 'slug' => 'cat-del-1']);
+        $cat2 = Category::create(['name' => 'Cat Del 2', 'slug' => 'cat-del-2']);
+
+        $response = $this->actingAs($admin)->postJson('/admin/categories/bulk-delete', [
+            'ids' => [$cat1->id, $cat2->id],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('count', 2);
+
+        $this->assertDatabaseMissing('categories', ['id' => $cat1->id]);
+        $this->assertDatabaseMissing('categories', ['id' => $cat2->id]);
     }
 }

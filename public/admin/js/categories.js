@@ -10,11 +10,14 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ─── 0. Config ─────────────────────────────────────────── */
     const app    = document.getElementById('categoriesApp');
     const ROUTES = {
-        data:    app.dataset.dataUrl,
-        store:   app.dataset.storeUrl,
-        update:  app.dataset.updateUrl,   // chứa __ID__
-        destroy: app.dataset.destroyUrl,  // chứa __ID__
-        csrf:    app.dataset.csrf,
+        data:       app.dataset.dataUrl,
+        store:      app.dataset.storeUrl,
+        update:     app.dataset.updateUrl,      // chứa __ID__
+        destroy:    app.dataset.destroyUrl,     // chứa __ID__
+        export:     app.dataset.exportUrl,
+        bulkStatus: app.dataset.bulkStatusUrl,
+        bulkDelete: app.dataset.bulkDeleteUrl,
+        csrf:       app.dataset.csrf,
     };
 
     /* ─── 1. DOM refs ───────────────────────────────────────── */
@@ -23,6 +26,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const checkAll     = document.getElementById('checkAll');
     const selectInfo   = document.getElementById('catSelectInfo');
     const paginationEl = document.getElementById('catPagination');
+
+    const bulkToolbar  = document.getElementById('catBulkToolbar');
+    const bulkCount    = document.getElementById('catBulkCount');
+    const btnBulkShow  = document.getElementById('btnBulkShow');
+    const btnBulkHide  = document.getElementById('btnBulkHide');
+    const btnBulkDelete= document.getElementById('btnBulkDelete');
+    const btnBulkClear = document.getElementById('btnBulkClear');
+    const btnExport    = document.getElementById('btnExportCatCsv');
 
     const modalEl      = document.getElementById('catModal');
     const modal        = new bootstrap.Modal(modalEl);
@@ -483,7 +494,104 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateSelectInfo() {
-        selectInfo.textContent = `${selectedIds.size} dòng đã chọn`;
+        const count = selectedIds.size;
+        selectInfo.textContent = `${count} dòng đã chọn`;
+        if (bulkToolbar) {
+            bulkToolbar.style.display = count > 0 ? '' : 'none';
+        }
+        if (bulkCount) {
+            bulkCount.textContent = count;
+        }
+    }
+
+    function clearSelection() {
+        selectedIds.clear();
+        if (checkAll) {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+        }
+        tableBody.querySelectorAll('.row-check').forEach(cb => {
+            cb.checked = false;
+            cb.closest('tr').classList.remove('selected');
+        });
+        updateSelectInfo();
+    }
+
+    /* ─── 16b. Bulk actions ─────────────────────────────────── */
+    if (btnBulkClear) {
+        btnBulkClear.addEventListener('click', clearSelection);
+    }
+
+    if (btnBulkShow) {
+        btnBulkShow.addEventListener('click', () => {
+            if (selectedIds.size === 0) return;
+            fetch(ROUTES.bulkStatus, {
+                method: 'POST',
+                headers: headers(),
+                body: JSON.stringify({ ids: [...selectedIds], status: true }),
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showToast(res.message ?? 'Đã hiển thị các danh mục đã chọn.', 'success');
+                    clearSelection();
+                    loadCategories();
+                })
+                .catch(() => showToast('Lỗi kết nối.', 'error'));
+        });
+    }
+
+    if (btnBulkHide) {
+        btnBulkHide.addEventListener('click', () => {
+            if (selectedIds.size === 0) return;
+            fetch(ROUTES.bulkStatus, {
+                method: 'POST',
+                headers: headers(),
+                body: JSON.stringify({ ids: [...selectedIds], status: false }),
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showToast(res.message ?? 'Đã ẩn các danh mục đã chọn.', 'success');
+                    clearSelection();
+                    loadCategories();
+                })
+                .catch(() => showToast('Lỗi kết nối.', 'error'));
+        });
+    }
+
+    if (btnBulkDelete) {
+        btnBulkDelete.addEventListener('click', () => {
+            const count = selectedIds.size;
+            if (count === 0) return;
+            if (!confirm(`Bạn có chắc chắn muốn xóa ${count} danh mục đã chọn?\n\nHành động này không thể hoàn tác!`)) return;
+
+            fetch(ROUTES.bulkDelete, {
+                method: 'POST',
+                headers: headers(),
+                body: JSON.stringify({ ids: [...selectedIds] }),
+            })
+                .then(r => r.json())
+                .then(res => {
+                    showToast(res.message ?? 'Đã xóa các danh mục thành công.', 'success');
+                    clearSelection();
+                    loadCategories();
+                })
+                .catch(() => showToast('Lỗi kết nối.', 'error'));
+        });
+    }
+
+    /* ─── 16c. Export CSV ───────────────────────────────────── */
+    if (btnExport) {
+        btnExport.addEventListener('click', (e) => {
+            e.preventDefault();
+            const a = document.createElement('a');
+            a.href = ROUTES.export;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            showToast('Đang tải file CSV...', 'success');
+        });
     }
 
     /* ─── 17. Filter chips ──────────────────────────────────── */

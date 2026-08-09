@@ -1,15 +1,11 @@
 <?php
 
+use App\Http\Controllers\Client\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Storefront Public Routes
-Route::get('/', function () {
-    return view('client.home.index');
-})->name('home');
-
-Route::get('/home', function () {
-    return view('client.home.index');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index']);
 
 Route::get('/promotions', function () {
     return view('client.promotions');

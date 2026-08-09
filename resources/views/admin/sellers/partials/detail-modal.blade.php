@@ -62,6 +62,10 @@
                             <span class="detail-label">CCCD / MST</span>
                             <span class="detail-value" id="dNationalId">--</span>
                         </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Ngày đăng ký</span>
+                            <span class="detail-value" id="dRegDate">--</span>
+                        </div>
                     </div>
 
                     {{-- Cot phai: Tai chinh & Ngan hang --}}
