@@ -1,6 +1,24 @@
+:root {
+    --primary-red: #c62828;
+    --primary-red-dark: #b71c1c;
+}
 * {
     box-sizing: border-box;
 }
 body {
     font-family: "Roboto", sans-serif;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--primary-red);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-red-dark);
 }

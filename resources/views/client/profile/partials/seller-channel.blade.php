@@ -78,7 +78,8 @@
             {{-- ===== TAG MULTI-SELECT: Lĩnh vực kinh doanh ===== --}}
             <div class="row mb-3">
                 <div class="col-12">
-                    <label class="form-label">Lĩnh vực / Danh mục hàng hóa buôn bán <span class="text-danger">*</span></label>
+                    <label class="form-label">Lĩnh vực / Danh mục hàng hóa buôn bán <span
+                            class="text-danger">*</span></label>
 
                     {{-- Browse 2 tầng: ngành cha → mặt hàng con → nút Thêm --}}
                     <div class="cat-browse-row">
@@ -111,7 +112,8 @@
 
                     {{-- Hidden inputs gửi giá trị lên server --}}
                     <div id="categoryHiddenInputs"></div>
-                    <small class="text-muted mt-1 d-block">Có thể chọn nhiều lĩnh vực kinh doanh cho 1 gian hàng.</small>
+                    <small class="text-muted mt-1 d-block">Có thể chọn nhiều lĩnh vực kinh doanh cho 1 gian
+                        hàng.</small>
                 </div>
             </div>
 
@@ -134,7 +136,8 @@
             {{-- CCCD + Địa chỉ --}}
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span class="text-danger">*</span></label>
+                    <label class="form-label">Số CCCD / Mã số thuế (12 chữ số) <span
+                            class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="national_id" value="{{ old('national_id') }}"
                         placeholder="Nhập đúng 12 chữ số CCCD/MST" required>
                 </div>

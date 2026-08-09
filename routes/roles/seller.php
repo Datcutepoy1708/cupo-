@@ -2,15 +2,15 @@
 
 use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerProductController;
+use App\Http\Controllers\Seller\SellerProfileController;
 use App\Http\Controllers\Seller\SellerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('seller')->group(function () {
-    // route tra ve view cua hang cua seller
-    Route::middleware(['auth', 'role: seller'])
-        ->get('/shop', function () {
-            return view('client.seller-store.index');
-        })
+
+    // Route trả về view cửa hàng của seller
+    Route::middleware(['auth', 'role:seller'])
+        ->get('/shop', [SellerProfileController::class, 'index'])
         ->name('seller.shop');
 
     // 1. Route Đăng ký làm Người bán (Cho phép cả Customer & Seller)
