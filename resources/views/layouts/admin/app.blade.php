@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -177,6 +177,12 @@
                 <button type="button" class="topbar-icon-btn" title="Thong bao">
                     <i class="fa-solid fa-bell"></i>
                     <span class="notif-dot"></span>
+                </button>
+
+                {{-- Light / Dark toggle --}}
+                <button type="button" id="themeToggleBtn" class="theme-toggle-btn" title="Đổi giao diện">
+                    <i class="fa-solid fa-sun icon-sun"></i>
+                    <i class="fa-solid fa-moon icon-moon"></i>
                 </button>
 
                 {{-- Xem trang chu --}}

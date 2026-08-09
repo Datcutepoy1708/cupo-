@@ -3,7 +3,7 @@
    Màu chủ đạo đồng bộ với trang Customer: #c62828 (đỏ)
    =================================================== */
 
-/* ===== CSS Variables ===== */
+/* ===== CSS Variables — Light (default) ===== */
 :root {
     --cupo-red:        #c62828;
     --cupo-red-dark:   #b71c1c;
@@ -17,9 +17,56 @@
     --sidebar-active:  rgba(198, 40, 40, 0.25);
     --text-white-soft: rgba(255, 255, 255, 0.85);
     --text-white-dim:  rgba(255, 255, 255, 0.5);
-    --body-bg:         #f4f5f7;
     --card-radius:     12px;
     --transition:      0.2s ease;
+
+    /* Semantic tokens — light */
+    --body-bg:         #f4f5f7;
+    --card-bg:         #ffffff;
+    --card-border:     #e9ecef;
+    --topbar-bg:       #ffffff;
+    --topbar-border:   #e9ecef;
+    --text-primary:    #212529;
+    --text-secondary:  #6c757d;
+    --text-muted:      #9ca3af;
+    --border-color:    #f0f0f0;
+    --input-bg:        #ffffff;
+    --input-border:    #e9ecef;
+    --table-head-bg:   #f8f9fa;
+    --table-row-hover: #fafafa;
+    --table-border:    #f0f0f0;
+    --dropdown-bg:     #ffffff;
+    --dropdown-border: #e9ecef;
+    --modal-bg:        #ffffff;
+    --chip-bg:         #ffffff;
+    --chip-border:     #e9ecef;
+    --chip-color:      #6c757d;
+}
+
+/* ===== CSS Variables — Dark ===== */
+[data-theme="dark"] {
+    --body-bg:         #0f1117;
+    --card-bg:         #1c1f2b;
+    --card-border:     #2a2d3e;
+    --topbar-bg:       #1c1f2b;
+    --topbar-border:   #2a2d3e;
+    --text-primary:    #e9ecef;
+    --text-secondary:  #9ca3af;
+    --text-muted:      #6c757d;
+    --border-color:    #2a2d3e;
+    --input-bg:        #252838;
+    --input-border:    #3a3d52;
+    --table-head-bg:   #252838;
+    --table-row-hover: #252838;
+    --table-border:    #2a2d3e;
+    --dropdown-bg:     #1c1f2b;
+    --dropdown-border: #3a3d52;
+    --modal-bg:        #1c1f2b;
+    --chip-bg:         #252838;
+    --chip-border:     #3a3d52;
+    --chip-color:      #9ca3af;
+    --cupo-red-light:  rgba(198, 40, 40, 0.15);
+    --cupo-red-mid:    rgba(239, 154, 154, 0.5);
 }
 
 /* ===== Reset & Base ===== */
@@ -32,8 +79,9 @@
 body.admin-body {
     font-family: "Roboto", sans-serif;
     background-color: var(--body-bg);
-    color: #212529;
+    color: var(--text-primary);
     min-height: 100vh;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ===== LAYOUT WRAPPER ===== */
@@ -236,14 +284,15 @@ body.admin-body {
     left: var(--sidebar-width);
     right: 0;
     height: var(--topbar-height);
-    background-color: #ffffff;
-    border-bottom: 1px solid #e9ecef;
+    background-color: var(--topbar-bg);
+    border-bottom: 1px solid var(--topbar-border);
     display: flex;
     align-items: center;
     padding: 0 24px;
     z-index: 100;
     gap: 12px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .topbar-toggle {
@@ -270,7 +319,7 @@ body.admin-body {
 .topbar-breadcrumb .page-title {
     font-size: 17px;
     font-weight: 600;
-    color: #212529;
+    color: var(--text-primary);
     margin: 0;
     line-height: 1;
 }
@@ -286,7 +335,7 @@ body.admin-body {
 }
 
 .topbar-breadcrumb .breadcrumb-item.active {
-    color: #6c757d;
+    color: var(--text-secondary);
 }
 
 .topbar-actions {
@@ -294,6 +343,43 @@ body.admin-body {
     align-items: center;
     gap: 8px;
 }
+
+/* ===== Theme toggle button ===== */
+.theme-toggle-btn {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.theme-toggle-btn:hover {
+    background-color: var(--cupo-red-light);
+    color: var(--cupo-red);
+    border-color: var(--cupo-red-mid);
+}
+
+.theme-toggle-btn .icon-sun,
+.theme-toggle-btn .icon-moon {
+    position: absolute;
+    transition: opacity 0.2s ease, transform 0.3s ease;
+}
+
+[data-theme="dark"] .theme-toggle-btn .icon-sun  { opacity: 1; transform: rotate(0deg); }
+[data-theme="dark"] .theme-toggle-btn .icon-moon { opacity: 0; transform: rotate(90deg); }
+
+[data-theme="light"] .theme-toggle-btn .icon-sun,
+:root:not([data-theme]) .theme-toggle-btn .icon-sun  { opacity: 0; transform: rotate(-90deg); }
+[data-theme="light"] .theme-toggle-btn .icon-moon,
+:root:not([data-theme]) .theme-toggle-btn .icon-moon { opacity: 1; transform: rotate(0deg); }
 
 .topbar-icon-btn {
     position: relative;
@@ -304,10 +390,10 @@ body.admin-body {
     align-items: center;
     justify-content: center;
     background: none;
-    border: 1px solid #e9ecef;
-    color: #495057;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: background-color var(--transition), color var(--transition);
+    transition: background-color var(--transition), color var(--transition), border-color var(--transition);
     text-decoration: none;
 }
 
@@ -325,7 +411,7 @@ body.admin-body {
     height: 8px;
     background-color: var(--cupo-red);
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 2px solid var(--topbar-bg);
 }
 
 .topbar-admin-info {
@@ -336,7 +422,7 @@ body.admin-body {
     border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color var(--transition);
+    transition: background-color var(--transition), border-color var(--transition);
     border: 1px solid transparent;
 }
 
@@ -356,7 +442,7 @@ body.admin-body {
 .topbar-admin-info .topbar-name {
     font-size: 13px;
     font-weight: 600;
-    color: #212529;
+    color: var(--text-primary);
 }
 
 /* ===================================================
@@ -372,16 +458,17 @@ body.admin-body {
 
 /* ===== Card ===== */
 .admin-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border-radius: var(--card-radius);
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--card-border);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .admin-card-header {
     padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -391,7 +478,7 @@ body.admin-body {
 .admin-card-title {
     font-size: 15px;
     font-weight: 600;
-    color: #212529;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -401,14 +488,14 @@ body.admin-body {
 
 /* ===== Stat Cards (Dashboard) ===== */
 .stat-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border-radius: var(--card-radius);
     padding: 20px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--card-border);
     display: flex;
     align-items: center;
     gap: 16px;
-    transition: box-shadow var(--transition), transform var(--transition);
+    transition: box-shadow var(--transition), transform var(--transition), background-color 0.25s ease;
 }
 
 .stat-card:hover {
@@ -435,14 +522,14 @@ body.admin-body {
 .stat-value {
     font-size: 22px;
     font-weight: 700;
-    color: #212529;
+    color: var(--text-primary);
     line-height: 1;
     margin-bottom: 4px;
 }
 
 .stat-label {
     font-size: 12px;
-    color: #6c757d;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -465,30 +552,107 @@ body.admin-body {
 }
 
 .admin-table thead th {
-    background-color: #f8f9fa;
-    color: #6c757d;
+    background-color: var(--table-head-bg);
+    color: var(--text-secondary);
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 12px 16px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid var(--card-border);
     white-space: nowrap;
 }
 
 .admin-table tbody tr {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--table-border);
     transition: background-color var(--transition);
 }
 
 .admin-table tbody tr:hover {
-    background-color: #fafafa;
+    background-color: var(--table-row-hover);
 }
 
 .admin-table tbody td {
     padding: 12px 16px;
     vertical-align: middle;
-    color: #495057;
+    color: var(--text-secondary);
+}
+
+/* Bootstrap modal dark overrides */
+[data-theme="dark"] .modal-content {
+    background-color: var(--modal-bg);
+    border-color: var(--card-border);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-header {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-title {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-body {
+    color: var(--text-secondary);
+}
+
+/* Bootstrap dropdown dark overrides */
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--dropdown-bg);
+    border-color: var(--dropdown-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .dropdown-item-text {
+    color: var(--text-muted);
+}
+
+/* Bootstrap form dark overrides */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border-color: var(--cupo-red);
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.2);
+}
+
+[data-theme="dark"] .form-text,
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .btn-secondary {
+    background-color: #3a3d52;
+    border-color: #4a4d62;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(1);
 }
 
 .admin-table tbody tr:last-child {
