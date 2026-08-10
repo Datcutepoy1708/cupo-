@@ -24,15 +24,18 @@
         <link href="{{ asset('client/css/home.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('promotions'))
         <link href="{{ asset('client/css/promotions.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('categories.*'))
+        <link href="{{ asset('client/css/category-show.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('profile.*'))
         <link href="{{ asset('client/css/profile.css') }}" rel="stylesheet">
         <link href="{{ asset('client/css/seller-register.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('seller.shop'))
         <link href="{{ asset('client/css/seller-store.css') }}" rel="stylesheet">
     @endif
+    @stack('styles')
     {{-- embed modal css --}}
     <link href="{{ asset('client/css/modal.css') }}" rel="stylesheet">
-    <title>Document</title>
+    <title>@yield('page-title', 'Cupo — Sàn Thương Mại Điện Tử')</title>
 </head>
 
 <body>

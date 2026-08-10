@@ -20,16 +20,25 @@ class HomeController extends Controller
         $midBanners = Banner::active()->atPosition('homepage_mid')->get();
         $sideBanners = Banner::active()->atPosition('sidebar')->get();
 
-        $featuredCategories = Category::withCount(['sellerProfiles', 'children'])
+        $featuredCategories = Category::with(['children' => function ($q) {
+                $q->where('status', true);
+            }])
+            ->withCount(['sellerProfiles', 'children', 'products'])
             ->whereNull('parent_id')
             ->where('status', true)
-            ->take(8)
+            ->take(16)
             ->get();
 
         $flashSaleProducts = Product::with(['seller.sellerProfile', 'category'])
             ->where('status', 'approved')
             ->latest()
-            ->take(6)
+            ->take(8)
+            ->get();
+
+        $latestProducts = Product::with(['seller.sellerProfile', 'category'])
+            ->where('status', 'approved')
+            ->latest()
+            ->take(16)
             ->get();
 
         return view('client.home.index', compact(
@@ -37,7 +46,8 @@ class HomeController extends Controller
             'midBanners',
             'sideBanners',
             'featuredCategories',
-            'flashSaleProducts'
+            'flashSaleProducts',
+            'latestProducts'
         ));
     }
 }

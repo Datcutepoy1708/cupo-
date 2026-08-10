@@ -414,7 +414,7 @@
         setText('dHasVariants', product.has_variants ? 'Có biến thể' : 'Sản phẩm thường');
         setText('dViewsCount',  (product.views_count ?? 0) + ' lượt');
         setText('dShortDesc',   product.short_description ?? '--');
-        setText('dFullDesc',    product.description ?? 'Không có mô tả chi tiết');
+        document.getElementById('dFullDesc').innerHTML = product.description ?? 'Không có mô tả chi tiết';
 
         const shopName  = product.seller?.seller_profile?.shop_name ?? product.seller?.name ?? '--';
         const ownerName = product.seller?.name ?? '--';

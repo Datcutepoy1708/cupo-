@@ -93,7 +93,7 @@
                 {{-- Mô tả chi tiết --}}
                 <div class="px-4 py-3 border-top">
                     <div class="detail-section-title mb-2">Mô tả chi tiết</div>
-                    <div class="p-3 bg-light rounded text-secondary" style="font-size: 13px; max-height: 180px; overflow-y: auto;" id="dFullDesc">
+                    <div class="p-3 bg-light rounded text-secondary" style="font-size: 13px; max-height: 320px; overflow-y: auto;" id="dFullDesc">
                         --
                     </div>
                 </div>

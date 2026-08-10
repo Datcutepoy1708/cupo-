@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Controllers\Client\ClientCategoryController;
 use App\Http\Controllers\Client\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Storefront Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/home', [HomeController::class, 'index']);
+
+// Storefront Category Routes
+Route::get('/categories', [ClientCategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/{slug}', [ClientCategoryController::class, 'show'])->name('categories.show');
 
 Route::get('/promotions', function () {
     return view('client.promotions');
