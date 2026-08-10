@@ -116,6 +116,6 @@ class BannerSeeder extends Seeder
             Banner::create($bannerData);
         }
 
-        $this->command->info("Đã seed thành công " . count($banners) . " Banner cho cả 4 vị trí!");
+        $this->command->info('Đã seed thành công '.count($banners).' Banner cho cả 4 vị trí!');
     }
 }

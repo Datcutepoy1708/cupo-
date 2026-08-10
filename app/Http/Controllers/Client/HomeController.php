@@ -21,8 +21,8 @@ class HomeController extends Controller
         $sideBanners = Banner::active()->atPosition('sidebar')->get();
 
         $featuredCategories = Category::with(['children' => function ($q) {
-                $q->where('status', true);
-            }])
+            $q->where('status', true);
+        }])
             ->withCount(['sellerProfiles', 'children', 'products'])
             ->whereNull('parent_id')
             ->where('status', true)

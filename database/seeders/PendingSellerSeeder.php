@@ -123,7 +123,7 @@ class PendingSellerSeeder extends Seeder
         foreach ($pendingSellers as $item) {
             // Kiểm tra tránh lặp email
             $user = User::where('email', $item['email'])->first();
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
                     'name' => $item['name'],
                     'email' => $item['email'],
@@ -146,7 +146,7 @@ class PendingSellerSeeder extends Seeder
             // Tạo Seller Profile với status PENDING
             $slug = Str::slug($item['shop_name']);
             if (SellerProfile::where('slug', $slug)->exists()) {
-                $slug .= '-' . Str::random(3);
+                $slug .= '-'.Str::random(3);
             }
 
             $profile = SellerProfile::updateOrCreate(
@@ -167,8 +167,8 @@ class PendingSellerSeeder extends Seeder
             );
 
             // Gán danh mục tương ứng nếu có
-            if (!empty($item['category_kw'])) {
-                $cats = Category::where('name', 'LIKE', '%' . $item['category_kw'] . '%')->pluck('id');
+            if (! empty($item['category_kw'])) {
+                $cats = Category::where('name', 'LIKE', '%'.$item['category_kw'].'%')->pluck('id');
                 if ($cats->isNotEmpty()) {
                     $profile->categories()->sync($cats);
                 }

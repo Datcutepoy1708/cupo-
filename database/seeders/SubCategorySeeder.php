@@ -119,10 +119,10 @@ class SubCategorySeeder extends Seeder
         foreach ($subCategories as $parentName => $children) {
             // Tìm danh mục gốc theo tên
             $parent = Category::whereNull('parent_id')
-                ->where('name', 'LIKE', '%' . $parentName . '%')
+                ->where('name', 'LIKE', '%'.$parentName.'%')
                 ->first();
 
-            if (!$parent) {
+            if (! $parent) {
                 // Nếu chưa có thì tạo mới danh mục gốc
                 $parent = Category::create([
                     'name' => $parentName,
@@ -133,10 +133,10 @@ class SubCategorySeeder extends Seeder
 
             foreach ($children as $childName) {
                 $slug = Str::slug($childName);
-                
+
                 // Tránh lặp slug
                 if (Category::where('slug', $slug)->exists()) {
-                    $slug .= '-' . Str::random(3);
+                    $slug .= '-'.Str::random(3);
                 }
 
                 Category::firstOrCreate(

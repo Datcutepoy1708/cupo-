@@ -17,8 +17,8 @@ class ClientCategoryController extends Controller
     public function index(): View
     {
         $categories = Category::with(['children' => function ($q) {
-                $q->where('status', true)->withCount('products');
-            }])
+            $q->where('status', true)->withCount('products');
+        }])
             ->withCount(['products', 'children'])
             ->whereNull('parent_id')
             ->where('status', true)
@@ -58,8 +58,8 @@ class ClientCategoryController extends Controller
 
         // 3. Lấy tất cả danh mục gốc (kèm danh mục con) cho Sidebar "Tất Cả Danh Mục"
         $allRootCategories = Category::with(['children' => function ($q) {
-                $q->where('status', true);
-            }])
+            $q->where('status', true);
+        }])
             ->whereNull('parent_id')
             ->where('status', true)
             ->get();
@@ -84,7 +84,7 @@ class ClientCategoryController extends Controller
         if ($request->filled('location')) {
             $loc = $request->input('location');
             $query->whereHas('seller.sellerProfile', function ($q) use ($loc) {
-                $q->where('address', 'LIKE', '%' . $loc . '%');
+                $q->where('address', 'LIKE', '%'.$loc.'%');
             });
         }
 
