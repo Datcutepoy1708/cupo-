@@ -7,6 +7,7 @@ use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class ClientCategoryController extends Controller
@@ -56,16 +57,29 @@ class ClientCategoryController extends Controller
             $subCategories = $rootCategory ? $rootCategory->children : collect([$category]);
         }
 
-        // 3. Lấy tất cả danh mục gốc (kèm danh mục con) cho Sidebar "Tất Cả Danh Mục"
-        $allRootCategories = Category::with(['children' => function ($q) {
-            $q->where('status', true);
-        }])
-            ->whereNull('parent_id')
-            ->where('status', true)
-            ->get();
+        // 3. Lấy tất cả danh mục gốc (kèm danh mục con) cho Sidebar "Tất Cả Danh Mục" qua Redis Cache
+        $allRootCategories = collect(Cache::store('redis')->remember('categories:all_tree', 86400, function () {
+            return Category::with(['children' => function ($q) {
+                $q->where('status', true);
+            }])
+                ->whereNull('parent_id')
+                ->where('status', true)
+                ->get()
+                ->toArray();
+        }))->map(function ($cat) {
+            $catObj = (object) $cat;
+            $catObj->children = collect($cat['children'] ?? [])->map(fn ($c) => (object) $c);
 
-        // 4. Banner đầu trang danh mục (category_top)
-        $categoryBanner = Banner::active()->atPosition('category_top')->first();
+            return $catObj;
+        });
+
+        // 4. Banner đầu trang danh mục (category_top) qua Redis Cache
+        $bannerArr = Cache::store('redis')->remember('banners:category_top', 3600, function () {
+            $b = Banner::active()->atPosition('category_top')->first();
+
+            return $b ? $b->toArray() : null;
+        });
+        $categoryBanner = $bannerArr ? (object) $bannerArr : null;
 
         // 5. Khởi tạo truy vấn sản phẩm
         $query = Product::with(['seller.sellerProfile', 'category'])

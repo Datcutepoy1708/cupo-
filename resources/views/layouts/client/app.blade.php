@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- embed font --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +27,8 @@
         <link href="{{ asset('client/css/promotions.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('categories.*'))
         <link href="{{ asset('client/css/category-show.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('products.*'))
+        <link href="{{ asset('client/css/product-show.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('profile.*'))
         <link href="{{ asset('client/css/profile.css') }}" rel="stylesheet">
         <link href="{{ asset('client/css/seller-register.css') }}" rel="stylesheet">
@@ -74,6 +77,10 @@
         <script src="{{ asset('client/js/seller-register.js') }}"></script>
     @elseif (request()->routeIs('home'))
         <script src="{{ asset('client/js/home.js') }}"></script>
+    @elseif (request()->routeIs('categories.*'))
+        <script src="{{ asset('client/js/category-show.js') }}"></script>
+    @elseif (request()->routeIs('products.*'))
+        <script src="{{ asset('client/js/product-show.js') }}"></script>
     @elseif (request()->routeIs('seller.shop'))
         <script src="{{ asset('client/js/seller-store.js') }}"></script>
     @endif

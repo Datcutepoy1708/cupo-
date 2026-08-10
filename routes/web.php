@@ -1,12 +1,17 @@
 <?php
 
 use App\Http\Controllers\Client\ClientCategoryController;
+use App\Http\Controllers\Client\ClientProductController;
 use App\Http\Controllers\Client\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Storefront Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/home', [HomeController::class, 'index']);
+
+// Storefront Product Routes
+Route::get('/products/{slug}', [ClientProductController::class, 'show'])->name('products.show');
+Route::post('/products/{product}/like', [ClientProductController::class, 'toggleLike'])->name('products.like');
 
 // Storefront Category Routes
 Route::get('/categories', [ClientCategoryController::class, 'index'])->name('categories.index');
