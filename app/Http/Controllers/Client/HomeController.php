@@ -18,20 +18,20 @@ class HomeController extends Controller
     public function index(): View
     {
         // 1. Redis Cache cho các vị trí Banner (lưu dạng array an toàn)
-        $heroBanners = collect(Cache::store('redis')->remember('banners:homepage_hero', 3600, function () {
+        $heroBanners = collect(Cache::remember('banners:homepage_hero', 3600, function () {
             return Banner::active()->atPosition('homepage_hero')->get()->toArray();
         }))->map(fn ($item) => (object) $item);
 
-        $midBanners = collect(Cache::store('redis')->remember('banners:homepage_mid', 3600, function () {
+        $midBanners = collect(Cache::remember('banners:homepage_mid', 3600, function () {
             return Banner::active()->atPosition('homepage_mid')->get()->toArray();
         }))->map(fn ($item) => (object) $item);
 
-        $sideBanners = collect(Cache::store('redis')->remember('banners:sidebar', 3600, function () {
+        $sideBanners = collect(Cache::remember('banners:sidebar', 3600, function () {
             return Banner::active()->atPosition('sidebar')->get()->toArray();
         }))->map(fn ($item) => (object) $item);
 
         // 2. Redis Cache cho Cây Danh Mục Nổi Bật (TTL 24h)
-        $featuredCategories = collect(Cache::store('redis')->remember('categories:tree', 86400, function () {
+        $featuredCategories = collect(Cache::remember('categories:tree', 86400, function () {
             return Category::with(['children' => function ($q) {
                 $q->where('status', true);
             }])
@@ -49,7 +49,7 @@ class HomeController extends Controller
         });
 
         // 3. Redis Cache cho Sản Phẩm Flash Sale & Mới nhất
-        $flashSaleProducts = collect(Cache::store('redis')->remember('products:flash_sale', 600, function () {
+        $flashSaleProducts = collect(Cache::remember('products:flash_sale', 600, function () {
             return Product::with(['seller.sellerProfile', 'category'])
                 ->where('status', 'approved')
                 ->latest()
@@ -67,7 +67,7 @@ class HomeController extends Controller
             return $pObj;
         });
 
-        $latestProducts = collect(Cache::store('redis')->remember('products:latest', 600, function () {
+        $latestProducts = collect(Cache::remember('products:latest', 600, function () {
             return Product::with(['seller.sellerProfile', 'category'])
                 ->where('status', 'approved')
                 ->latest()

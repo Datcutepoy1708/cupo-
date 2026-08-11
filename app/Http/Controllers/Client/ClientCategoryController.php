@@ -58,7 +58,7 @@ class ClientCategoryController extends Controller
         }
 
         // 3. Lấy tất cả danh mục gốc (kèm danh mục con) cho Sidebar "Tất Cả Danh Mục" qua Redis Cache
-        $allRootCategories = collect(Cache::store('redis')->remember('categories:all_tree', 86400, function () {
+        $allRootCategories = collect(Cache::remember('categories:all_tree', 86400, function () {
             return Category::with(['children' => function ($q) {
                 $q->where('status', true);
             }])
@@ -74,7 +74,7 @@ class ClientCategoryController extends Controller
         });
 
         // 4. Banner đầu trang danh mục (category_top) qua Redis Cache
-        $bannerArr = Cache::store('redis')->remember('banners:category_top', 3600, function () {
+        $bannerArr = Cache::remember('banners:category_top', 3600, function () {
             $b = Banner::active()->atPosition('category_top')->first();
 
             return $b ? $b->toArray() : null;
