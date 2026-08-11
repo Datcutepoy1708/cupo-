@@ -21,6 +21,9 @@
 
     {{-- Admin CSS --}}
     <link href="{{ asset('admin/css/admin.css') }}" rel="stylesheet">
+    @if (request()->routeIs('admin.roles.*'))
+        <link href="{{ asset('admin/css/roles.css') }}" rel="stylesheet">
+    @endif
 
     @stack('styles')
 </head>
@@ -120,6 +123,11 @@
 
                 {{-- He thong --}}
                 <div class="sidebar-nav-label">Hệ thống</div>
+
+                <a href="{{ route('admin.roles.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Phân quyền & Chức vụ
+                </a>
 
                 <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users"></i>

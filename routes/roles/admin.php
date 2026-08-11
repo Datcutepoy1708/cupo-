@@ -4,7 +4,9 @@ use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminSellerController;
+use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\AdminUploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,4 +51,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::apiResource('banners', AdminBannerController::class)->except(['index']);
 
     Route::post('/upload', [AdminUploadController::class, 'upload'])->name('upload');
+
+    // Quản lý Phân Quyền & Chức Vụ (RBAC)
+    Route::get('/roles/data', [AdminRoleController::class, 'data'])->name('roles.data');
+    Route::post('/roles/assign-user', [AdminRoleController::class, 'assignUserRole'])->name('roles.assign-user');
+    Route::apiResource('roles', AdminRoleController::class)->where(['role' => '[0-9]+']);
+
+    // Quản lý Nhân viên Admin (Staff)
+    Route::post('/staff', [AdminStaffController::class, 'store'])->name('staff.store');
+    Route::put('/staff/{user}', [AdminStaffController::class, 'update'])->name('staff.update');
+    Route::post('/staff/{user}/reset-password', [AdminStaffController::class, 'resetPassword'])->name('staff.reset-password');
+    Route::delete('/staff/{user}', [AdminStaffController::class, 'destroy'])->name('staff.destroy');
 });
