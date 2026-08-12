@@ -34,22 +34,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(res => res.json())
-        .then(resData => {
-            if (resData.status === 'success') {
-                const data = resData.data;
-                rolesData = data.roles || [];
-                groupedPermissions = data.grouped_permissions || {};
-                usersData = data.users || [];
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.status === 'success') {
+                    const data = resData.data;
+                    rolesData = data.roles || [];
+                    groupedPermissions = data.grouped_permissions || {};
+                    usersData = data.users || [];
 
-                renderStats();
-                renderStaffTable();
-                renderRolesTable();
-                renderPermissionMatrix('createRolePermissionsContainer');
-                populateRoleOptions();
-            }
-        })
-        .catch(err => console.error('Failed to load roles data:', err));
+                    renderStats();
+                    renderStaffTable();
+                    renderRolesTable();
+                    renderPermissionMatrix('createRolePermissionsContainer');
+                    populateRoleOptions();
+                }
+            })
+            .catch(err => console.error('Failed to load roles data:', err));
     }
 
     // Render Stats
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </td>
                     <td>
                         <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1">
-                            <i class="fa-solid fa-key me-1"></i>${permsCount} quyền CRUD
+                            <i class="fa-solid fa-key me-1"></i>${permsCount} quyền
                         </span>
                     </td>
                     <td>
@@ -247,20 +247,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('✓ ' + data.message);
-                    const modalEl = document.getElementById('createStaffModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                    createStaffForm.reset();
-                    loadRolesData();
-                } else {
-                    alert(data.message || 'Có lỗi xảy ra khi tạo tài khoản.');
-                }
-            })
-            .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('✓ ' + data.message);
+                        const modalEl = document.getElementById('createStaffModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        createStaffForm.reset();
+                        loadRolesData();
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra khi tạo tài khoản.');
+                    }
+                })
+                .catch(err => console.error(err));
         });
     }
 
@@ -305,19 +305,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('✓ ' + data.message);
-                    const modalEl = document.getElementById('editStaffModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                    loadRolesData();
-                } else {
-                    alert(data.message || 'Có lỗi xảy ra khi cập nhật.');
-                }
-            })
-            .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('✓ ' + data.message);
+                        const modalEl = document.getElementById('editStaffModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        loadRolesData();
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra khi cập nhật.');
+                    }
+                })
+                .catch(err => console.error(err));
         });
     }
 
@@ -350,19 +350,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ password: password })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('✓ ' + data.message);
-                    const modalEl = document.getElementById('resetPasswordModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                    resetPasswordForm.reset();
-                } else {
-                    alert(data.message || 'Có lỗi xảy ra.');
-                }
-            })
-            .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('✓ ' + data.message);
+                        const modalEl = document.getElementById('resetPasswordModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        resetPasswordForm.reset();
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra.');
+                    }
+                })
+                .catch(err => console.error(err));
         });
     }
 
@@ -377,12 +377,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-            loadRolesData();
-        })
-        .catch(err => console.error(err));
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                loadRolesData();
+            })
+            .catch(err => console.error(err));
     };
 
     // 8. Create Role Form Submit
@@ -415,20 +415,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     permissions: selectedPerms
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.data) {
-                    alert('✓ Tạo chức vụ mới thành công!');
-                    const modalEl = document.getElementById('createRoleModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                    createRoleForm.reset();
-                    loadRolesData();
-                } else {
-                    alert(data.message || 'Có lỗi xảy ra khi tạo chức vụ.');
-                }
-            })
-            .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.data) {
+                        alert('✓ Tạo chức vụ mới thành công!');
+                        const modalEl = document.getElementById('createRoleModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        createRoleForm.reset();
+                        loadRolesData();
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra khi tạo chức vụ.');
+                    }
+                })
+                .catch(err => console.error(err));
         });
     }
 
@@ -483,19 +483,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     permissions: selectedPerms
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.data) {
-                    alert('✓ Cập nhật phân quyền chức vụ thành công!');
-                    const modalEl = document.getElementById('editRoleModal');
-                    const modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) modal.hide();
-                    loadRolesData();
-                } else {
-                    alert(data.message || 'Có lỗi xảy ra khi cập nhật.');
-                }
-            })
-            .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.data) {
+                        alert('✓ Cập nhật phân quyền chức vụ thành công!');
+                        const modalEl = document.getElementById('editRoleModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                        loadRolesData();
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra khi cập nhật.');
+                    }
+                })
+                .catch(err => console.error(err));
         });
     }
 
@@ -510,11 +510,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-            loadRolesData();
-        })
-        .catch(err => console.error(err));
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                loadRolesData();
+            })
+            .catch(err => console.error(err));
     };
 });

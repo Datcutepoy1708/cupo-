@@ -9,7 +9,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="{{ asset('client/css/bootstrap.min.css') }}" rel="stylesheet">
 
@@ -55,15 +56,9 @@
                         <span class="input-group-text">
                             <i class="fa-solid fa-envelope"></i>
                         </span>
-                        <input type="email"
-                               id="admin_email"
-                               name="email"
-                               class="form-control"
-                               value="{{ old('email') }}"
-                               placeholder="admin@cupo.vn"
-                               autocomplete="email"
-                               autofocus
-                               required>
+                        <input type="email" id="admin_email" name="email" class="form-control"
+                            value="{{ old('email') }}" placeholder="admin@cupo.vn" autocomplete="email" autofocus
+                            required>
                     </div>
                 </div>
 
@@ -73,13 +68,8 @@
                         <span class="input-group-text">
                             <i class="fa-solid fa-lock"></i>
                         </span>
-                        <input type="password"
-                               id="admin_password"
-                               name="password"
-                               class="form-control"
-                               placeholder="Nhập mật khẩu"
-                               autocomplete="current-password"
-                               required>
+                        <input type="password" id="admin_password" name="password" class="form-control"
+                            placeholder="Nhập mật khẩu" autocomplete="current-password" required>
                     </div>
                 </div>
 
@@ -89,7 +79,6 @@
                 </button>
 
                 <div class="security-note">
-                    <i class="fa-solid fa-shield-halved"></i>
                     <span>Kết nối được bảo mật. Phiên đăng nhập sẽ hết hạn sau 2 giờ.</span>
                 </div>
             </form>
