@@ -206,8 +206,9 @@
                             <p class="text-muted small mb-2"><i class="fa-solid fa-circle text-success me-1" style="font-size: 8px;"></i>Online 8 phút trước</p>
                             <div class="d-flex gap-2">
                                 <a href="#" class="btn btn-sm btn-outline-danger px-3 py-1"><i class="fa-solid fa-comments me-1"></i>Chat Ngay</a>
-                                <a href="#" class="btn btn-sm btn-light border px-3 py-1 text-dark"><i class="fa-solid fa-store me-1"></i>Xem Shop</a>
+                                <a href="{{ route('shops.show', $profile->id ?? ($sellerObj->id ?? 1)) }}" class="btn btn-sm btn-light border px-3 py-1 text-dark"><i class="fa-solid fa-store me-1"></i>Xem Shop</a>
                             </div>
+
                         </div>
                     </div>
                 </div>
