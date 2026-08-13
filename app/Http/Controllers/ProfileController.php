@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+<<<<<<< feature/be-updated
+=======
+use App\Models\Category;
+use App\Models\Coupon;
+>>>>>>> local
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +23,45 @@ class ProfileController extends Controller
      */
     public function show(Request $request): View
     {
+<<<<<<< feature/be-updated
         return view('client.profile.index', [
             'user' => $request->user(),
+=======
+        $user = $request->user();
+
+        $orders = $user->orders()
+            ->with(['sellerOrders.items.product', 'sellerOrders.seller.sellerProfile'])
+            ->latest()
+            ->get();
+
+        $categories = Category::tree()->get();
+
+        // 1. Voucher đang có trong ví của user
+        $savedCoupons = $user->savedCoupons()
+            ->with('seller.sellerProfile')
+            ->orderByPivot('created_at', 'desc')
+            ->get();
+
+        $savedCouponIds = $savedCoupons->pluck('id')->toArray();
+
+        // 2. Voucher khám phá / Nhận thêm voucher (các coupon active mà user chưa lưu)
+        $discoverableCoupons = Coupon::active()
+            ->with('seller.sellerProfile')
+            ->whereNotIn('id', $savedCouponIds)
+            ->where(function ($q) {
+                $q->where('usage_limit', 0)
+                    ->orWhereColumn('used_count', '<', 'usage_limit');
+            })
+            ->latest()
+            ->get();
+
+        return view('client.profile.index', [
+            'user' => $user,
+            'orders' => $orders,
+            'categories' => $categories,
+            'savedCoupons' => $savedCoupons,
+            'discoverableCoupons' => $discoverableCoupons,
+>>>>>>> local
         ]);
     }
 
