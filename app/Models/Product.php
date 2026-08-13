@@ -25,6 +25,7 @@ class Product extends Model
         'status',
         'admin_note',
         'views_count',
+        'likes_count',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class Product extends Model
         'has_variants' => 'boolean',
         'attributes' => 'array',
         'views_count' => 'integer',
+        'likes_count' => 'integer',
     ];
 
     public function seller()

@@ -93,6 +93,10 @@ main {
     color: #495057;
     user-select: none;
 }
+input::placeholder {
+    color: #dbe1e6;
+    font-style: italic !important;
+}
 
 /* Primary Button */
 .btn-auth-primary {

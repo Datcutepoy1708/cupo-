@@ -26,6 +26,7 @@ class SellerProfile extends Model
         'bank_account',
         'bank_owner',
         'status',
+        'admin_note',
     ];
 
     protected function casts(): array
@@ -40,6 +41,11 @@ class SellerProfile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'seller_categories');
     }
 
     public function followers()

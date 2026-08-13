@@ -1,0 +1,528 @@
+/* =============================================
+   CUPO ADMIN — Trang Quan ly Seller
+   ============================================= */
+
+/* ===== Stat cards nhanh ===== */
+.seller-stat-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.seller-stat-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+    transform: translateY(-2px);
+}
+
+.seller-stat-card.pending { border-left: 4px solid #e65100; }
+.seller-stat-card.approved { border-left: 4px solid #2e7d32; }
+.seller-stat-card.blocked { border-left: 4px solid #c62828; }
+
+.seller-stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: #212529;
+    line-height: 1;
+}
+
+.seller-stat-label {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ===== Tab filter ===== */
+.seller-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.seller-tab {
+    background: none;
+    border: 1.5px solid #e9ecef;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.seller-tab:hover {
+    border-color: #c62828;
+    color: #c62828;
+}
+
+.seller-tab.active {
+    background-color: #c62828;
+    border-color: #c62828;
+    color: #fff;
+    font-weight: 600;
+}
+
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 5px;
+}
+
+.tab-badge.pending { background: #fff3e0; color: #e65100; }
+.seller-tab.active .tab-badge.pending { background: rgba(255,255,255,0.25); color: #fff; }
+
+/* ===== Search ===== */
+.seller-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.seller-search-wrap i {
+    position: absolute;
+    left: 11px;
+    color: #adb5bd;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.seller-search {
+    border: 1.5px solid #e9ecef;
+    border-radius: 8px;
+    padding: 7px 14px 7px 34px;
+    font-size: 13px;
+    width: 220px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.seller-search:focus {
+    border-color: #c62828;
+    box-shadow: 0 0 0 3px rgba(198,40,40,0.1);
+}
+
+/* ===== Row cells ===== */
+.shop-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.shop-logo-sm {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.shop-logo-letter {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #c62828, #b71c1c);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.shop-name-text {
+    font-weight: 600;
+    color: #212529;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.shop-slug-text {
+    font-size: 11px;
+    color: #adb5bd;
+}
+
+.owner-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #212529;
+}
+
+.owner-email {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+/* ===== Action button in row ===== */
+.btn-row-detail {
+    background: none;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-row-detail:hover {
+    background-color: #fdecea;
+    border-color: #ef9a9a;
+    color: #c62828;
+}
+
+/* ===== Empty state ===== */
+.sellers-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: #adb5bd;
+}
+
+.sellers-empty i {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.sellers-empty p {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ===== Modal detail ===== */
+.seller-logo-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.admin-note-banner {
+    background: #fff3e0;
+    border-left: 4px solid #e65100;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: #795548;
+}
+
+.seller-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+@media (max-width: 575.98px) {
+    .seller-detail-grid { grid-template-columns: 1fr; }
+}
+
+.detail-section {
+    padding: 20px 24px;
+}
+
+.detail-section:first-child {
+    border-right: 1px solid #f0f0f0;
+}
+
+.detail-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #adb5bd;
+    margin-bottom: 14px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f8f9fa;
+    font-size: 13px;
+}
+
+.detail-row:last-child { border-bottom: none; }
+
+.detail-label {
+    color: #6c757d;
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 90px;
+}
+
+.detail-value {
+    color: #212529;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-all;
+}
+
+/* ===== Modal action buttons ===== */
+.btn-action-approve {
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-action-approve:hover { background: #1b5e20; }
+
+.btn-action-reject {
+    background: #e65100;
+    color: #fff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-action-reject:hover { background: #bf360c; }
+
+.btn-action-block {
+    background: #c62828;
+    color: #fff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-action-block:hover { background: #b71c1c; }
+
+/* ===== Pagination ===== */
+.page-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    background: #fff;
+    font-size: 13px;
+    color: #495057;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.page-btn:hover {
+    border-color: #c62828;
+    color: #c62828;
+}
+
+.page-btn.active {
+    background: #c62828;
+    border-color: #c62828;
+    color: #fff;
+    font-weight: 700;
+}
+
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ===== Toast ===== */
+#actionToast {
+    min-width: 280px;
+    border-radius: 10px;
+    color: #fff;
+}
+
+#actionToast.toast-success { background: #2e7d32; }
+#actionToast.toast-error   { background: #c62828; }
+
+/* ===== Waiting badge (so ngay cho duyet) ===== */
+.waiting-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 20px;
+    margin-top: 3px;
+    background: #fff3e0;
+    color: #e65100;
+    white-space: nowrap;
+}
+
+.waiting-badge.new {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.waiting-badge.urgent {
+    background: #fdecea;
+    color: #c62828;
+    animation: urgentPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.6; }
+}
+
+/* ===== Export button ===== */
+.btn-seller-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1.5px solid #a5d6a7;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    white-space: nowrap;
+}
+
+.btn-seller-export:hover {
+    background: #c8e6c9;
+    border-color: #66bb6a;
+    color: #1b5e20;
+    transform: translateY(-1px);
+}
+
+.btn-seller-export i {
+    font-size: 14px;
+}
+
+/* ===== Bulk action toolbar ===== */
+.bulk-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #fff8e1;
+    border-bottom: 1px solid #ffe082;
+    animation: slideDown 0.18s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.bulk-info {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5d4037;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.bulk-info i {
+    color: #f57c00;
+    font-size: 15px;
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-bulk-approve {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-bulk-approve:hover:not(:disabled) { background: #1b5e20; }
+.btn-bulk-approve:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-bulk-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-bulk-clear:hover { background: #f8f9fa; }
+
+/* ===== Checkbox column ===== */
+.seller-checkbox {
+    width: 15px;
+    height: 15px;
+    accent-color: #c62828;
+    cursor: pointer;
+}
+
+/* Row highlight when selected */
+.admin-table tbody tr.seller-row-selected {
+    background: rgba(198, 40, 40, 0.06) !important;
+}
+
+.admin-table tbody tr.seller-row-selected td {
+    border-bottom-color: rgba(198, 40, 40, 0.12);
+}

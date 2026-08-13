@@ -1,0 +1,131 @@
+/* ==============================================
+   CUPO ADMIN — Staff & Granular CRUD RBAC CSS
+   File: public/admin/css/roles.css
+   ============================================== */
+
+/* Custom Nav Tabs */
+.nav-tabs-custom {
+    border-bottom: 2px solid #e2e8f0;
+}
+.nav-tabs-custom .nav-link {
+    font-weight: 600;
+    color: #64748b;
+    border: none;
+    padding: 12px 20px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+.nav-tabs-custom .nav-link:hover {
+    color: #0f172a;
+}
+.nav-tabs-custom .nav-link.active {
+    color: #ef4444;
+    border-bottom-color: #ef4444;
+    background: transparent;
+}
+
+/* Stat Cards */
+.role-stat-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.role-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.role-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+.role-stat-icon.primary { background: #ebf5ff; color: #1a56db; }
+.role-stat-icon.success { background: #f0fdf4; color: #16a34a; }
+.role-stat-icon.purple  { background: #faf5ff; color: #9333ea; }
+.role-stat-icon.warning { background: #fffbeb; color: #d97706; }
+
+.role-stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.2;
+}
+.role-stat-label {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Role Badges */
+.badge-role {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+.badge-role.super-admin { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.badge-role.admin       { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.badge-role.moderator   { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+.badge-role.accountant  { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.badge-role.seller      { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+.badge-role.customer    { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+/* Permission Matrix Modal Box */
+.perm-group-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+.perm-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #cbd5e1;
+}
+.perm-group-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.perm-checkbox-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.perm-checkbox-item:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+/* CRUD Permission Table */
+.crud-matrix-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f8fafc;
+}
+.crud-matrix-table td {
+    vertical-align: middle;
+}

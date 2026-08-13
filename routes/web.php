@@ -1,52 +1,25 @@
 <?php
 
+use App\Http\Controllers\Client\ClientCategoryController;
+use App\Http\Controllers\Client\ClientProductController;
 use App\Http\Controllers\Client\ClientShopController;
-use App\Models\Banner;
-use App\Models\Category;
-use App\Models\FlashSale;
-use App\Models\Product;
+use App\Http\Controllers\Client\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Storefront Public Routes
-Route::get('/', function () {
-    $featuredCategories = Category::whereNull('parent_id')->with('children')->get();
-    $flashSale = FlashSale::where('status', true)->first();
-    $heroBanners = Banner::all();
-
-    return view('client.home', compact('featuredCategories', 'flashSale', 'heroBanners'));
-})->name('home');
-
-Route::get('/home', function () {
-    return redirect()->route('home');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index']);
 
 // Storefront Shop Routes
 Route::get('/shops/{sellerProfile}', [ClientShopController::class, 'show'])->name('shops.show');
 
 // Storefront Product Routes
-Route::get('/products/{slug}', function ($slug) {
-    $product = Product::where('slug', $slug)->with(['images', 'variants', 'category', 'seller.sellerProfile'])->firstOrFail();
-
-    return view('client.products.show', compact('product'));
-})->name('products.show');
-
-Route::post('/products/{product}/like', function () {
-    return response()->json(['success' => true]);
-})->name('products.like');
+Route::get('/products/{slug}', [ClientProductController::class, 'show'])->name('products.show');
+Route::post('/products/{product}/like', [ClientProductController::class, 'toggleLike'])->name('products.like');
 
 // Storefront Category Routes
-Route::get('/categories', function () {
-    $categories = Category::whereNull('parent_id')->with(['children.products', 'products'])->get();
-
-    return view('client.categories.index', compact('categories'));
-})->name('categories.index');
-
-Route::get('/categories/{slug}', function ($slug) {
-    $category = Category::where('slug', $slug)->firstOrFail();
-    $products = Product::where('category_id', $category->id)->where('status', 'approved')->paginate(12);
-
-    return view('client.categories.show', compact('category', 'products'));
-})->name('categories.show');
+Route::get('/categories', [ClientCategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/{slug}', [ClientCategoryController::class, 'show'])->name('categories.show');
 
 Route::get('/promotions', function () {
     return view('client.promotions');

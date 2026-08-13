@@ -4,40 +4,62 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'parent_id',
         'name',
         'slug',
+        'parent_id',
         'image',
         'status',
     ];
 
-    protected $casts = [
-        'status' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
+    }
 
-    public function parent()
+    /**
+     * Relationship: Danh mục cha
+     */
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    public function children()
+    /**
+     * Relationship: Các danh mục con
+     */
+    public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function products()
+    /**
+     * Relationship: Các sản phẩm thuộc danh mục
+     */
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
 
+    public function sellerProfiles()
+    {
+        return $this->belongsToMany(SellerProfile::class, 'seller_categories');
+    }
+
+    /**
+     * Scope: Lấy cây danh mục (Root categories kèm các cấp con)
+     */
     public function scopeTree($query)
     {
-        return $query->whereNull('parent_id')->with('children');
+        return $query->whereNull('parent_id')->with('children.children');
     }
 }

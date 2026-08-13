@@ -17,8 +17,8 @@
             {{-- Upload avatar --}}
             <div class="avatar-upload-section">
                 <div class="avatar-preview-container" onclick="document.getElementById('avatar-input').click()">
-                    <img src="{{ asset('https://picsum.photos/1600/700') }}" alt="Avatar" class="avatar-preview"
-                        id="avatar-preview">
+                    <img src="{{ auth()->user()->avatar_url }}" alt="Ảnh đại diện của {{ auth()->user()->name }}"
+                        class="avatar-preview" id="avatar-preview">
                     <div class="camera-overlay">
                         <i class="fa-solid fa-camera"></i>
                     </div>
@@ -31,9 +31,6 @@
                     <p class="text-muted small mb-3">
                         <i class="fa-solid fa-circle-info me-1"></i>Định dạng: JPG, PNG | Tối đa: 5MB
                     </p>
-                    <span class="file-name-display" id="file-name">
-                        <i class="fa-solid fa-file-image me-1"></i>Chưa chọn file
-                    </span>
                 </div>
             </div>
 
@@ -48,7 +45,8 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" name="date_of_birth"
+                    <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
+                        name="date_of_birth"
                         value="{{ old('date_of_birth', auth()->user()->date_of_birth?->format('Y-m-d')) }}">
                     @error('date_of_birth')
                         <div class="invalid-feedback">{{ $message }}</div>

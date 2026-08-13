@@ -195,3 +195,108 @@ the business rule changes):
 - Seller registration form may collect `date_of_birth` if the user
   hasn't set one yet, but must write it back to `users.date_of_birth`
   — never store a separate copy on `seller_profiles`.
+## 16. Admin Rejection/Block Reasons
+- Every admin action that rejects or blocks a resource (seller, product,
+  withdrawal, dispute...) must require and store a reason via
+  `admin_note` — never change status to `rejected`/`blocked` silently.
+- Approve actions do not require a reason.
+- The reason must be validated via a dedicated FormRequest, following
+  Section 6's rule — never validated inline in the controller.
+
+## 18. No Icons/Emoji in Written Output
+
+- Never use emoji or decorative icons (✅, 🎯, 📋, ⭐, 🚀, etc.) in any
+  generated text: code comments, commit messages, PR descriptions,
+  README content, markdown reports, or chat responses.
+- This applies to headings, bullet points, status indicators, and
+  section markers alike — use plain text labels instead
+  (e.g. "Done" / "Pending" / "High priority" rather than ✅ / ⏳ / 🔴).
+- Tables and checklists should use plain Markdown syntax (`- [ ]`,
+  `- [x]`) without emoji decoration.
+- This rule is about written/generated text only — it does not apply
+  to actual product UI icons (Font Awesome, SVG icons in Blade views),
+  which remain a frontend design decision, not a content rule.
+
+
+## 19. Admin Route Security
+- The `role:admin` middleware is the actual access control — never
+  rely on URL obscurity as the primary protection.
+- Admin route prefix is configurable via `ADMIN_PATH` in `.env`
+  (default `admin`), read via `config('app.admin_path')` — this is a
+  supplementary measure to reduce automated bot noise, not a security
+  boundary by itself.
+- Login routes (especially admin) must have `throttle` middleware
+  applied to mitigate brute-force attempts.
+## Component Reuse Rules
+
+- **Rule of 2**: if the same markup block (structure + styling) appears
+  or is about to appear in 2 or more places, extract it into a
+  `components/` Blade component immediately — do not wait for a third
+  occurrence.
+- Before writing new markup for status labels, buttons, cards, badges,
+  or form inputs, check `resources/views/components/` first. If an
+  existing component covers 80%+ of the need, extend it with a new
+  prop rather than writing new raw HTML.
+- Known reusable components (do not recreate these):
+  - `<x-status-badge :status="$status" type="order|product|seller" />`
+    — maps a status string to the correct color/label, shared across
+    Admin, Seller, and Customer views.
+  - `<x-button>`, `<x-input>`, `<x-modal>` — base form/UI primitives.
+  - `<x-pagination :items="$items" />` — wraps Laravel's paginator UI
+    consistently across all list pages (products, orders, sellers).
+- A component belongs in `components/` only if it is presentational
+  and role-agnostic. If a piece of markup is tied to one specific
+  role's layout (e.g. the admin sidebar), it stays in
+  `layouts/{role}/`, not `components/`.
+- When creating a new component, document its expected props as PHP
+  doc comments at the top of the file, so its contract is discoverable
+  without reading the whole implementation.
+## 20. Strict Separation of HTML, CSS, and JS
+
+- **Every Blade view must contain HTML/markup only.** No `<style>`
+  blocks, no `<script>` blocks, no inline `style="..."` attributes,
+  no inline `onclick="..."` or other inline event handlers — with zero
+  exceptions, regardless of how small the snippet is.
+- **Every page gets its own dedicated CSS file and JS file**, matching
+  the view's location:
+  - `resources/views/admin/sellers/index.blade.php`
+    → `public/admin/css/sellers.css` + `public/admin/js/sellers.js`
+  - `resources/views/client/home/index.blade.php`
+    → `public/client/css/home.css` + `public/client/js/home.js`
+- **No JS config objects inline in Blade**, even short ones. Data the
+  JS needs from the backend (route URLs, CSRF token, IDs) must be
+  passed via `data-*` attributes on the HTML element the script reads
+  from, not via an inline `<script>` block defining a global object.
+
+  Wrong:
+```blade
+  <script>
+      window.ADMIN_SELLERS_ROUTES = { index: '{{ route(...) }}', ... };
+  </script>
+```
+
+  Right:
+```blade
+  <div id="sellersApp"
+       data-index-url="{{ route('admin.sellers.index') }}"
+       data-approve-url="{{ url('admin/sellers') }}"
+       data-csrf="{{ csrf_token() }}">
+  </div>
+```
+```js
+  // sellers.js
+  const app = document.getElementById('sellersApp');
+  const indexUrl = app.dataset.indexUrl;
+```
+
+- **`@push('styles')` / `@push('scripts')` must only reference external
+  files** (`<link href="...">`, `<script src="...">`) — never contain
+  raw CSS/JS inside the push block itself.
+- If a piece of markup is repeated across pages (modals, badges,
+  cards), it still follows this rule once extracted into a
+  component/partial — the component's own script/style, if any, lives
+  in a matching dedicated file, not inline in the component's Blade
+  file.
+- This rule applies retroactively: when touching an existing view that
+  violates it, extract the inline CSS/JS into proper files as part of
+  that change, rather than adding more inline code next to it.
