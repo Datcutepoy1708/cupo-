@@ -23,6 +23,8 @@
     <link href="{{ asset('admin/css/admin.css') }}" rel="stylesheet">
     @if (request()->routeIs('admin.roles.*'))
         <link href="{{ asset('admin/css/roles.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.coupons.*'))
+        <link href="{{ asset('admin/css/coupons.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -109,9 +111,9 @@
                     Banner trang chủ
                 </a>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.coupons.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-ticket"></i>
-                    Ma giảm giá
+                    Mã giảm giá
                 </a>
 
                 <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">

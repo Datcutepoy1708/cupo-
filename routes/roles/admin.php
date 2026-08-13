@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminRoleController;
@@ -49,6 +50,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/banners/bulk-status', [AdminBannerController::class, 'bulkStatus'])->name('banners.bulk-status');
     Route::post('/banners/bulk-delete', [AdminBannerController::class, 'bulkDestroy'])->name('banners.bulk-delete');
     Route::apiResource('banners', AdminBannerController::class)->except(['index']);
+
+    // Quản lý Mã giảm giá (Coupons / Vouchers)
+    Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
+    Route::post('/coupons/bulk-status', [AdminCouponController::class, 'bulkStatus'])->name('coupons.bulk-status');
+    Route::post('/coupons/bulk-delete', [AdminCouponController::class, 'bulkDestroy'])->name('coupons.bulk-delete');
+    Route::patch('/coupons/{coupon}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+    Route::apiResource('coupons', AdminCouponController::class)->except(['index']);
 
     Route::post('/upload', [AdminUploadController::class, 'upload'])->name('upload');
 
