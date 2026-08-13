@@ -19,6 +19,7 @@ class User extends Authenticatable
         'date_of_birth',
         'role',
         'status',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -70,8 +71,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Dispute::class, 'buyer_id');
     }
-<<<<<<< feature/be-updated
-=======
 
     public function cart()
     {
@@ -109,5 +108,4 @@ class User extends Authenticatable
         return 'https://ui-avatars.com/api/?name='.urlencode($this->name)
             .'&background=c62828&color=fff&size=128&bold=true';
     }
->>>>>>> local
 }

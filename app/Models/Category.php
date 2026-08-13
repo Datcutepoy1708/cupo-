@@ -35,4 +35,9 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function scopeTree($query)
+    {
+        return $query->whereNull('parent_id')->with('children');
+    }
 }

@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-<<<<<<< feature/be-updated
-=======
 use App\Models\Category;
 use App\Models\Coupon;
->>>>>>> local
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,10 +20,6 @@ class ProfileController extends Controller
      */
     public function show(Request $request): View
     {
-<<<<<<< feature/be-updated
-        return view('client.profile.index', [
-            'user' => $request->user(),
-=======
         $user = $request->user();
 
         $orders = $user->orders()
@@ -61,7 +54,6 @@ class ProfileController extends Controller
             'categories' => $categories,
             'savedCoupons' => $savedCoupons,
             'discoverableCoupons' => $discoverableCoupons,
->>>>>>> local
         ]);
     }
 
