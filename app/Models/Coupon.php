@@ -41,4 +41,34 @@ class Coupon extends Model
     {
         return $this->hasMany(CouponUsage::class);
     }
+
+    public function savedUsers()
+    {
+        return $this->belongsToMany(User::class, 'customer_coupons')
+            ->withPivot(['id', 'status', 'used_at'])
+            ->withTimestamps();
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at && $this->expires_at->isPast();
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->status
+            && ! $this->isExpired()
+            && ($this->usage_limit == 0 || $this->used_count < $this->usage_limit);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', true)
+            ->where(function ($q) {
+                $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
+            })
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            });
+    }
 }

@@ -53,4 +53,9 @@ class SellerProfile extends Model
         return $this->belongsToMany(User::class, 'shop_follows', 'seller_profile_id', 'user_id')
             ->withPivot('followed_at');
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'seller_id', 'user_id');
+    }
 }

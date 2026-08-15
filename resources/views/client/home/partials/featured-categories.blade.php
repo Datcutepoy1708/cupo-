@@ -8,10 +8,14 @@
                     @php
                         $imgUrl = null;
                         if (!empty($cat->image)) {
-                            $p = $cat->image;
-                            $imgUrl = str_contains($p, '/storage/')
-                                ? '/storage/' . explode('/storage/', $p)[1]
-                                : '/storage/' . ltrim($p, '/');
+                            $rawPath = $cat->image;
+                            if (\Illuminate\Support\Str::startsWith($rawPath, ['http://', 'https://'])) {
+                                $imgUrl = $rawPath;
+                            } elseif (\Illuminate\Support\Str::contains($rawPath, '/storage/')) {
+                                $imgUrl = asset('storage/' . explode('/storage/', $rawPath)[1]);
+                            } else {
+                                $imgUrl = asset('storage/' . ltrim($rawPath, '/'));
+                            }
                         }
                         $icons = [
                             'điện tử' => 'fa-mobile-screen',

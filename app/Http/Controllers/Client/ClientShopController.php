@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\SellerProfile;
 use Illuminate\Http\Request;
@@ -35,7 +36,22 @@ class ClientShopController extends Controller
             ? $shop->followers()->where('user_id', auth()->id())->exists()
             : false;
 
-        // 2. Lấy từ khóa tìm kiếm trong shop & lọc sản phẩm
+        // 2. Lấy danh sách Voucher của Shop đang khả dụng
+        $shopCoupons = Coupon::where('seller_id', $sellerUserId)
+            ->active()
+            ->where(function ($q) {
+                $q->where('usage_limit', 0)
+                    ->orWhereColumn('used_count', '<', 'usage_limit');
+            })
+            ->latest()
+            ->get();
+
+        // Danh sách ID các voucher mà người dùng hiện tại đã lưu vào ví
+        $savedCouponIds = auth()->check()
+            ? auth()->user()->savedCoupons()->pluck('coupons.id')->toArray()
+            : [];
+
+        // 3. Lấy từ khóa tìm kiếm trong shop & lọc sản phẩm
         $searchQuery = $request->get('q');
         $sort = $request->get('sort', 'newest');
 
@@ -58,13 +74,13 @@ class ClientShopController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        // 3. Sản phẩm bán chạy (Top Best Sellers cho mục GỢI Ý & SẢN PHẨM BÁN CHẠY)
+        // 4. Sản phẩm bán chạy (Top Best Sellers cho mục GỢI Ý & SẢN PHẨM BÁN CHẠY)
         $topProducts = (clone $productsQuery)
             ->orderBy('views_count', 'desc')
             ->take(6)
             ->get();
 
-        // 4. Danh mục sản phẩm mà shop có kinh doanh
+        // 5. Danh mục sản phẩm mà shop có kinh doanh
         $shopCategories = Product::where('seller_id', $sellerUserId)
             ->where('status', 'approved')
             ->with('category')
@@ -79,6 +95,8 @@ class ClientShopController extends Controller
             'totalProducts',
             'followersCount',
             'isFollowed',
+            'shopCoupons',
+            'savedCouponIds',
             'products',
             'topProducts',
             'shopCategories',

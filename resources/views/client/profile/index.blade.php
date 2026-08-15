@@ -1,4 +1,8 @@
-@extends('layouts.client.app')
+﻿@extends('layouts.client.app')
+
+@push('styles')
+    <link href="{{ asset('client/css/vouchers.css') }}" rel="stylesheet">
+@endpush
 
 @section('content')
     @php
@@ -13,6 +17,7 @@
                 <div class="content-area">
                     <div class="tab-content">
                         @include('client.profile.partials.personal-info')
+                        @include('client.profile.partials.my-vouchers')
                         @include('client.profile.partials.change-password')
                         @include('client.profile.partials.address-book')
                         @include('client.profile.partials.order-history')
@@ -29,3 +34,7 @@
     @include('client.profile.modals.add-address')
     @include('client.profile.modals.edit-address')
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('client/js/vouchers.js') }}"></script>
+@endpush

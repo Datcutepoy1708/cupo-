@@ -202,33 +202,7 @@ the business rule changes):
 - Approve actions do not require a reason.
 - The reason must be validated via a dedicated FormRequest, following
   Section 6's rule — never validated inline in the controller.
-## 17. Backend-Only Scope — Do Not Touch Frontend
 
-- This assistant's responsibility is **backend only**: migrations,
-  models, controllers, services, form requests, routes, and their
-  tests. **Never generate, edit, or scaffold Blade views, CSS,
-  JavaScript, or any frontend markup**, even if a task seems to
-  require a UI to "complete" it.
-- If a task appears to need a view (e.g. "build the seller
-  registration flow"), stop at the Controller/Route layer and describe
-  what the endpoint expects/returns — do not create the corresponding
-  `.blade.php` file. The frontend is owned and implemented separately
-  by another team member.
-- **Verify backend endpoints via Postman (or curl), not by building a
-  form to submit them.** When asked to "test" a feature, provide the
-  Postman request details (method, URL, headers, body) instead of
-  writing HTML to exercise it.
-- If existing code in the repo already contains frontend files (Blade/
-  CSS/JS), do not modify them as a side effect of a backend task —
-  flag that a frontend change would be needed and stop there.
-- This rule applies regardless of how the request is phrased —
-  "make it work end-to-end", "show me a demo", "quick UI to test this"
-  are all still backend-only requests in this repo.
-- If a person's request implies frontend work, respond with the
-  backend deliverable only, and explicitly note: "Frontend for this
-  is handled separately — here's the Postman spec to test the
-  endpoint." Do not silently comply and do not silently refuse either
-  — say what you're doing and why.
 ## 18. No Icons/Emoji in Written Output
 
 - Never use emoji or decorative icons (✅, 🎯, 📋, ⭐, 🚀, etc.) in any

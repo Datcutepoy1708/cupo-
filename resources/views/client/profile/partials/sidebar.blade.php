@@ -13,6 +13,10 @@
             role="tab">
             <i class="fa-solid fa-id-card"></i> Thông tin cá nhân
         </a>
+        <a class="nav-link {{ $activeTab === 'myVouchers' ? 'active' : '' }}" data-bs-toggle="pill" href="#myVouchers"
+            role="tab">
+            <i class="fa-solid fa-ticket"></i> Kho Voucher của tôi
+        </a>
         <a class="nav-link {{ $activeTab === 'changePassword' ? 'active' : '' }}" data-bs-toggle="pill"
             href="#changePassword" role="tab">
             <i class="fa-solid fa-key"></i> Đổi mật khẩu
@@ -37,7 +41,7 @@
         @if (auth()->user()->role === 'customer')
             <a class="nav-link {{ $activeTab === 'sellerChannel' ? 'active' : '' }}" data-bs-toggle="pill"
                 href="#sellerChannel" role="tab">
-                <i class="fa-solid fa-shop"></i> Đăng kí bán hàng
+                <i class="fa-solid fa-shop"></i> Đăng ký bán hàng
             </a>
         @endif
     </nav>

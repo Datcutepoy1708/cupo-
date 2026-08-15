@@ -83,6 +83,13 @@ class User extends Authenticatable
             ->withPivot('followed_at');
     }
 
+    public function savedCoupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'customer_coupons')
+            ->withPivot(['id', 'status', 'used_at'])
+            ->withTimestamps();
+    }
+
     public function getCartCountAttribute(): int
     {
         return $this->cart?->items()->sum('quantity') ?? 0;
@@ -90,7 +97,7 @@ class User extends Authenticatable
 
     /**
      * URL ảnh đại diện — trả về ảnh thật nếu có,
-     * fallback về UI Avatars (tự tạo ảnh chữ cái đầu tên).
+     * fallback về UI Avatars (tự tạo ảnh chữ cái đầu tiên).
      */
     public function getAvatarUrlAttribute(): string
     {

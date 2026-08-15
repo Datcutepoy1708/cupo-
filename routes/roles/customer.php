@@ -4,6 +4,7 @@ use App\Http\Controllers\Client\AddressController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CustomerOrderController;
+use App\Http\Controllers\Client\CustomerVoucherController;
 use App\Http\Controllers\Client\ProductReviewController;
 use App\Http\Controllers\Client\ShopFollowController;
 use App\Http\Controllers\ProfileController;
@@ -40,8 +41,6 @@ Route::middleware('auth')->group(function () {
 
     // API Đánh giá Sản phẩm
     Route::post('/products/{product}/reviews', [ProductReviewController::class, 'store'])->name('products.reviews.store');
-    Route::put('/reviews/{review}', [ProductReviewController::class, 'update'])->name('products.reviews.update');
-    Route::delete('/reviews/{review}', [ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
 
     // Quản lý Sổ địa chỉ
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
@@ -52,5 +51,8 @@ Route::middleware('auth')->group(function () {
     // Theo dõi Gian hàng (Shop Follow)
     Route::post('/shops/{sellerProfile}/follow', [ShopFollowController::class, 'toggle'])->name('shops.follow.toggle');
     Route::get('/customer/followed-shops', [ShopFollowController::class, 'index'])->name('customer.followed-shops.index');
+
+    // Lưu / Nhận Mã giảm giá (Customer Vouchers)
+    Route::post('/customer/vouchers/{coupon}/save', [CustomerVoucherController::class, 'save'])->name('customer.vouchers.save');
 
 });
