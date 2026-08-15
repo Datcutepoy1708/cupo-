@@ -322,12 +322,12 @@
 
 .fcat-item {
     flex: 0 0 auto;
-    width: 96px;
+    width: 120px;
     text-align: center;
 }
 
 .fcat-item .category-icon {
-    font-size: 22px;
+    font-size: 30px;
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease;
@@ -372,4 +372,11 @@
     .fcat-item {
         width: 80px;
     }
+}
+.fcat-item-all .category-icon-all {
+    background: #c62828;
+    color: #fff;
+}
+.fcat-item-all:hover .category-icon-all {
+    background: #b71c1c;
 }

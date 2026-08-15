@@ -53,6 +53,13 @@
                 @empty
                     <p class="text-muted small px-3 py-2">Chưa có danh mục.</p>
                 @endforelse
+                <a href="{{ url('/categories') }}" class="fcat-item fcat-item-all text-decoration-none text-dark">
+                    <div
+                        class="category-icon category-icon-all mx-auto mb-2 d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <span class="small fw-medium">Xem tất cả</span>
+                </a>
             </div>
 
             <div class="fcat-track">
