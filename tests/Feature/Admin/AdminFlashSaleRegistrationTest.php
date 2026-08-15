@@ -34,7 +34,7 @@ class AdminFlashSaleRegistrationTest extends TestCase
     {
         $seller = User::factory()->create([
             'role' => 'seller',
-            'status' => 'approved',
+            'status' => 'active',
         ]);
         SellerProfile::create([
             'user_id' => $seller->id,

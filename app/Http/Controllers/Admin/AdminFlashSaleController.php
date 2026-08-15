@@ -62,7 +62,10 @@ class AdminFlashSaleController extends Controller
 
         // Gui thong bao cho tat ca Seller da duoc duyet khi phien mo dang ky
         if ($flashSale->registration_deadline !== null) {
-            $sellers = User::where('role', 'seller')->where('status', 'approved')->get();
+            $sellers = User::where('role', 'seller')
+                ->where('status', 'active')
+                ->whereHas('sellerProfile', fn ($q) => $q->where('status', 'approved'))
+                ->get();
             Notification::send($sellers, new FlashSaleRegistrationOpenNotification($flashSale));
         }
 

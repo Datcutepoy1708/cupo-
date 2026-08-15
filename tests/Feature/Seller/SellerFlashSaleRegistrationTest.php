@@ -15,11 +15,11 @@ class SellerFlashSaleRegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createApprovedSeller(string $status = 'approved'): User
+    private function createApprovedSeller(string $profileStatus = 'approved'): User
     {
         $seller = User::factory()->create([
             'role' => 'seller',
-            'status' => $status,
+            'status' => 'active',
         ]);
         SellerProfile::create([
             'user_id' => $seller->id,
@@ -27,7 +27,7 @@ class SellerFlashSaleRegistrationTest extends TestCase
             'slug' => 'shop-'.$seller->id,
             'address' => 'Ha Noi',
             'national_id' => '012345678901',
-            'status' => 'approved',
+            'status' => $profileStatus,
         ]);
 
         return $seller;
