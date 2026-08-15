@@ -27,7 +27,7 @@ class ClientCategoryController extends Controller
 
         $categoryBanner = Banner::active()->atPosition('category_top')->first();
 
-        return view('client.categories.index', compact('categories', 'categoryBanner'));
+        return view('client.categories.categories-list', compact('categories', 'categoryBanner'));
     }
 
     /**
