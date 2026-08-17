@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminCustomerController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFlashSaleController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -26,9 +27,7 @@ Route::middleware('auth')->post('/quan_tri_vien_cupo_1708/logout', [AdminLoginCo
 
 // Khu vực quản trị Admin (yêu cầu đăng nhập + role:admin)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/sellers', [AdminSellerController::class, 'index'])->name('sellers.index');
     Route::get('/sellers/export', [AdminSellerController::class, 'export'])->name('sellers.export');
