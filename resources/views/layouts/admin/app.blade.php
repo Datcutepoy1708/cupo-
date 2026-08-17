@@ -25,6 +25,12 @@
         <link href="{{ asset('admin/css/roles.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.coupons.*'))
         <link href="{{ asset('admin/css/coupons.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.flash-sales.*'))
+        <link href="{{ asset('admin/css/flash-sales.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.orders.*'))
+        <link href="{{ asset('admin/css/orders.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.settings.*'))
+        <link href="{{ asset('admin/css/settings.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -86,7 +92,7 @@
                 {{-- Kinh doanh --}}
                 <div class="sidebar-nav-label">Kinh doanh</div>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.orders.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bag-shopping"></i>
                     Đơn hàng
                 </a>
@@ -116,7 +122,7 @@
                     Mã giảm giá
                 </a>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.flash-sales.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bolt"></i>
                     Flash Sale
                 </a>
@@ -136,7 +142,7 @@
                     Người dùng
                 </a>
 
-                <a href="#" class="sidebar-nav-item">
+                <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-gear"></i>
                     Cài đặt
                 </a>

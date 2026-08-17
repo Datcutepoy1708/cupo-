@@ -1,0 +1,20 @@
+/* flash-sale-registrations.css (Seller side) */
+
+.registration-form .form-control:focus,
+.registration-form .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.registration-form .proposed-price-hint {
+    min-height: 1.25rem;
+    font-size: 0.78rem;
+    color: #6c757d;
+}
+
+/* Status badge compat */
+.btn-xs {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+}
