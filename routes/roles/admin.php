@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCouponController;
+use App\Http\Controllers\Admin\AdminCustomerController;
 use App\Http\Controllers\Admin\AdminFlashSaleController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -106,5 +107,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/', [AdminSettingController::class, 'index'])->name('index');
         Route::post('/update', [AdminSettingController::class, 'update'])->name('update');
         Route::post('/test-mail', [AdminSettingController::class, 'testMail'])->name('test-mail');
+    });
+
+    // Quan ly Khach hang (Customers)
+    Route::prefix('customers')->name('customers.')->group(function () {
+        Route::get('/export', [AdminCustomerController::class, 'export'])->name('export');
+        Route::get('/', [AdminCustomerController::class, 'index'])->name('index');
+        Route::get('/{user}', [AdminCustomerController::class, 'show'])->name('show');
+        Route::patch('/{user}/block', [AdminCustomerController::class, 'block'])->name('block');
+        Route::patch('/{user}/unblock', [AdminCustomerController::class, 'unblock'])->name('unblock');
     });
 });

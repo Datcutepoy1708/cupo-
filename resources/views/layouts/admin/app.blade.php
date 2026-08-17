@@ -31,6 +31,8 @@
         <link href="{{ asset('admin/css/orders.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.settings.*'))
         <link href="{{ asset('admin/css/settings.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.customers.*'))
+        <link href="{{ asset('admin/css/customers.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -137,7 +139,7 @@
                     Phân quyền & Chức vụ
                 </a>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.customers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users"></i>
                     Người dùng
                 </a>
