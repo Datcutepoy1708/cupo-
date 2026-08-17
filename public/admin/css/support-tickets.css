@@ -1,0 +1,316 @@
+/* ================================================================
+   support-tickets.css — Admin Support & Appeals Management Styles
+   ================================================================ */
+
+/* ---- Stat Cards ---- */
+.ticket-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--admin-card-bg, #fff);
+    border: 1px solid var(--admin-border, #e9ecef);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.ticket-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+}
+
+.ticket-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: rgba(99, 102, 241, .12);
+    color: #6366f1;
+    flex-shrink: 0;
+}
+
+.ticket-stat-card.open-card .ticket-stat-icon {
+    background: rgba(245, 158, 11, .12);
+    color: #f59e0b;
+}
+
+.ticket-stat-card.review-card .ticket-stat-icon {
+    background: rgba(59, 130, 246, .12);
+    color: #3b82f6;
+}
+
+.ticket-stat-card.resolved-card .ticket-stat-icon {
+    background: rgba(16, 185, 129, .12);
+    color: #10b981;
+}
+
+.ticket-stat-card.closed-card .ticket-stat-icon {
+    background: rgba(100, 116, 139, .12);
+    color: #64748b;
+}
+
+.ticket-stat-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-stat-num {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--admin-text, #1e293b);
+}
+
+.ticket-stat-label {
+    font-size: 12px;
+    color: var(--admin-text-muted, #64748b);
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+/* ---- Filter Tabs ---- */
+.ticket-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--admin-bg, #f8fafc);
+    border-radius: 10px;
+    padding: 4px;
+    border: 1px solid var(--admin-border, #e9ecef);
+    flex-wrap: wrap;
+}
+
+.ticket-tab {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--admin-text-muted, #64748b);
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.ticket-tab.active {
+    background: #fff;
+    color: #ef4444;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+    font-weight: 600;
+}
+
+.tab-badge.open {
+    background: #fef3c7;
+    color: #d97706;
+    border-radius: 20px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ---- Category Select & Search ---- */
+.ticket-category-select {
+    width: auto;
+    font-size: 13px;
+    border-color: var(--admin-border, #e9ecef);
+    border-radius: 8px;
+    padding: 7px 12px;
+    height: 38px;
+}
+
+.ticket-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ticket-search-wrap i {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.ticket-search {
+    padding: 8px 14px 8px 36px;
+    border: 1px solid var(--admin-border, #e9ecef);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--admin-card-bg, #fff);
+    color: var(--admin-text, #1e293b);
+    min-width: 220px;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.ticket-search:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, .12);
+}
+
+.btn-ticket-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    background: var(--admin-card-bg, #fff);
+    border: 1px solid var(--admin-border, #e9ecef);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--admin-text, #374151);
+    text-decoration: none;
+    transition: all .18s;
+    white-space: nowrap;
+}
+
+.btn-ticket-export:hover {
+    background: #f0fdf4;
+    border-color: #10b981;
+    color: #10b981;
+}
+
+/* ---- Badges ---- */
+.ticket-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ticket-badge-open {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.ticket-badge-review {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.ticket-badge-resolved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.ticket-badge-closed {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* ---- Action Buttons in Table ---- */
+.ticket-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-ticket-view,
+.btn-ticket-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .15s;
+}
+
+.btn-ticket-view {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+.btn-ticket-view:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.btn-ticket-respond {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+}
+
+.btn-ticket-respond:hover {
+    background: #dbeafe;
+}
+
+/* ---- Show Page ---- */
+.ticket-message-box {
+    background: #f8fafc;
+    border-left: 4px solid #3b82f6;
+    padding: 14px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #334155;
+}
+
+.ticket-response-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+/* ---- Pagination & Toast ---- */
+.page-btn {
+    padding: 5px 11px;
+    border: 1px solid var(--admin-border, #e2e8f0);
+    border-radius: 6px;
+    background: var(--admin-card-bg, #fff);
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--admin-text, #374151);
+    transition: all .15s;
+    line-height: 1.4;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fff5f5;
+}
+
+.page-btn.active {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+}
+
+.page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#ticketToast.toast {
+    min-width: 280px;
+    background: #1e293b;
+    color: #fff;
+    border-radius: 10px;
+}
+
+#ticketToast.toast.success {
+    background: #15803d;
+}
+
+#ticketToast.toast.danger {
+    background: #b91c1c;
+}

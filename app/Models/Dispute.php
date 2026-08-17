@@ -31,4 +31,32 @@ class Dispute extends Model
     {
         return $this->belongsTo(User::class, 'buyer_id');
     }
+
+    /**
+     * Nhan vien Label tieng Viet tuong ung voi status.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Chờ xử lý',
+            'in_progress' => 'Đang xử lý',
+            'refunded' => 'Đã hoàn tiền',
+            'rejected' => 'Đã từ chối',
+            default => $this->status,
+        };
+    }
+
+    /**
+     * CSS class tuong ung voi status (dung trong badge).
+     */
+    public function getStatusClassAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'dispute-badge-pending',
+            'in_progress' => 'dispute-badge-progress',
+            'refunded' => 'dispute-badge-refunded',
+            'rejected' => 'dispute-badge-rejected',
+            default => '',
+        };
+    }
 }

@@ -33,6 +33,10 @@
         <link href="{{ asset('admin/css/settings.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.customers.*'))
         <link href="{{ asset('admin/css/customers.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.disputes.*'))
+        <link href="{{ asset('admin/css/disputes.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.support-tickets.*'))
+        <link href="{{ asset('admin/css/support-tickets.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -104,9 +108,14 @@
                     Rút tiền & Seller
                 </a>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.disputes.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-scale-balanced"></i>
-                    Tranh chấp/Khiếu nại
+                    Tranh chấp Đơn hàng
+                </a>
+
+                <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-headset"></i>
+                    Kháng nghị Seller
                 </a>
 
                 <hr class="sidebar-divider">

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminCustomerController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminDisputeController;
 use App\Http\Controllers\Admin\AdminFlashSaleController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminStaffController;
+use App\Http\Controllers\Admin\AdminSupportTicketController;
 use App\Http\Controllers\Admin\AdminUploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -115,5 +117,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/{user}', [AdminCustomerController::class, 'show'])->name('show');
         Route::patch('/{user}/block', [AdminCustomerController::class, 'block'])->name('block');
         Route::patch('/{user}/unblock', [AdminCustomerController::class, 'unblock'])->name('unblock');
+    });
+
+    // Quan ly Tranh Chap / Khieu Nai (Disputes)
+    Route::prefix('disputes')->name('disputes.')->group(function () {
+        Route::get('/export', [AdminDisputeController::class, 'export'])->name('export');
+        Route::get('/', [AdminDisputeController::class, 'index'])->name('index');
+        Route::get('/{dispute}', [AdminDisputeController::class, 'show'])->name('show');
+        Route::patch('/{dispute}/process', [AdminDisputeController::class, 'process'])->name('process');
+        Route::patch('/{dispute}/refund', [AdminDisputeController::class, 'refund'])->name('refund');
+        Route::patch('/{dispute}/reject', [AdminDisputeController::class, 'reject'])->name('reject');
+    });
+
+    // Quan ly Khang nghi & Ho tro Seller (Support Tickets & Appeals)
+    Route::prefix('support-tickets')->name('support-tickets.')->group(function () {
+        Route::get('/export', [AdminSupportTicketController::class, 'export'])->name('export');
+        Route::get('/', [AdminSupportTicketController::class, 'index'])->name('index');
+        Route::get('/{ticket}', [AdminSupportTicketController::class, 'show'])->name('show');
+        Route::patch('/{ticket}/in-review', [AdminSupportTicketController::class, 'inReview'])->name('in-review');
+        Route::patch('/{ticket}/respond', [AdminSupportTicketController::class, 'respond'])->name('respond');
     });
 });

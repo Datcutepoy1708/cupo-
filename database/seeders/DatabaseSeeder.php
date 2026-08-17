@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             DummyProductSeeder::class,
             MarketingSeeder::class,
+            AdminDemoDataSeeder::class,
+            SupportTicketSeeder::class,
         ]);
 
     }
