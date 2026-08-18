@@ -82,58 +82,109 @@
         </div>
     </div>
 
-    {{-- Ngành hàng kinh doanh — chia 2 cấp: danh mục cha (nhóm) và danh mục con (chọn được) --}}
+    {{-- Ngành hàng kinh doanh — Chỉ hiển thị các ngành hàng đã đăng ký & được Admin duyệt --}}
     <div class="dash-info-card mb-4">
-        <div class="dash-info-card-header">
-            <i class="fa-solid fa-tags"></i>
-            <span>Ngành hàng kinh doanh</span>
+        <div class="dash-info-card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <i class="fa-solid fa-tags"></i>
+                <span>Ngành hàng kinh doanh đã đăng ký</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#categoryRequestModal">
+                <i class="fa-solid fa-paper-plane me-1"></i>Đơn đăng ký thêm ngành hàng
+            </button>
         </div>
+        <small class="dash-info-card-note">
+            <i class="fa-solid fa-shield-halved"></i>
+            Danh sách bên dưới là các ngành hàng cửa hàng của bạn đã đăng ký với Quản trị viên (Admin). Nếu muốn kinh doanh thêm ngành hàng mới, vui lòng gửi đơn đăng ký bổ sung để được xét duyệt.
+        </small>
         <div class="dash-info-card-body">
-            <form method="post" action="#">
-                @csrf
-                @method('PUT')
-                @php $selectedCategoryIds = $shop->categories->pluck('id')->all(); @endphp
-
-                @forelse ($allCategories ?? [] as $parent)
-                    <div class="cat-group mb-3">
-                        <p class="fw-bold mb-2">{{ $parent->name }}</p>
-                        <div class="row">
-                            @forelse ($parent->children as $child)
-                                <div class="col-6 col-md-4 col-lg-3 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="categories[]"
-                                            value="{{ $child->id }}" id="cat{{ $child->id }}"
-                                            @checked(in_array($child->id, $selectedCategoryIds))>
-                                        <label class="form-check-label"
-                                            for="cat{{ $child->id }}">{{ $child->name }}</label>
-                                    </div>
-                                </div>
-                            @empty
-                                {{-- Danh mục cha không có con: cho chọn thẳng danh mục cha --}}
-                                <div class="col-6 col-md-4 col-lg-3 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="categories[]"
-                                            value="{{ $parent->id }}" id="cat{{ $parent->id }}"
-                                            @checked(in_array($parent->id, $selectedCategoryIds))>
-                                        <label class="form-check-label"
-                                            for="cat{{ $parent->id }}">{{ $parent->name }}</label>
-                                    </div>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-muted mb-0">Chưa có danh mục ngành hàng nào trong hệ thống.</p>
-                @endforelse
-
-                <div class="d-flex justify-content-end mt-2">
-                    <button type="submit" class="btn btn-save">
-                        <i class="fa-solid fa-floppy-disk me-2"></i>Lưu ngành hàng
-                    </button>
+            @if ($shop->categories && $shop->categories->isNotEmpty())
+                <div class="d-flex flex-wrap gap-2 py-2">
+                    @foreach ($shop->categories as $cat)
+                        <span class="badge bg-light text-dark border px-3 py-2 fs-6 rounded-pill d-inline-flex align-items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            {{ $cat->name }}
+                            @if ($cat->parent)
+                                <small class="text-muted">({{ $cat->parent->name }})</small>
+                            @endif
+                        </span>
+                    @endforeach
                 </div>
-            </form>
+            @else
+                <div class="alert alert-warning mb-0 py-2 fs-6">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                    Cửa hàng chưa có ngành hàng kinh doanh nào được phê duyệt. Vui lòng gửi đơn đăng ký bổ sung.
+                </div>
+            @endif
         </div>
     </div>
+
+    {{-- Modal đăng ký thêm ngành hàng kinh doanh --}}
+    <div class="modal fade" id="categoryRequestModal" tabindex="-1" aria-labelledby="categoryRequestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold" id="categoryRequestModalLabel">
+                        <i class="fa-solid fa-file-pen me-2"></i>Đơn đăng ký bổ sung ngành hàng
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Đơn đăng ký bổ sung ngành hàng của bạn đã được gửi thành công tới Quản trị viên (Admin) để xét duyệt!'); bootstrap.Modal.getInstance(document.getElementById('categoryRequestModal')).hide();">
+                    @csrf
+                    <div class="modal-body">
+                        <p class="small text-muted mb-3">
+                            Vui lòng chọn các ngành hàng bạn muốn mở rộng kinh doanh. Đơn đăng ký sẽ được Admin kiểm tra và duyệt bổ sung.
+                        </p>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Chọn ngành hàng muốn đăng ký thêm:</label>
+                            @php
+                                $registeredIds = $shop->categories ? $shop->categories->pluck('id')->toArray() : [];
+                            @endphp
+                            <div class="border rounded p-3 bg-light" style="max-height: 220px; overflow-y: auto;">
+                                @forelse ($allCategories ?? [] as $parent)
+                                    <div class="fw-bold text-dark mt-2 mb-1 fs-6">{{ $parent->name }}</div>
+                                    @forelse ($parent->children as $child)
+                                        @if (!in_array($child->id, $registeredIds))
+                                            <div class="form-check ms-2 mb-1">
+                                                <input class="form-check-input" type="checkbox" name="request_categories[]" value="{{ $child->id }}" id="reqCat{{ $child->id }}">
+                                                <label class="form-check-label small" for="reqCat{{ $child->id }}">
+                                                    {{ $child->name }}
+                                                </label>
+                                            </div>
+                                        @endif
+                                    @empty
+                                        @if (!in_array($parent->id, $registeredIds))
+                                            <div class="form-check ms-2 mb-1">
+                                                <input class="form-check-input" type="checkbox" name="request_categories[]" value="{{ $parent->id }}" id="reqCat{{ $parent->id }}">
+                                                <label class="form-check-label small" for="reqCat{{ $parent->id }}">
+                                                    {{ $parent->name }}
+                                                </label>
+                                            </div>
+                                        @endif
+                                    @endforelse
+                                @empty
+                                    <p class="text-muted small mb-0">Không có ngành hàng mới để đăng ký.</p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ghi chú gửi Admin:</label>
+                            <textarea class="form-control form-control-sm" name="seller_note" rows="3" placeholder="Mô tả lý do hoặc thông tin sản phẩm dự kiến bán thêm..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger btn-sm px-3">
+                            <i class="fa-solid fa-paper-plane me-1"></i>Gửi đơn xét duyệt
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
     {{-- Định danh (chỉ xem) + Ngân hàng nhận tiền (chỉnh sửa được) — gộp chung 1 card vì cùng nhóm thông tin nhạy cảm --}}
     <div class="dash-info-card">

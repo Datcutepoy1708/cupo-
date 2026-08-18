@@ -1,10 +1,8 @@
 {{-- ===== SIDEBAR ===== --}}
 <div class="col-md-3 col-lg-2 px-0 sidebar">
     <div class="profile-section">
-        <img src="{{ auth()->user()->avatar_url }}"
-             alt="Ảnh đại diện của {{ auth()->user()->name }}"
-             class="profile-img"
-             id="sidebar-avatar">
+        <img src="{{ auth()->user()->avatar_url }}" alt="Ảnh đại diện của {{ auth()->user()->name }}" class="profile-img"
+            id="sidebar-avatar">
         <div class="profile-name" id="username-display">{{ auth()->user()->name }}</div>
     </div>
 
@@ -15,7 +13,7 @@
         </a>
         <a class="nav-link {{ $activeTab === 'myVouchers' ? 'active' : '' }}" data-bs-toggle="pill" href="#myVouchers"
             role="tab">
-            <i class="fa-solid fa-ticket"></i> Kho Voucher của tôi
+            <i class="fa-solid fa-ticket"></i> Voucher
         </a>
         <a class="nav-link {{ $activeTab === 'changePassword' ? 'active' : '' }}" data-bs-toggle="pill"
             href="#changePassword" role="tab">
