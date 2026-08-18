@@ -179,6 +179,24 @@ class AdminDisputeTest extends TestCase
         $this->assertEquals($initialBalance - $this->sellerOrder->grand_total, $this->sellerProfile->balance);
     }
 
+    /* ---- 6b. Hoàn tiền tranh chấp khi số dư không đủ -> Số dư bị Âm (ghi nợ) ---- */
+    public function test_admin_dispute_refund_allows_negative_seller_balance(): void
+    {
+        // Đặt số dư của seller nhỏ hơn số tiền đơn hàng cần hoàn (có 100k, hoàn 300k)
+        $this->sellerProfile->update(['balance' => 100000.00]);
+
+        $response = $this->actingAs($this->admin)
+            ->patchJson(route('admin.disputes.refund', $this->dispute), [
+                'admin_decision' => 'Hoàn tiền gấp cho khách, số dư seller bị ghi nợ.',
+            ]);
+
+        $response->assertStatus(200);
+
+        // Số dư seller chuyển thành 100,000 - 230,000 = -130,000đ
+        $this->sellerProfile->refresh();
+        $this->assertEquals(-130000.00, $this->sellerProfile->balance);
+    }
+
     /* ---- 7. Hoàn tiền thiếu lý do -> 422 ---- */
     public function test_admin_cannot_refund_without_decision(): void
     {

@@ -72,32 +72,40 @@
                     Dashboard
                 </a>
 
-                <hr class="sidebar-divider">
+                {{-- Phân quyền hiển thị Menu theo Vai trò nhân viên --}}
+                @php
+                    $role = auth()->user()->role ?? '';
+                    $isSuperOrAdmin = in_array($role, ['super-admin', 'admin']);
+                    $isModerator    = ($role === 'moderator');
+                    $isAccountant   = ($role === 'accountant');
+                @endphp
 
-                {{-- San xuat --}}
-                <div class="sidebar-nav-label">Quản lý sàn</div>
+                {{-- 1. Quản lý sàn: Dành cho Admin & Moderator --}}
+                @if ($isSuperOrAdmin || $isModerator)
+                    <div class="sidebar-nav-label">Quản lý sàn</div>
 
-                <a href="{{ route('admin.sellers.index') }}"
-                    class="sidebar-nav-item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-store"></i>
-                    Gian hàng & Seller
-                </a>
+                    <a href="{{ route('admin.sellers.index') }}"
+                        class="sidebar-nav-item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-store"></i>
+                        Gian hàng & Seller
+                    </a>
 
-                <a href="{{ route('admin.products.index') }}"
-                    class="sidebar-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-box-open"></i>
-                    Sản phẩm
-                </a>
+                    <a href="{{ route('admin.products.index') }}"
+                        class="sidebar-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-box-open"></i>
+                        Sản phẩm
+                    </a>
 
-                <a href="{{ route('admin.categories.index') }}"
-                    class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-tags"></i>
-                    Danh mục
-                </a>
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-tags"></i>
+                        Danh mục
+                    </a>
 
-                <hr class="sidebar-divider">
+                    <hr class="sidebar-divider">
+                @endif
 
-                {{-- Kinh doanh --}}
+                {{-- 2. Kinh doanh: Phân chia theo nghiệp vụ --}}
                 <div class="sidebar-nav-label">Kinh doanh</div>
 
                 <a href="{{ route('admin.orders.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
@@ -105,60 +113,72 @@
                     Đơn hàng
                 </a>
 
-                <a href="{{ route('admin.withdrawals.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-money-bill-transfer"></i>
-                    Rút tiền & Seller
-                </a>
+                @if ($isSuperOrAdmin || $isAccountant)
+                    <a href="{{ route('admin.withdrawals.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        Rút tiền & Seller
+                    </a>
+                @endif
 
-                <a href="{{ route('admin.disputes.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-scale-balanced"></i>
-                    Tranh chấp Đơn hàng
-                </a>
+                @if ($isSuperOrAdmin || $isModerator)
+                    <a href="{{ route('admin.disputes.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        Tranh chấp Đơn hàng
+                    </a>
 
-                <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-headset"></i>
-                    Kháng nghị Seller
-                </a>
-
-                <hr class="sidebar-divider">
-
-                {{-- Marketing --}}
-                <div class="sidebar-nav-label">Marketing</div>
-
-                <a href="{{ route('admin.banners.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-image"></i>
-                    Banner trang chủ
-                </a>
-
-                <a href="{{ route('admin.coupons.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-ticket"></i>
-                    Mã giảm giá
-                </a>
-
-                <a href="{{ route('admin.flash-sales.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-bolt"></i>
-                    Flash Sale
-                </a>
+                    <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-headset"></i>
+                        Kháng nghị Seller
+                    </a>
+                @endif
 
                 <hr class="sidebar-divider">
 
-                {{-- He thong --}}
-                <div class="sidebar-nav-label">Hệ thống</div>
+                {{-- 3. Marketing: Dành cho Admin & Moderator --}}
+                @if ($isSuperOrAdmin || $isModerator)
+                    <div class="sidebar-nav-label">Marketing</div>
 
-                <a href="{{ route('admin.roles.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    Phân quyền & Chức vụ
-                </a>
+                    <a href="{{ route('admin.banners.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-image"></i>
+                        Banner trang chủ
+                    </a>
 
-                <a href="{{ route('admin.customers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-users"></i>
-                    Người dùng
-                </a>
+                    <a href="{{ route('admin.coupons.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-ticket"></i>
+                        Mã giảm giá
+                    </a>
 
-                <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-gear"></i>
-                    Cài đặt
-                </a>
+                    <a href="{{ route('admin.flash-sales.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-bolt"></i>
+                        Flash Sale
+                    </a>
+
+                    <hr class="sidebar-divider">
+                @endif
+
+                {{-- 4. Hệ thống: Phân quyền & Cài đặt --}}
+                @if ($isSuperOrAdmin || $isModerator)
+                    <div class="sidebar-nav-label">Hệ thống</div>
+
+                    @if ($isSuperOrAdmin)
+                        <a href="{{ route('admin.roles.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            Phân quyền & Chức vụ
+                        </a>
+                    @endif
+
+                    <a href="{{ route('admin.customers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users"></i>
+                        Người dùng
+                    </a>
+
+                    @if ($isSuperOrAdmin)
+                        <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-gear"></i>
+                            Cài đặt
+                        </a>
+                    @endif
+                @endif
 
             </nav>
 
@@ -166,11 +186,19 @@
             <div class="sidebar-footer">
                 <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="admin-avatar">
                 <div class="admin-info">
-                    <div class="admin-name">{{ auth()->user()->name }}</div>
-                    <div class="admin-role">Quản trị viên</div>
+                    <div class="admin-name text-truncate" style="max-width: 130px;">{{ auth()->user()->name }}</div>
+                    <div class="admin-role">
+                        {{ match(auth()->user()->role) {
+                            'super-admin' => 'Super Admin',
+                            'admin'       => 'Quản trị viên',
+                            'moderator'   => 'Kiểm duyệt viên',
+                            'accountant'  => 'Kế toán sàn',
+                            default       => ucfirst(auth()->user()->role ?? 'Nhân viên'),
+                        } }}
+                    </div>
                 </div>
                 <button type="button" class="logout-btn" data-bs-toggle="modal" data-bs-target="#adminLogoutModal"
-                    title="Dang xuat">
+                    title="Đăng xuất">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
@@ -182,7 +210,7 @@
         <header class="admin-topbar">
 
             {{-- Hamburger (mobile) --}}
-            <button class="topbar-toggle" id="sidebarToggle" type="button" aria-label="Mo sidebar">
+            <button class="topbar-toggle" id="sidebarToggle" type="button" aria-label="Mở sidebar">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
@@ -200,7 +228,25 @@
             </div>
 
             {{-- Actions --}}
-            <div class="topbar-actions">
+            <div class="topbar-actions d-flex align-items-center">
+
+                {{-- Role Badge --}}
+                <span class="badge rounded-pill px-3 py-2 me-1 {{ match(auth()->user()->role) {
+                    'super-admin' => 'bg-danger text-white',
+                    'admin'       => 'bg-primary text-white',
+                    'moderator'   => 'bg-info text-dark',
+                    'accountant'  => 'bg-success text-white',
+                    default       => 'bg-secondary text-white',
+                } }}">
+                    <i class="fa-solid fa-user-shield me-1"></i>
+                    {{ match(auth()->user()->role) {
+                        'super-admin' => 'Super Admin',
+                        'admin'       => 'Quản trị viên',
+                        'moderator'   => 'Kiểm duyệt viên',
+                        'accountant'  => 'Kế toán viên',
+                        default       => ucfirst(auth()->user()->role ?? 'Nhân viên'),
+                    } }}
+                </span>
 
                 {{-- Thong bao --}}
                 <button type="button" class="topbar-icon-btn" title="Thong bao">

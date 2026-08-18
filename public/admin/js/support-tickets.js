@@ -47,12 +47,18 @@
 
     let modalInstance = null;
 
-    function openResponseModal(ticketId, ticketSubject, onConfirmCallback) {
+    function openResponseModal(ticketId, ticketSubject, onConfirmCallback, category, hasProduct) {
         const modalEl = document.getElementById('ticketResponseModal');
         const subjectEl = document.getElementById('modalTicketSubject');
         const textEl = document.getElementById('adminResponseText');
         const errEl = document.getElementById('responseNoteError');
         const confirmBtn = document.getElementById('confirmTicketResponseBtn');
+
+        const actionWrap  = document.getElementById('modalActionOptions');
+        const unlockWrap  = document.getElementById('optUnlockSellerWrap');
+        const approveWrap = document.getElementById('optApproveProductWrap');
+        const unlockChk   = document.getElementById('chkUnlockSeller');
+        const approveChk  = document.getElementById('chkApproveProduct');
 
         if (!modalEl) return;
 
@@ -60,9 +66,34 @@
         if (textEl) textEl.value = '';
         if (errEl) errEl.classList.add('d-none');
 
+        if (unlockChk) unlockChk.checked = false;
+        if (approveChk) approveChk.checked = false;
+
+        let hasAnyAction = false;
+        if (category === 'account_blocked' && unlockWrap) {
+            unlockWrap.classList.remove('d-none');
+            hasAnyAction = true;
+        } else if (unlockWrap) {
+            unlockWrap.classList.add('d-none');
+        }
+
+        if (category === 'product_rejected' && hasProduct && approveWrap) {
+            approveWrap.classList.remove('d-none');
+            hasAnyAction = true;
+        } else if (approveWrap) {
+            approveWrap.classList.add('d-none');
+        }
+
+        if (actionWrap) {
+            if (hasAnyAction) actionWrap.classList.remove('d-none');
+            else actionWrap.classList.add('d-none');
+        }
+
         confirmBtn.onclick = function () {
             const responseText = textEl.value.trim();
             const actionStatus = document.querySelector('input[name="action_status"]:checked')?.value || 'resolved';
+            const unlockSeller = unlockChk ? unlockChk.checked : false;
+            const approveProduct = approveChk ? approveChk.checked : false;
 
             if (!responseText) {
                 if (errEl) {
@@ -73,7 +104,7 @@
             }
             if (errEl) errEl.classList.add('d-none');
 
-            onConfirmCallback(ticketId, responseText, actionStatus, modalInstance);
+            onConfirmCallback(ticketId, responseText, actionStatus, modalInstance, { unlockSeller, approveProduct });
         };
 
         modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -165,7 +196,9 @@
                 if (t.status !== 'closed') {
                     actionButtons += `
                       <button type="button" class="btn-ticket-action btn-ticket-respond ms-1"
-                              data-id="${t.id}" data-subject="${escHtml(t.subject)}" title="Phản hồi">
+                              data-id="${t.id}" data-subject="${escHtml(t.subject)}"
+                              data-category="${t.category}" data-has-product="${t.product_id ? '1' : '0'}"
+                              title="Phản hồi">
                         <i class="fa-solid fa-reply"></i>
                       </button>
                     `;
@@ -198,7 +231,13 @@
 
             tbody.querySelectorAll('.btn-ticket-respond').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    openResponseModal(btn.dataset.id, btn.dataset.subject, handleResponseSubmit);
+                    openResponseModal(
+                        btn.dataset.id,
+                        btn.dataset.subject,
+                        handleResponseSubmit,
+                        btn.dataset.category,
+                        btn.dataset.hasProduct === '1'
+                    );
                 });
             });
         }
@@ -228,7 +267,7 @@
             }
         }
 
-        function handleResponseSubmit(ticketId, responseText, actionStatus, modalInst) {
+        function handleResponseSubmit(ticketId, responseText, actionStatus, modalInst, extra) {
             const url = RESPOND_URL.replace('__ID__', ticketId);
 
             fetch(url, {
@@ -241,6 +280,8 @@
                 body: JSON.stringify({
                     admin_response: responseText,
                     action_status: actionStatus,
+                    unlock_seller: extra?.unlockSeller || false,
+                    approve_product: extra?.approveProduct || false,
                 }),
             })
                 .then(r => r.json())
@@ -378,7 +419,7 @@
         });
 
         document.getElementById('btnRespondTicket')?.addEventListener('click', () => {
-            openResponseModal(ticketId, ticketSubject, (id, note, status, modalInst) => {
+            openResponseModal(ticketId, ticketSubject, (id, note, status, modalInst, extra) => {
                 fetch(RESPOND_URL, {
                     method: 'PATCH',
                     headers: {
@@ -389,6 +430,8 @@
                     body: JSON.stringify({
                         admin_response: note,
                         action_status: status,
+                        unlock_seller: extra?.unlockSeller || false,
+                        approve_product: extra?.approveProduct || false,
                     }),
                 })
                     .then(r => r.json())
@@ -398,7 +441,7 @@
                         setTimeout(() => window.location.reload(), 1000);
                     })
                     .catch(() => showToast('Có lỗi xảy ra.', 'danger'));
-            });
+            }, showConfig.dataset.category, showConfig.dataset.hasProduct === '1');
         });
     }
 
