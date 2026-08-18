@@ -37,6 +37,8 @@
         <link href="{{ asset('admin/css/disputes.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.support-tickets.*'))
         <link href="{{ asset('admin/css/support-tickets.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.withdrawals.*'))
+        <link href="{{ asset('admin/css/withdrawals.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -103,7 +105,7 @@
                     Đơn hàng
                 </a>
 
-                <a href="#" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.withdrawals.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-money-bill-transfer"></i>
                     Rút tiền & Seller
                 </a>

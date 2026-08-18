@@ -1,0 +1,302 @@
+/* ================================================================
+   withdrawals.css — Admin Withdrawal Management Styles
+   ================================================================ */
+
+/* ---- Stat Cards ---- */
+.withdrawal-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--admin-card-bg, #fff);
+    border: 1px solid var(--admin-border, #e9ecef);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.withdrawal-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+}
+
+.withdrawal-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: rgba(99, 102, 241, .12);
+    color: #6366f1;
+    flex-shrink: 0;
+}
+
+.withdrawal-stat-card.pending-card .withdrawal-stat-icon {
+    background: rgba(245, 158, 11, .12);
+    color: #f59e0b;
+}
+
+.withdrawal-stat-card.approved-card .withdrawal-stat-icon {
+    background: rgba(16, 185, 129, .12);
+    color: #10b981;
+}
+
+.withdrawal-stat-card.rejected-card .withdrawal-stat-icon {
+    background: rgba(239, 68, 68, .12);
+    color: #ef4444;
+}
+
+.withdrawal-stat-card.paid-card .withdrawal-stat-icon {
+    background: rgba(14, 165, 233, .12);
+    color: #0ea5e9;
+}
+
+.withdrawal-stat-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.withdrawal-stat-num {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--admin-text, #1e293b);
+}
+
+.withdrawal-stat-label {
+    font-size: 12px;
+    color: var(--admin-text-muted, #64748b);
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+/* ---- Filter Tabs ---- */
+.withdrawal-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--admin-bg, #f8fafc);
+    border-radius: 10px;
+    padding: 4px;
+    border: 1px solid var(--admin-border, #e9ecef);
+    flex-wrap: wrap;
+}
+
+.withdrawal-tab {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--admin-text-muted, #64748b);
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.withdrawal-tab.active {
+    background: #fff;
+    color: #ef4444;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+    font-weight: 600;
+}
+
+.tab-badge.pending {
+    background: #fef3c7;
+    color: #d97706;
+    border-radius: 20px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ---- Search & Export ---- */
+.withdrawal-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.withdrawal-search-wrap i {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.withdrawal-search {
+    padding: 8px 14px 8px 36px;
+    border: 1px solid var(--admin-border, #e9ecef);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--admin-card-bg, #fff);
+    color: var(--admin-text, #1e293b);
+    min-width: 250px;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.withdrawal-search:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, .12);
+}
+
+.btn-withdrawal-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    background: var(--admin-card-bg, #fff);
+    border: 1px solid var(--admin-border, #e9ecef);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--admin-text, #374151);
+    text-decoration: none;
+    transition: all .18s;
+    white-space: nowrap;
+}
+
+.btn-withdrawal-export:hover {
+    background: #f0fdf4;
+    border-color: #10b981;
+    color: #10b981;
+}
+
+/* ---- Badges ---- */
+.withdrawal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.withdrawal-badge-pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.withdrawal-badge-approved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.withdrawal-badge-rejected {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ---- Action Buttons in Table ---- */
+.withdrawal-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-withdrawal-view,
+.btn-withdrawal-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .15s;
+}
+
+.btn-withdrawal-view {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+.btn-withdrawal-view:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.btn-withdrawal-approve {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.btn-withdrawal-approve:hover {
+    background: #dcfce7;
+}
+
+.btn-withdrawal-reject {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.btn-withdrawal-reject:hover {
+    background: #fee2e2;
+}
+
+/* ---- Show Page Styles ---- */
+.withdrawal-amount-banner {
+    background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
+    border: 1px dashed #fca5a5;
+}
+
+/* ---- Pagination & Toast ---- */
+.page-btn {
+    padding: 5px 11px;
+    border: 1px solid var(--admin-border, #e2e8f0);
+    border-radius: 6px;
+    background: var(--admin-card-bg, #fff);
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--admin-text, #374151);
+    transition: all .15s;
+    line-height: 1.4;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fff5f5;
+}
+
+.page-btn.active {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+}
+
+.page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#withdrawalToast.toast {
+    min-width: 280px;
+    background: #1e293b;
+    color: #fff;
+    border-radius: 10px;
+}
+
+#withdrawalToast.toast.success {
+    background: #15803d;
+}
+
+#withdrawalToast.toast.danger {
+    background: #b91c1c;
+}

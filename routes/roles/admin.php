@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\AdminSupportTicketController;
 use App\Http\Controllers\Admin\AdminUploadController;
+use App\Http\Controllers\Admin\AdminWithdrawalController;
 use Illuminate\Support\Facades\Route;
 
 // Trang đăng nhập ẩn dành riêng cho Admin (Rule 19: throttle chống brute-force)
@@ -136,5 +137,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/{ticket}', [AdminSupportTicketController::class, 'show'])->name('show');
         Route::patch('/{ticket}/in-review', [AdminSupportTicketController::class, 'inReview'])->name('in-review');
         Route::patch('/{ticket}/respond', [AdminSupportTicketController::class, 'respond'])->name('respond');
+    });
+
+    // Quan ly Yeu cau Rut tien (Withdrawals)
+    Route::prefix('withdrawals')->name('withdrawals.')->group(function () {
+        Route::get('/export', [AdminWithdrawalController::class, 'export'])->name('export');
+        Route::get('/', [AdminWithdrawalController::class, 'index'])->name('index');
+        Route::get('/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('show');
+        Route::patch('/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('approve');
+        Route::patch('/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('reject');
     });
 });
