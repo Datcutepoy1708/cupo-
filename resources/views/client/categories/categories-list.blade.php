@@ -7,59 +7,101 @@
 @endpush
 
 @section('content')
-    <div class="cat-page-bg py-4">
-        <div class="container">
+<div class="cat-page-bg">
+    <div class="container py-4">
 
-            {{-- Top Category Banner --}}
-            @if (isset($categoryBanner) && $categoryBanner)
-                <div class="cat-top-banner mb-4">
-                    <a href="{{ $categoryBanner->link_url ?: '#' }}">
-                        <img src="{{ Str::contains($categoryBanner->image_path, 'http') ? $categoryBanner->image_path : asset('storage/' . $categoryBanner->image_path) }}"
-                            alt="{{ $categoryBanner->title }}" class="img-fluid rounded-3 w-100 shadow-sm"
-                            style="max-height: 200px; object-fit: cover;">
-                    </a>
-                </div>
-            @endif
+        {{-- Breadcrumb --}}
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb cat-breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('home') }}">Trang chủ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tất cả danh mục</li>
+            </ol>
+        </nav>
 
-            <h1 class="h4 fw-bold text-dark mb-4">
-                <i class="fa-solid fa-layer-group text-danger me-2"></i>Tất Cả Danh Mục Hàng Hóa
-            </h1>
+        {{-- Header Tiêu Đề --}}
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+            <h4 class="fw-bold mb-0 text-dark">
+                <i class="fa-solid fa-layer-group me-2 text-danger"></i>Tất Cả Danh Mục Sản Phẩm
+            </h4>
+            <span class="text-muted small">Hiển thị {{ $categories->count() }} danh mục chính</span>
+        </div>
 
-            <div class="row g-4">
-                @foreach ($categories as $root)
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card border-0 shadow-sm h-100 p-3 rounded-3" style="background:#fff;">
+        @php
+            // Chia danh mục thành 3 cột cố định độc lập
+            $columns = [[], [], []];
+            foreach ($categories as $index => $root) {
+                $columns[$index % 3][] = $root;
+            }
+        @endphp
+
+        {{-- 3 Cột Flexbox Độc Lập --}}
+        <div class="row g-4 align-items-start">
+            @foreach ($columns as $colIndex => $colCategories)
+                <div class="col-lg-4 col-md-6 d-flex flex-column gap-4">
+                    @foreach ($colCategories as $root)
+                        <div class="card border-0 shadow-sm p-3 rounded-3 cat-card-item" style="background:#fff;">
 
                             {{-- Header danh mục gốc --}}
-                            <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                            <div class="d-flex align-items-center justify-content-between pb-3 mb-2 border-bottom cat-root-header">
                                 <a href="{{ url('/categories/' . $root->slug) }}"
                                     class="fw-bold text-dark text-decoration-none h5 mb-0 hover-red">
                                     {{ $root->name }}
                                 </a>
-                                <span class="badge bg-danger rounded-pill">{{ $root->products_count ?? 0 }} SP</span>
+
+                                <span class="badge bg-danger rounded-pill px-3 py-2">{{ $root->products_count ?? 0 }} SP</span>
                             </div>
 
-                            {{-- Danh sách con --}}
-                            @if ($root->children && $root->children->isNotEmpty())
-                                <div class="d-flex flex-wrap gap-2">
-                                    @foreach ($root->children as $child)
-                                        <a href="{{ url('/categories/' . $child->slug) }}"
-                                            class="btn btn-sm btn-light border text-dark text-decoration-none"
-                                            style="font-size: 12px;">
-                                            {{ $child->name }}
-                                            <span class="text-muted ms-1">({{ $child->products_count ?? 0 }})</span>
-                                        </a>
-                                    @endforeach
+                            {{-- Dropdown danh mục con (Chỉ đẩy các phần tử BÊN DƯỚI thuộc cùng 1 cột) --}}
+                            <div class="pt-2">
+                                <button class="btn btn-outline-danger btn-sm w-100 dropdown-toggle d-flex align-items-center justify-content-between px-3 py-2 rounded-2 cat-collapse-btn"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#catCollapse{{ $root->id }}"
+                                    aria-expanded="false"
+                                    aria-controls="catCollapse{{ $root->id }}">
+                                    <span>
+                                        <i class="fa-solid fa-list-ul me-2"></i>Danh mục con ({{ $root->children ? $root->children->count() : 0 }})
+                                    </span>
+                                </button>
+
+                                <div class="collapse mt-2" id="catCollapse{{ $root->id }}">
+                                    <div class="card card-body border-0 bg-light p-2 rounded-2">
+                                        @if ($root->children && $root->children->isNotEmpty())
+                                            <ul class="cat-dropdown-list mb-0">
+                                                @foreach ($root->children as $child)
+                                                    <li>
+                                                        <a class="cat-dropdown-link d-flex align-items-center justify-content-between py-2 px-3 text-decoration-none" href="{{ url('/categories/' . $child->slug) }}">
+                                                            <span>
+                                                                <i class="fa-solid fa-angle-right me-2 text-danger small"></i>
+                                                                {{ $child->name }}
+                                                            </span>
+                                                            <span class="badge bg-white text-secondary border rounded-pill small">
+                                                                {{ $child->products_count ?? 0 }} SP
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            <div class="text-center text-muted small py-2">
+                                                <i class="fa-solid fa-circle-info me-1"></i>Không có danh mục con
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                            @else
-                                <p class="text-muted small mb-0">Chưa có danh mục con.</p>
-                            @endif
+                            </div>
 
                         </div>
-                    </div>
-                @endforeach
-            </div>
-
+                    @endforeach
+                </div>
+            @endforeach
         </div>
+
     </div>
+</div>
 @endsection
+
+
+
+
+

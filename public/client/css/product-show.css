@@ -18,10 +18,10 @@
     text-decoration: none;
 }
 .prod-breadcrumb a:hover {
-    color: #ee4d2d;
+    color: #c62828;
 }
 .prod-breadcrumb .breadcrumb-item.active {
-    color: #ee4d2d;
+    color: #c62828;
     font-weight: 600;
 }
 
@@ -56,7 +56,7 @@
 }
 .prod-thumb-item:hover,
 .prod-thumb-item.active {
-    border-color: #ee4d2d;
+    border-color: #c62828;
 }
 
 /* Social Share & Like button */
@@ -79,7 +79,7 @@
 .btn-like-product {
     background: transparent;
     border: 1px solid #ffccd5;
-    color: #ee4d2d;
+    color: #c62828;
     font-size: 13px;
     padding: 4px 12px;
     border-radius: 20px;
@@ -87,9 +87,9 @@
 }
 .btn-like-product:hover,
 .btn-like-product.liked {
-    background: #ffeef0;
-    color: #d70018;
-    border-color: #d70018;
+    background: #fdecea;
+    color: #b71c1c;
+    border-color: #b71c1c;
 }
 .btn-like-product.liked i {
     animation: heartBeat 0.3s ease;
@@ -120,7 +120,7 @@
 .prod-current-price {
     font-size: 28px;
     font-weight: 800;
-    color: #ee4d2d;
+    color: #c62828;
 }
 
 /* Variant & Buttons */
@@ -130,35 +130,35 @@
     border-radius: 2px;
 }
 .btn-variant.active {
-    background: #fff0ed;
-    color: #ee4d2d;
-    border-color: #ee4d2d;
+    background: #fdecea;
+    color: #c62828;
+    border-color: #c62828;
     font-weight: 600;
 }
 
 .btn-cart-add {
-    background: #ffefe6;
-    color: #ee4d2d;
-    border: 1px solid #ee4d2d;
+    background: #fdecea;
+    color: #c62828;
+    border: 1px solid #c62828;
     border-radius: 2px;
     font-size: 15px;
     transition: background 0.15s ease;
 }
 .btn-cart-add:hover {
-    background: #ffded1;
-    color: #ee4d2d;
+    background: #f8d7da;
+    color: #b71c1c;
 }
 
 .btn-buy-now {
-    background: #ee4d2d;
+    background: #c62828;
     color: #ffffff;
-    border: 1px solid #ee4d2d;
+    border: 1px solid #c62828;
     border-radius: 2px;
     font-size: 15px;
     transition: background 0.15s ease;
 }
 .btn-buy-now:hover {
-    background: #d73211;
+    background: #b71c1c;
     color: #ffffff;
 }
 
@@ -208,7 +208,7 @@
 .shopee-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    border-color: #ee4d2d;
+    border-color: #c62828;
 }
 .shopee-card-img-wrap {
     width: 100%;
@@ -237,5 +237,5 @@
 .shopee-card-price {
     font-size: 14px;
     font-weight: 700;
-    color: #ee4d2d;
+    color: #c62828;
 }
