@@ -100,22 +100,26 @@
                 {{-- Kinh doanh --}}
                 <div class="sidebar-nav-label">Kinh doanh</div>
 
-                <a href="{{ route('admin.orders.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bag-shopping"></i>
                     Đơn hàng
                 </a>
 
-                <a href="{{ route('admin.withdrawals.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.withdrawals.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-money-bill-transfer"></i>
                     Rút tiền & Seller
                 </a>
 
-                <a href="{{ route('admin.disputes.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.disputes.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-scale-balanced"></i>
                     Tranh chấp Đơn hàng
                 </a>
 
-                <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.support-tickets.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-headset"></i>
                     Kháng nghị Seller
                 </a>
@@ -125,17 +129,20 @@
                 {{-- Marketing --}}
                 <div class="sidebar-nav-label">Marketing</div>
 
-                <a href="{{ route('admin.banners.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.banners.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-image"></i>
                     Banner trang chủ
                 </a>
 
-                <a href="{{ route('admin.coupons.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.coupons.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-ticket"></i>
                     Mã giảm giá
                 </a>
 
-                <a href="{{ route('admin.flash-sales.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.flash-sales.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bolt"></i>
                     Flash Sale
                 </a>
@@ -145,17 +152,20 @@
                 {{-- He thong --}}
                 <div class="sidebar-nav-label">Hệ thống</div>
 
-                <a href="{{ route('admin.roles.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.roles.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-shield-halved"></i>
                     Phân quyền & Chức vụ
                 </a>
 
-                <a href="{{ route('admin.customers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.customers.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users"></i>
                     Người dùng
                 </a>
 
-                <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.settings.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-gear"></i>
                     Cài đặt
                 </a>
@@ -225,7 +235,8 @@
                         <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
                             class="topbar-avatar">
                         <span class="topbar-name">{{ auth()->user()->name }}</span>
-                        <i class="fa-solid fa-chevron-down" style="font-size:11px; color:#adb5bd; margin-left:2px;"></i>
+                        <i class="fa-solid fa-chevron-down"
+                            style="font-size:11px; color:#adb5bd; margin-left:2px;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end mt-1">
                         <li>
@@ -233,6 +244,10 @@
                                 {{ auth()->user()->email }}
                             </span>
                         </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="{{ route('home') }}">Sàn thương mại</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
