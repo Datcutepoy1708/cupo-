@@ -16,6 +16,7 @@ Route::prefix('seller')->group(function () {
 
     // 1. Route Dang ky lam Nguoi ban (Cho phep ca Customer & Seller)
     Route::middleware(['auth', 'role:customer,seller'])->group(function () {
+        Route::get('/register', [SellerRegistrationController::class, 'create'])->name('seller.register');
         Route::post('/register', [SellerRegistrationController::class, 'store'])->name('seller.register.store');
     });
 
