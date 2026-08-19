@@ -45,6 +45,7 @@ class AdminRoleController extends Controller
             'Quản lý Banner & Quảng cáo' => $rawPermissions->filter(fn ($p) => Str::startsWith($p->name, 'banners.'))->values(),
             'Tài chính & Rút tiền' => $rawPermissions->filter(fn ($p) => Str::startsWith($p->name, ['withdrawals.', 'reports.']))->values(),
             'Tranh chấp & Khiếu nại' => $rawPermissions->filter(fn ($p) => Str::startsWith($p->name, 'disputes.'))->values(),
+            'Quản lý Vận chuyển & Đối tác' => $rawPermissions->filter(fn ($p) => Str::startsWith($p->name, 'shipping.'))->values(),
             'Quyền Người Bán (Seller)' => $rawPermissions->filter(fn ($p) => Str::startsWith($p->name, 'manage own'))->values(),
         ];
 

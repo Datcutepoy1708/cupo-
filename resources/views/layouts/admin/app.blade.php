@@ -80,114 +80,143 @@
                     $isSuperOrAdmin = in_array($role, ['super-admin', 'admin']);
                     $isModerator    = ($role === 'moderator');
                     $isAccountant   = ($role === 'accountant');
+
+                    $isFloorActive    = request()->routeIs('admin.sellers.*', 'admin.products.*', 'admin.categories.*');
+                    $isBusinessActive = request()->routeIs('admin.orders.*', 'admin.withdrawals.*', 'admin.disputes.*', 'admin.support-tickets.*', 'admin.shipping.*');
+                    $isMarketingActive= request()->routeIs('admin.banners.*', 'admin.coupons.*', 'admin.flash-sales.*');
+                    $isSystemActive   = request()->routeIs('admin.roles.*', 'admin.customers.*', 'admin.settings.*');
                 @endphp
 
                 {{-- 1. Quản lý sàn: Dành cho Admin & Moderator --}}
                 @if ($isSuperOrAdmin || $isModerator)
-                    <div class="sidebar-nav-label">Quản lý sàn</div>
+                    <div class="sidebar-nav-label d-flex justify-content-between align-items-center {{ $isFloorActive ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" data-bs-target="#navGroupFloor" aria-expanded="{{ $isFloorActive ? 'true' : 'false' }}">
+                        <span>Quản lý sàn</span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </div>
 
-                    <a href="{{ route('admin.sellers.index') }}"
-                        class="sidebar-nav-item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-store"></i>
-                        Gian hàng & Seller
-                    </a>
+                    <div class="collapse {{ $isFloorActive ? 'show' : '' }}" id="navGroupFloor">
+                        <a href="{{ route('admin.sellers.index') }}"
+                            class="sidebar-nav-item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-store"></i>
+                            Gian hàng & Seller
+                        </a>
 
-                    <a href="{{ route('admin.products.index') }}"
-                        class="sidebar-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-box-open"></i>
-                        Sản phẩm
-                    </a>
+                        <a href="{{ route('admin.products.index') }}"
+                            class="sidebar-nav-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-box-open"></i>
+                            Sản phẩm
+                        </a>
 
-                    <a href="{{ route('admin.categories.index') }}"
-                        class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-tags"></i>
-                        Danh mục
-                    </a>
+                        <a href="{{ route('admin.categories.index') }}"
+                            class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-tags"></i>
+                            Danh mục
+                        </a>
+                    </div>
 
                     <hr class="sidebar-divider">
                 @endif
 
                 {{-- 2. Kinh doanh: Phân chia theo nghiệp vụ --}}
-                <div class="sidebar-nav-label">Kinh doanh</div>
+                <div class="sidebar-nav-label d-flex justify-content-between align-items-center {{ $isBusinessActive ? '' : 'collapsed' }}"
+                    data-bs-toggle="collapse" data-bs-target="#navGroupBusiness" aria-expanded="{{ $isBusinessActive ? 'true' : 'false' }}">
+                    <span>Kinh doanh</span>
+                    <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                </div>
 
-                <a href="{{ route('admin.orders.index') }}"
-                    class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    Đơn hàng
-                </a>
-
-                @if ($isSuperOrAdmin || $isAccountant)
-                    <a href="{{ route('admin.withdrawals.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
-                        Rút tiền & Seller
-                    </a>
-                @endif
-
-                @if ($isSuperOrAdmin || $isModerator)
-                    <a href="{{ route('admin.disputes.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-scale-balanced"></i>
-                        Tranh chấp Đơn hàng
+                <div class="collapse {{ $isBusinessActive ? 'show' : '' }}" id="navGroupBusiness">
+                    <a href="{{ route('admin.orders.index') }}"
+                        class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        Đơn hàng
                     </a>
 
-                    <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-headset"></i>
-                        Kháng nghị Seller
-                    </a>
-                @endif
+                    @if ($isSuperOrAdmin || $isAccountant)
+                        <a href="{{ route('admin.withdrawals.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.withdrawals.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                            Rút tiền & Seller
+                        </a>
+                    @endif
 
-                @if ($isSuperOrAdmin || $isModerator || $isAccountant)
-                    <a href="{{ route('admin.shipping.carriers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-truck-fast"></i>
-                        Vận chuyển & Đối tác
-                    </a>
-                @endif
+                    @if ($isSuperOrAdmin || $isModerator)
+                        <a href="{{ route('admin.disputes.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.disputes.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                            Tranh chấp Đơn hàng
+                        </a>
+
+                        <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-headset"></i>
+                            Kháng nghị Seller
+                        </a>
+                    @endif
+
+                    @if ($isSuperOrAdmin || $isModerator || $isAccountant)
+                        <a href="{{ route('admin.shipping.carriers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-truck-fast"></i>
+                            Vận chuyển & Đối tác
+                        </a>
+                    @endif
+                </div>
 
                 <hr class="sidebar-divider">
 
                 {{-- 3. Marketing: Dành cho Admin & Moderator --}}
                 @if ($isSuperOrAdmin || $isModerator)
-                    <div class="sidebar-nav-label">Marketing</div>
+                    <div class="sidebar-nav-label d-flex justify-content-between align-items-center {{ $isMarketingActive ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" data-bs-target="#navGroupMarketing" aria-expanded="{{ $isMarketingActive ? 'true' : 'false' }}">
+                        <span>Marketing</span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </div>
 
-                    <a href="{{ route('admin.banners.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-image"></i>
-                        Banner trang chủ
-                    </a>
+                    <div class="collapse {{ $isMarketingActive ? 'show' : '' }}" id="navGroupMarketing">
+                        <a href="{{ route('admin.banners.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-image"></i>
+                            Banner trang chủ
+                        </a>
 
-                    <a href="{{ route('admin.coupons.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-ticket"></i>
-                        Mã giảm giá
-                    </a>
+                        <a href="{{ route('admin.coupons.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-ticket"></i>
+                            Mã giảm giá
+                        </a>
 
-                    <a href="{{ route('admin.flash-sales.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-bolt"></i>
-                        Flash Sale
-                    </a>
+                        <a href="{{ route('admin.flash-sales.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.flash-sales.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-bolt"></i>
+                            Flash Sale
+                        </a>
+                    </div>
 
                     <hr class="sidebar-divider">
                 @endif
 
                 {{-- 4. Hệ thống: Phân quyền & Cài đặt --}}
                 @if ($isSuperOrAdmin || $isModerator)
-                    <div class="sidebar-nav-label">Hệ thống</div>
+                    <div class="sidebar-nav-label d-flex justify-content-between align-items-center {{ $isSystemActive ? '' : 'collapsed' }}"
+                        data-bs-toggle="collapse" data-bs-target="#navGroupSystem" aria-expanded="{{ $isSystemActive ? 'true' : 'false' }}">
+                        <span>Hệ thống</span>
+                        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                    </div>
 
-                    @if ($isSuperOrAdmin)
-                        <a href="{{ route('admin.roles.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-shield-halved"></i>
-                            Phân quyền & Chức vụ
+                    <div class="collapse {{ $isSystemActive ? 'show' : '' }}" id="navGroupSystem">
+                        @if ($isSuperOrAdmin)
+                            <a href="{{ route('admin.roles.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                Phân quyền & Chức vụ
+                            </a>
+                        @endif
+
+                        <a href="{{ route('admin.customers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-users"></i>
+                            Người dùng
                         </a>
-                    @endif
 
-                    <a href="{{ route('admin.customers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-users"></i>
-                        Người dùng
-                    </a>
-
-                    @if ($isSuperOrAdmin)
-                        <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                            <i class="fa-solid fa-gear"></i>
-                            Cài đặt
-                        </a>
-                    @endif
+                        @if ($isSuperOrAdmin)
+                            <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                                <i class="fa-solid fa-gear"></i>
+                                Cài đặt
+                            </a>
+                        @endif
+                    </div>
                 @endif
 
             </nav>

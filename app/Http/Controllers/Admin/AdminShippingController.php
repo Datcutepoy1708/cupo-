@@ -44,6 +44,8 @@ class AdminShippingController extends Controller
      */
     public function toggleActive(ShippingCarrier $carrier): JsonResponse
     {
+        $this->checkCarrierManagePermission();
+
         $carrier->update(['is_active' => ! $carrier->is_active]);
 
         return response()->json([
@@ -57,6 +59,8 @@ class AdminShippingController extends Controller
      */
     public function setDefault(ShippingCarrier $carrier): JsonResponse
     {
+        $this->checkCarrierManagePermission();
+
         // Reset tất cả các hãng khác
         ShippingCarrier::query()->update(['is_default' => false]);
         $carrier->update(['is_default' => true, 'is_active' => true]);
@@ -72,6 +76,8 @@ class AdminShippingController extends Controller
      */
     public function updateCarrier(Request $request, ShippingCarrier $carrier): JsonResponse
     {
+        $this->checkCarrierManagePermission();
+
         $validated = $request->validate([
             'base_fee' => ['required', 'numeric', 'min:0'],
             'estimated_days' => ['required', 'string', 'max:50'],
@@ -170,11 +176,35 @@ class AdminShippingController extends Controller
      */
     public function simulateNextStep(SellerOrder $sellerOrder, ShippingSimulationService $simulator): JsonResponse
     {
+        $this->checkShippingSimulatePermission();
+
         $result = $simulator->advanceNextStep($sellerOrder);
 
         return response()->json([
             'message' => 'Đã cập nhật bước vận chuyển tiếp theo thành công!',
             'data' => $result,
         ]);
+    }
+
+    /**
+     * Kiểm tra quyền quản lý cấu hình hãng vận chuyển (Chỉ Super Admin & Admin).
+     */
+    protected function checkCarrierManagePermission(): void
+    {
+        $role = auth()->user()->role ?? '';
+        if (! in_array($role, ['super-admin', 'admin'])) {
+            abort(403, 'Bạn không có quyền quản lý cấu hình đối tác vận chuyển!');
+        }
+    }
+
+    /**
+     * Kiểm tra quyền mô phỏng hành trình vận chuyển (Super Admin, Admin, Moderator).
+     */
+    protected function checkShippingSimulatePermission(): void
+    {
+        $role = auth()->user()->role ?? '';
+        if (! in_array($role, ['super-admin', 'admin', 'moderator'])) {
+            abort(403, 'Bạn không có quyền mô phỏng hành trình vận chuyển!');
+        }
     }
 }

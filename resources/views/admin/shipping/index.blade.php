@@ -118,29 +118,31 @@
                         </div>
                     @endif
 
-                    <div class="d-flex gap-2 pt-3 border-top mt-auto">
-                        <button type="button" class="btn btn-sm btn-outline-primary btn-edit-carrier flex-grow-1"
-                            data-id="{{ $carrier->id }}"
-                            data-name="{{ $carrier->name }}"
-                            data-fee="{{ (int)$carrier->base_fee }}"
-                            data-days="{{ $carrier->estimated_days }}"
-                            data-hotline="{{ $carrier->hotline }}"
-                            data-desc="{{ $carrier->description }}">
-                            <i class="fa-solid fa-pen-to-square me-1"></i>Cấu hình
-                        </button>
-
-                        @if (! $carrier->is_default)
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-set-default-carrier"
-                                data-id="{{ $carrier->id }}" title="Đặt làm mặc định">
-                                <i class="fa-regular fa-star"></i>
+                    @if (in_array(auth()->user()->role ?? '', ['super-admin', 'admin']))
+                        <div class="d-flex gap-2 pt-3 border-top mt-auto">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-edit-carrier flex-grow-1"
+                                data-id="{{ $carrier->id }}"
+                                data-name="{{ $carrier->name }}"
+                                data-fee="{{ (int)$carrier->base_fee }}"
+                                data-days="{{ $carrier->estimated_days }}"
+                                data-hotline="{{ $carrier->hotline }}"
+                                data-desc="{{ $carrier->description }}">
+                                <i class="fa-solid fa-pen-to-square me-1"></i>Cấu hình
                             </button>
-                        @endif
 
-                        <button type="button" class="btn btn-sm {{ $carrier->is_active ? 'btn-outline-danger' : 'btn-outline-success' }} btn-toggle-carrier"
-                            data-id="{{ $carrier->id }}" title="{{ $carrier->is_active ? 'Tạm ngưng' : 'Kích hoạt' }}">
-                            <i class="fa-solid {{ $carrier->is_active ? 'fa-pause' : 'fa-play' }}"></i>
-                        </button>
-                    </div>
+                            @if (! $carrier->is_default)
+                                <button type="button" class="btn btn-sm btn-outline-secondary btn-set-default-carrier"
+                                    data-id="{{ $carrier->id }}" title="Đặt làm mặc định">
+                                    <i class="fa-regular fa-star"></i>
+                                </button>
+                            @endif
+
+                            <button type="button" class="btn btn-sm {{ $carrier->is_active ? 'btn-outline-danger' : 'btn-outline-success' }} btn-toggle-carrier"
+                                data-id="{{ $carrier->id }}" title="{{ $carrier->is_active ? 'Tạm ngưng' : 'Kích hoạt' }}">
+                                <i class="fa-solid {{ $carrier->is_active ? 'fa-pause' : 'fa-play' }}"></i>
+                            </button>
+                        </div>
+                    @endif
                 </div>
             </div>
         @endforeach

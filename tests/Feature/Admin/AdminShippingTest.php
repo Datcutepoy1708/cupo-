@@ -260,4 +260,48 @@ class AdminShippingTest extends TestCase
             'type' => 'free_shipping',
         ]);
     }
+
+    /* ---- 12. Phân quyền: Kế toán (Accountant) chỉ có quyền xem, không được sửa cước ---- */
+    public function test_accountant_cannot_modify_carrier_settings(): void
+    {
+        $accountant = User::factory()->create(['role' => 'accountant', 'status' => 'active']);
+
+        // Xem danh sách: Cho phép (200)
+        $this->actingAs($accountant)
+            ->get(route('admin.shipping.carriers.index'))
+            ->assertStatus(200);
+
+        // Bật/tắt hãng: Bị chặn (403)
+        $this->actingAs($accountant)
+            ->patchJson(route('admin.shipping.carriers.toggle', $this->carrier))
+            ->assertStatus(403);
+
+        // Cập nhật cước: Bị chặn (403)
+        $this->actingAs($accountant)
+            ->putJson(route('admin.shipping.carriers.update', $this->carrier), [
+                'base_fee' => 35000,
+                'estimated_days' => '1 ngày',
+            ])
+            ->assertStatus(403);
+    }
+
+    /* ---- 13. Phân quyền: Kiểm duyệt viên (Moderator) được mô phỏng nhưng không được sửa cước hãng ---- */
+    public function test_moderator_can_simulate_but_cannot_update_carrier(): void
+    {
+        $moderator = User::factory()->create(['role' => 'moderator', 'status' => 'active']);
+
+        // Sửa cước: Bị chặn (403)
+        $this->actingAs($moderator)
+            ->putJson(route('admin.shipping.carriers.update', $this->carrier), [
+                'base_fee' => 35000,
+                'estimated_days' => '1 ngày',
+            ])
+            ->assertStatus(403);
+
+        // Mô phỏng giao hàng: Được phép (200)
+        $this->actingAs($moderator)
+            ->postJson(route('admin.shipping.simulate', $this->sellerOrder))
+            ->assertStatus(200)
+            ->assertJsonPath('data.current_status', 'confirmed');
+    }
 }
