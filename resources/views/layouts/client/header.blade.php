@@ -49,8 +49,7 @@
                 @else
                     <a href="{{ route('cart.index') }}"
                         class="btn btn-outline-light position-relative me-2 d-flex align-items-center justify-content-center"
-                        style="width: 38px; height: 38px;"
-                        aria-label="Giỏ hàng">
+                        style="width: 38px; height: 38px;" aria-label="Giỏ hàng">
                         <i class="fa-solid fa-cart-shopping" style="font-size: 18px;"></i>
                         <span id="header-cart-badge"
                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {{ (auth()->user()->cart_count ?? 0) > 0 ? '' : 'd-none' }}"
@@ -64,13 +63,22 @@
                             {{ auth()->user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Tài khoản</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                            @if (auth()->user()->role === 'customer' || auth()->user()->role === 'seller')
+                                <li><a class="dropdown-item" href="{{ route('profile.show') }}">Tài khoản</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            @endif
 
                             @if (auth()->user()->role === 'seller')
-                                <li><a class="dropdown-item" href="{{ route('seller.shop') }}">Cửa hàng của tôi</a></li>
+                                <li><a class="dropdown-item" href="{{ route('seller.shop') }}">Cửa hàng</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            @endif
+
+                            @if (auth()->user()->role === 'admin')
+                                <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Bảng điều khiển</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

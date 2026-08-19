@@ -27,12 +27,12 @@
 }
 
 .voucher-tab-btn:hover {
-    color: #ee4d2d;
+    color: #c62828;
 }
 
 .voucher-tab-btn.active {
-    color: #ee4d2d;
-    border-bottom-color: #ee4d2d;
+    color: #c62828;
+    border-bottom-color: #c62828;
 }
 
 .voucher-tab-badge {
@@ -60,7 +60,9 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
     min-height: 115px;
 }
 
@@ -72,7 +74,7 @@
 /* Ticket Left Side (Badge / Icon) */
 .voucher-left {
     width: 105px;
-    background: linear-gradient(135deg, #ee4d2d 0%, #ff7337 100%);
+    background: linear-gradient(135deg, #c62828 0%, #ff7337 100%);
     color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -119,7 +121,7 @@
 
 .voucher-divider::before,
 .voucher-divider::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 12px;
     height: 12px;
@@ -202,14 +204,14 @@
 }
 
 .btn-voucher-claim {
-    background: #ee4d2d;
+    background: #c62828;
     color: #ffffff;
-    border-color: #ee4d2d;
+    border-color: #c62828;
 }
 
 .btn-voucher-claim:hover {
-    background: #d73211;
-    border-color: #d73211;
+    background: #b71c1c;
+    border-color: #b71c1c;
     color: #ffffff;
 }
 
@@ -222,12 +224,12 @@
 
 .btn-voucher-use {
     background: #ffffff;
-    color: #ee4d2d;
-    border-color: #ee4d2d;
+    color: #c62828;
+    border-color: #c62828;
 }
 
 .btn-voucher-use:hover {
-    background: #ee4d2d;
+    background: #c62828;
     color: #ffffff;
 }
 
@@ -274,5 +276,5 @@
 }
 
 .shop-vouchers-title i {
-    color: #ee4d2d;
+    color: #c62828;
 }

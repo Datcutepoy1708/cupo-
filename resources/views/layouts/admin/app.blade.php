@@ -108,7 +108,8 @@
                 {{-- 2. Kinh doanh: Phân chia theo nghiệp vụ --}}
                 <div class="sidebar-nav-label">Kinh doanh</div>
 
-                <a href="{{ route('admin.orders.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="sidebar-nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-bag-shopping"></i>
                     Đơn hàng
                 </a>
@@ -271,7 +272,8 @@
                         <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
                             class="topbar-avatar">
                         <span class="topbar-name">{{ auth()->user()->name }}</span>
-                        <i class="fa-solid fa-chevron-down" style="font-size:11px; color:#adb5bd; margin-left:2px;"></i>
+                        <i class="fa-solid fa-chevron-down"
+                            style="font-size:11px; color:#adb5bd; margin-left:2px;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end mt-1">
                         <li>
@@ -279,6 +281,10 @@
                                 {{ auth()->user()->email }}
                             </span>
                         </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="{{ route('home') }}">Sàn thương mại</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
