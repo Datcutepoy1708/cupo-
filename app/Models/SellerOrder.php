@@ -19,6 +19,7 @@ class SellerOrder extends Model
         'commission_amount',
         'status',
         'tracking_number',
+        'carrier_id',
     ];
 
     protected $casts = [
@@ -39,6 +40,11 @@ class SellerOrder extends Model
         return $this->belongsTo(User::class, 'seller_id');
     }
 
+    public function carrier()
+    {
+        return $this->belongsTo(ShippingCarrier::class, 'carrier_id');
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
@@ -47,5 +53,10 @@ class SellerOrder extends Model
     public function dispute()
     {
         return $this->hasOne(Dispute::class);
+    }
+
+    public function shippingLogs()
+    {
+        return $this->hasMany(OrderShippingLog::class, 'seller_order_id')->orderBy('event_time', 'desc');
     }
 }

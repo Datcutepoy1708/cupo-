@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminShippingController;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\AdminSupportTicketController;
 use App\Http\Controllers\Admin\AdminUploadController;
@@ -146,5 +147,16 @@ Route::middleware(['auth', 'role:super-admin,admin,moderator,accountant'])->pref
         Route::get('/{withdrawal}', [AdminWithdrawalController::class, 'show'])->name('show');
         Route::patch('/{withdrawal}/approve', [AdminWithdrawalController::class, 'approve'])->name('approve');
         Route::patch('/{withdrawal}/reject', [AdminWithdrawalController::class, 'reject'])->name('reject');
+    });
+
+    // Quan ly Van chuyen & Doi tac Giao hang (Shipping)
+    Route::prefix('shipping')->name('shipping.')->group(function () {
+        Route::get('/carriers', [AdminShippingController::class, 'index'])->name('carriers.index');
+        Route::patch('/carriers/{carrier}/toggle', [AdminShippingController::class, 'toggleActive'])->name('carriers.toggle');
+        Route::patch('/carriers/{carrier}/default', [AdminShippingController::class, 'setDefault'])->name('carriers.default');
+        Route::put('/carriers/{carrier}', [AdminShippingController::class, 'updateCarrier'])->name('carriers.update');
+        Route::get('/orders', [AdminShippingController::class, 'orders'])->name('orders');
+        Route::get('/tracking/{sellerOrder}', [AdminShippingController::class, 'tracking'])->name('tracking');
+        Route::post('/simulate/{sellerOrder}', [AdminShippingController::class, 'simulateNextStep'])->name('simulate');
     });
 });

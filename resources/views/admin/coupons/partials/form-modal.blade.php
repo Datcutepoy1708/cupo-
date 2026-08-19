@@ -111,8 +111,9 @@
                                         Loại giảm giá <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="couponType" name="type" required>
-                                        <option value="fixed_amount">Số tiền cố định (VNĐ)</option>
-                                        <option value="percentage">Theo phần trăm (%)</option>
+                                        <option value="fixed_amount">Số tiền cố định (VNĐ) — Giảm tiền hàng</option>
+                                        <option value="percentage">Theo phần trăm (%) — Giảm tiền hàng</option>
+                                        <option value="free_shipping">Miễn phí vận chuyển — Giảm phí ship</option>
                                     </select>
                                     <div class="invalid-feedback" id="err-type"></div>
                                 </div>

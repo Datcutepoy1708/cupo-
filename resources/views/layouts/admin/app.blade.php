@@ -39,6 +39,8 @@
         <link href="{{ asset('admin/css/support-tickets.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.withdrawals.*'))
         <link href="{{ asset('admin/css/withdrawals.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.shipping.*'))
+        <link href="{{ asset('admin/css/shipping.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -130,6 +132,13 @@
                     <a href="{{ route('admin.support-tickets.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.support-tickets.*') ? 'active' : '' }}">
                         <i class="fa-solid fa-headset"></i>
                         Kháng nghị Seller
+                    </a>
+                @endif
+
+                @if ($isSuperOrAdmin || $isModerator || $isAccountant)
+                    <a href="{{ route('admin.shipping.carriers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-truck-fast"></i>
+                        Vận chuyển & Đối tác
                     </a>
                 @endif
 

@@ -248,7 +248,13 @@
 
         // Mức giảm & Điều kiện
         let discountHtml = '';
-        if (c.type === 'percentage') {
+        if (c.type === 'free_shipping') {
+            const maxText = c.max_discount ? ` (Tối đa ${formatMoney(c.max_discount)}đ)` : '';
+            discountHtml = `
+                <div class="discount-val-main text-success"><i class="fa-solid fa-truck-fast me-1"></i>Freeship ${c.value}%${maxText}</div>
+                <div class="discount-cond-sub">Đơn từ ${formatMoney(c.min_order_amount)}đ</div>
+            `;
+        } else if (c.type === 'percentage') {
             const maxText = c.max_discount ? ` (Tối đa ${formatMoney(c.max_discount)}đ)` : '';
             discountHtml = `
                 <div class="discount-val-main">Giảm ${c.value}%${maxText}</div>
@@ -552,9 +558,16 @@
     }
 
     function handleTypeChange(type) {
+        const maxDiscLabel = document.querySelector('label[for="couponMaxDiscount"]');
         if (type === 'percentage') {
             inputValueUnit.textContent = '%';
             maxDiscountWrap.style.display = 'block';
+            if (maxDiscLabel) maxDiscLabel.textContent = 'Mức giảm tối đa (VNĐ)';
+        } else if (type === 'free_shipping') {
+            inputValueUnit.textContent = '%';
+            if (!inputValue.value) inputValue.value = '100';
+            maxDiscountWrap.style.display = 'block';
+            if (maxDiscLabel) maxDiscLabel.textContent = 'Giảm tối đa tiền ship (VNĐ)';
         } else {
             inputValueUnit.textContent = 'đ';
             maxDiscountWrap.style.display = 'none';
@@ -589,6 +602,8 @@
         if (val > 0) {
             if (type === 'percentage') {
                 discText = `Giảm ${val}%`;
+            } else if (type === 'free_shipping') {
+                discText = val >= 100 ? 'Miễn phí vận chuyển 100%' : `Freeship ${val}%`;
             } else {
                 discText = `Giảm ${formatMoney(val)}đ`;
             }
@@ -596,11 +611,25 @@
         voucherSimDiscount.textContent = discText;
         sumDiscount.textContent = discText;
 
+        if (type === 'free_shipping') {
+            voucherCardSim.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+            previewBadgeType.textContent = 'Voucher Freeship';
+            previewBadgeType.className = 'badge bg-success';
+        } else if (scopeShopCard.classList.contains('active')) {
+            voucherCardSim.style.background = '';
+            previewBadgeType.textContent = 'Voucher Gian Hàng';
+            previewBadgeType.className = 'badge bg-info text-dark';
+        } else {
+            voucherCardSim.style.background = '';
+            previewBadgeType.textContent = 'Voucher Toàn Sàn';
+            previewBadgeType.className = 'badge bg-primary';
+        }
+
         // Min Order
         voucherSimMin.textContent = `Đơn tối thiểu ${formatMoney(minOrder)}đ`;
 
         // Max Discount
-        if (type === 'percentage' && maxDisc > 0) {
+        if ((type === 'percentage' || type === 'free_shipping') && maxDisc > 0) {
             voucherSimMax.style.display = 'block';
             voucherSimMax.textContent = `Tối đa ${formatMoney(maxDisc)}đ`;
         } else {
@@ -733,7 +762,13 @@
         detailScopeBadge.textContent = isPlatform ? 'Toàn sàn' : `Shop: ${shopName}`;
         detailScopeBadge.className = isPlatform ? 'badge bg-primary' : 'badge bg-info text-dark';
 
-        if (c.type === 'percentage') {
+        if (c.type === 'free_shipping') {
+            const maxText = c.max_discount ? ` (Tối đa ${formatMoney(c.max_discount)}đ)` : '';
+            detailDiscountText.textContent = `Freeship ${c.value}%${maxText}`;
+            detailType.textContent = 'Miễn phí vận chuyển (Freeship)';
+            detailValue.textContent = `${c.value}%`;
+            detailMaxDiscount.textContent = c.max_discount ? `${formatMoney(c.max_discount)}đ` : 'Không giới hạn';
+        } else if (c.type === 'percentage') {
             const maxText = c.max_discount ? ` (Tối đa ${formatMoney(c.max_discount)}đ)` : '';
             detailDiscountText.textContent = `Giảm ${c.value}%${maxText}`;
             detailType.textContent = 'Theo phần trăm (%)';

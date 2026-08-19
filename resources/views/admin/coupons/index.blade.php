@@ -64,10 +64,11 @@
                 </select>
 
                 {{-- Loc loai giam --}}
-                <select id="couponTypeFilter" class="form-select form-select-sm" style="width: 170px;">
+                <select id="couponTypeFilter" class="form-select form-select-sm" style="width: 190px;">
                     <option value="">Tất cả loại giảm</option>
                     <option value="fixed_amount">Số tiền cố định (VNĐ)</option>
                     <option value="percentage">Theo phần trăm (%)</option>
+                    <option value="free_shipping">Miễn phí vận chuyển (Freeship)</option>
                 </select>
 
                 {{-- O tim kiem --}}
