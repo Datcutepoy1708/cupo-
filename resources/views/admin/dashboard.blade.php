@@ -8,6 +8,44 @@
 
 @section('content')
 
+    {{-- ===== WELCOME BANNER ===== --}}
+    <div class="admin-card mb-4 p-4 border-0" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; border-radius: 16px;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                    <h4 class="fw-bold mb-0 text-white">Xin chào, {{ auth()->user()->name }}! 👋</h4>
+                    <span class="badge {{ match(auth()->user()->role) {
+                        'super-admin' => 'bg-danger',
+                        'admin'       => 'bg-primary',
+                        'moderator'   => 'bg-info text-dark',
+                        'accountant'  => 'bg-success',
+                        default       => 'bg-secondary',
+                    } }} px-3 py-1 rounded-pill">
+                        {{ match(auth()->user()->role) {
+                            'super-admin' => 'Super Admin',
+                            'admin'       => 'Quản trị viên',
+                            'moderator'   => 'Kiểm duyệt viên',
+                            'accountant'  => 'Kế toán viên',
+                            default       => ucfirst(auth()->user()->role ?? 'Nhân viên'),
+                        } }}
+                    </span>
+                </div>
+                <p class="text-white-50 small mb-0">
+                    {{ match(auth()->user()->role) {
+                        'super-admin' => 'Bạn có toàn quyền quản trị, cấu hình hệ thống và phân quyền nhân sự.',
+                        'admin'       => 'Bạn có quyền quản lý toàn bộ gian hàng, sản phẩm, đơn hàng và tài chính.',
+                        'moderator'   => 'Không gian làm việc: Kiểm duyệt hồ sơ Gian hàng (KYC), duyệt Sản phẩm và giải quyết Tranh chấp.',
+                        'accountant'  => 'Không gian làm việc: Quản lý Yêu cầu rút tiền, đối soát Doanh thu và Đơn hàng.',
+                        default       => 'Chúc bạn một ngày làm việc hiệu quả tại hệ thống Cupo!',
+                    } }}
+                </p>
+            </div>
+            <div class="text-md-end text-white-50 small text-nowrap">
+                <i class="fa-solid fa-clock me-1"></i>{{ now()->format('H:i, d/m/Y') }}
+            </div>
+        </div>
+    </div>
+
     {{-- ===== STAT CARDS ===== --}}
     <div class="row g-3 mb-4">
 

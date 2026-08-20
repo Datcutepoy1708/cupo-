@@ -133,8 +133,7 @@ class AdminDisputeController extends Controller
                 ->first();
 
             if ($sellerProfile) {
-                $newBalance = max(0, $sellerProfile->balance - $sellerOrder->grand_total);
-                $sellerProfile->update(['balance' => $newBalance]);
+                $sellerProfile->update(['balance' => $sellerProfile->balance - $sellerOrder->grand_total]);
 
                 // Ghi nhat ky balance log
                 SellerBalanceLog::create([

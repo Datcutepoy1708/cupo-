@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\SellerProfile;
 use App\Models\SellerSupportTicket;
 use App\Models\User;
@@ -14,7 +16,13 @@ class AdminSupportTicketTest extends TestCase
 
     protected User $admin;
 
+    protected User $moderator;
+
+    protected User $accountant;
+
     protected User $seller;
+
+    protected SellerProfile $sellerProfile;
 
     protected SellerSupportTicket $ticket;
 
@@ -23,9 +31,11 @@ class AdminSupportTicketTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        $this->moderator = User::factory()->create(['role' => 'moderator', 'status' => 'active']);
+        $this->accountant = User::factory()->create(['role' => 'accountant', 'status' => 'active']);
         $this->seller = User::factory()->create(['role' => 'seller', 'status' => 'active']);
 
-        SellerProfile::create([
+        $this->sellerProfile = SellerProfile::create([
             'user_id' => $this->seller->id,
             'shop_name' => 'Shop Thoi Trang ABC',
             'slug' => 'shop-thoi-trang-abc',
@@ -169,7 +179,117 @@ class AdminSupportTicketTest extends TestCase
             ->assertJsonValidationErrors(['admin_response']);
     }
 
-    /* ---- 10. Non-admin không được truy cập ---- */
+    /* ---- 10. Moderator KHÔNG được xem hoặc xử lý ticket account_blocked -> 403 ---- */
+    public function test_moderator_cannot_view_or_respond_to_account_blocked_tickets(): void
+    {
+        // Moderator vào show() -> 403
+        $this->actingAs($this->moderator)
+            ->get(route('admin.support-tickets.show', $this->ticket))
+            ->assertStatus(403);
+
+        // Moderator gọi in-review -> 403
+        $this->actingAs($this->moderator)
+            ->patchJson(route('admin.support-tickets.in-review', $this->ticket))
+            ->assertStatus(403);
+
+        // Moderator gọi respond -> 403
+        $this->actingAs($this->moderator)
+            ->patchJson(route('admin.support-tickets.respond', $this->ticket), [
+                'admin_response' => 'Thử trả lời',
+                'action_status' => 'resolved',
+            ])
+            ->assertStatus(403);
+    }
+
+    /* ---- 11. Accountant xem và xử lý được ticket commission_fee & withdrawal_issue ---- */
+    public function test_accountant_can_view_and_respond_to_commission_and_withdrawal_tickets(): void
+    {
+        $feeTicket = SellerSupportTicket::create([
+            'seller_id' => $this->seller->id,
+            'category' => 'commission_fee',
+            'subject' => 'Hỏi về phí sàn tháng này',
+            'message' => 'Shop muốn kiểm tra lại biểu phí.',
+            'status' => 'open',
+        ]);
+
+        $this->actingAs($this->accountant)
+            ->get(route('admin.support-tickets.show', $feeTicket))
+            ->assertStatus(200);
+
+        $this->actingAs($this->accountant)
+            ->patchJson(route('admin.support-tickets.respond', $feeTicket), [
+                'admin_response' => 'Kế toán đã kiểm tra và đối soát biểu phí chuẩn 5%.',
+                'action_status' => 'resolved',
+            ])
+            ->assertStatus(200);
+    }
+
+    /* ---- 12. Admin giải quyết ticket account_blocked + unlock_seller = true (CHỈ đổi seller_profiles.status) ---- */
+    public function test_admin_can_resolve_ticket_and_unlock_seller_profile_only(): void
+    {
+        // Khóa shop
+        $this->sellerProfile->update(['status' => 'blocked']);
+
+        $response = $this->actingAs($this->admin)
+            ->patchJson(route('admin.support-tickets.respond', $this->ticket), [
+                'admin_response' => 'Admin chấp thuận kháng nghị và mở lại gian hàng.',
+                'action_status' => 'resolved',
+                'unlock_seller' => true,
+            ]);
+
+        $response->assertStatus(200);
+
+        // seller_profiles.status chuyển thành approved
+        $this->sellerProfile->refresh();
+        $this->assertEquals('approved', $this->sellerProfile->status);
+
+        // users.status KHÔNG BỊ ĐỤNG CHẠM
+        $this->seller->refresh();
+        $this->assertEquals('active', $this->seller->status);
+    }
+
+    /* ---- 13. Admin/Moderator giải quyết ticket product_rejected + approve_product = true ---- */
+    public function test_staff_can_resolve_ticket_and_approve_product(): void
+    {
+        $category = Category::create(['name' => 'Thời trang', 'slug' => 'thoi-trang']);
+
+        $product = Product::create([
+            'seller_id' => $this->seller->id,
+            'category_id' => $category->id,
+            'name' => 'Áo thun phong cách mới',
+            'slug' => 'ao-thun-phong-cach-moi',
+            'sku' => 'AOTHUN-001',
+            'price' => 150000.00,
+            'stock' => 50,
+            'thumbnail' => 'products/sample.jpg',
+            'description' => 'Mô tả sản phẩm',
+            'status' => 'rejected',
+        ]);
+
+        $productTicket = SellerSupportTicket::create([
+            'seller_id' => $this->seller->id,
+            'product_id' => $product->id,
+            'category' => 'product_rejected',
+            'subject' => 'Kháng nghị duyệt lại sản phẩm Áo thun',
+            'message' => 'Shop đã sửa lại ảnh sản phẩm theo đúng quy định.',
+            'status' => 'open',
+        ]);
+
+        $response = $this->actingAs($this->moderator)
+            ->patchJson(route('admin.support-tickets.respond', $productTicket), [
+                'admin_response' => 'Sản phẩm đã hợp lệ, chấp thuận duyệt lại.',
+                'action_status' => 'resolved',
+                'approve_product' => true,
+            ]);
+
+        $response->assertStatus(200);
+
+        // Product chuyển sang approved
+        $product->refresh();
+        $this->assertEquals('approved', $product->status);
+    }
+
+    /* ---- 14. Non-admin không được truy cập ---- */
     public function test_non_admin_cannot_access_support_tickets(): void
     {
         $this->actingAs($this->seller)

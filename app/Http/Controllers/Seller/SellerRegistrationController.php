@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\SellerRegistrationRequest;
+use App\Models\Category;
 use App\Models\SellerProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
@@ -13,11 +14,27 @@ use Illuminate\View\View;
 
 class SellerRegistrationController extends Controller
 {
-    public function create(): View
+    /**
+     * Hiển thị trang đăng ký bán hàng.
+     */
+    public function create(): View|RedirectResponse
     {
-        return view('seller.register');
+        $user = auth()->user();
+        $sellerProfile = $user->sellerProfile;
+
+        if ($sellerProfile && $sellerProfile->status === 'approved') {
+            return redirect()->route('seller.dashboard');
+        }
+
+        $categories = Category::tree()->get();
+
+        return view('seller.register', compact('sellerProfile', 'categories'));
     }
 
+    /**
+     * Tiếp nhận hồ sơ đăng ký / nộp lại hồ sơ của Seller.
+     * Sử dụng updateOrCreate để hỗ trợ mượt mà luồng nộp lại hồ sơ sau khi bị từ chối.
+     */
     public function store(SellerRegistrationRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -25,30 +42,47 @@ class SellerRegistrationController extends Controller
         DB::transaction(function () use ($user, $request) {
             $user->update([
                 'role' => 'seller',
+                'phone' => $request->phone ?? $user->phone,
                 'date_of_birth' => Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->format('Y-m-d'),
             ]);
 
-            $sellerProfile = SellerProfile::create([
-                'user_id' => $user->id,
-                'shop_name' => $request->shop_name,
-                'business_type' => $request->input('business_type', 'personal'),
-                'slug' => Str::slug($request->shop_name).'-'.Str::random(5),
-                'address' => $request->address,
-                'description' => $request->description,
-                'national_id' => $request->national_id,
-                'status' => 'pending',
-            ]);
+            $existingProfile = $user->sellerProfile;
+            $slug = $existingProfile?->slug ?? (Str::slug($request->shop_name).'-'.Str::random(5));
+
+            $sellerProfile = SellerProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'shop_name' => $request->shop_name,
+                    'business_type' => $request->input('business_type', 'personal'),
+                    'slug' => $slug,
+                    'address' => $request->address,
+                    'description' => $request->description,
+                    'national_id' => $request->national_id,
+                    'status' => 'pending', // Chuyển lại trạng thái Chờ duyệt
+                    'admin_note' => null,  // Xóa lý do từ chối trước đó
+                ]
+            );
 
             if ($request->filled('category_ids')) {
                 $sellerProfile->categories()->sync($request->category_ids);
             }
         });
 
-        return redirect()->route('seller.pending-approval');
+        return redirect()->route('seller.pending-approval')->with('success', 'Đã nộp hồ sơ đăng ký gian hàng thành công! Vui lòng chờ Ban Quản Trị phê duyệt.');
     }
 
-    public function pendingApproval(): View
+    /**
+     * Trang thông báo trạng thái phê duyệt hồ sơ gian hàng.
+     */
+    public function pendingApproval(): View|RedirectResponse
     {
-        return view('seller.pending-approval');
+        $user = auth()->user();
+        $sellerProfile = $user->sellerProfile;
+
+        if ($sellerProfile && $sellerProfile->status === 'approved') {
+            return redirect()->route('seller.dashboard');
+        }
+
+        return view('seller.pending-approval', compact('sellerProfile'));
     }
 }

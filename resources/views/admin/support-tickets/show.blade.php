@@ -57,6 +57,29 @@
                     </div>
                 @endif
 
+                {{-- Sản phẩm liên quan (nếu có) --}}
+                @if ($ticket->product)
+                    <h6 class="fw-bold text-dark mb-2">
+                        <i class="fa-solid fa-box me-1 text-primary"></i>
+                        Sản phẩm liên quan:
+                    </h6>
+                    <div class="card bg-light border p-3 mb-4 rounded-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ $ticket->product->thumbnail_url }}" alt="{{ $ticket->product->name }}"
+                                style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px;" class="border">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold text-dark fs-6">{{ $ticket->product->name }}</div>
+                                <div class="text-muted small">SKU: <span class="font-monospace fw-semibold">{{ $ticket->product->sku }}</span> | Giá: <span class="text-danger fw-bold">{{ number_format($ticket->product->price) }}đ</span></div>
+                                <div class="mt-1">
+                                    <span class="badge {{ $ticket->product->status === 'approved' ? 'bg-success' : ($ticket->product->status === 'pending' ? 'bg-warning text-dark' : 'bg-danger') }}">
+                                        Trạng thái: {{ $ticket->product->status === 'approved' ? 'Đã duyệt' : ($ticket->product->status === 'pending' ? 'Chờ duyệt' : 'Bị từ chối') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 {{-- Phản hồi của Admin (nếu đã có) --}}
                 @if ($ticket->admin_response)
                     <div class="ticket-response-box mb-4 p-3 rounded-3">
@@ -170,6 +193,8 @@
     <div id="ticketShowConfig"
          data-id="{{ $ticket->id }}"
          data-subject="{{ $ticket->subject }}"
+         data-category="{{ $ticket->category }}"
+         data-has-product="{{ $ticket->product_id ? '1' : '0' }}"
          data-in-review-url="{{ route('admin.support-tickets.in-review', $ticket) }}"
          data-respond-url="{{ route('admin.support-tickets.respond', $ticket) }}"
          data-back-url="{{ route('admin.support-tickets.index') }}"

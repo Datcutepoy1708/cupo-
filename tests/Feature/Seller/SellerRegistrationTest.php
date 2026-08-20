@@ -94,4 +94,37 @@ class SellerRegistrationTest extends TestCase
         $this->assertNotNull($profile);
         $this->assertEquals('Điện tử', $profile->categories->first()->name);
     }
+
+    public function test_rejected_seller_can_reapply_successfully(): void
+    {
+        $user = User::factory()->create(['role' => 'seller']);
+
+        $profile = SellerProfile::create([
+            'user_id' => $user->id,
+            'shop_name' => 'Shop Cũ',
+            'slug' => 'shop-cu-12345',
+            'address' => 'Hà Nội',
+            'national_id' => '012345678901',
+            'status' => 'rejected',
+            'admin_note' => 'Ảnh CCCD bị mờ, vui lòng nộp lại.',
+        ]);
+
+        $response = $this->actingAs($user)->post('/seller/register', [
+            'shop_name' => 'Shop Mới Đã Sửa',
+            'phone' => '0987654321',
+            'address' => '456 Trần Phú, Hà Nội',
+            'description' => 'Mô tả mới đã chỉnh sửa',
+            'date_of_birth' => '15/08/2000',
+            'national_id' => '012345678901',
+        ]);
+
+        $response->assertRedirect(route('seller.pending-approval'));
+
+        $profile->refresh();
+        $this->assertEquals('Shop Mới Đã Sửa', $profile->shop_name);
+        $this->assertEquals('456 Trần Phú, Hà Nội', $profile->address);
+        $this->assertEquals('pending', $profile->status);
+        $this->assertNull($profile->admin_note);
+        $this->assertEquals(1, SellerProfile::where('user_id', $user->id)->count());
+    }
 }

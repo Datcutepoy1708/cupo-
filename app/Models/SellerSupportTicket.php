@@ -11,6 +11,7 @@ class SellerSupportTicket extends Model
 
     protected $fillable = [
         'seller_id',
+        'product_id',
         'category',
         'subject',
         'message',
@@ -28,6 +29,11 @@ class SellerSupportTicket extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     public function resolvedBy()

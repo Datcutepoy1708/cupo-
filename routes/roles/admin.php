@@ -28,8 +28,8 @@ Route::middleware(['guest', 'throttle:5,1'])->prefix('quan_tri_vien_cupo_1708')-
 // Đăng xuất Admin (yêu cầu đã đăng nhập)
 Route::middleware('auth')->post('/quan_tri_vien_cupo_1708/logout', [AdminLoginController::class, 'destroy'])->name('admin.logout');
 
-// Khu vực quản trị Admin (yêu cầu đăng nhập + role:admin)
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+// Khu vực quản trị Admin (yêu cầu đăng nhập + các vai trò nhân viên hợp lệ)
+Route::middleware(['auth', 'role:super-admin,admin,moderator,accountant'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/sellers', [AdminSellerController::class, 'index'])->name('sellers.index');

@@ -28,7 +28,7 @@
                     <div class="invalid-feedback d-none" id="responseNoteError"></div>
                 </div>
 
-                <div class="mb-2">
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Cập nhật trạng thái:</label>
                     <div class="d-flex gap-3">
                         <div class="form-check">
@@ -43,6 +43,26 @@
                                 <i class="fa-solid fa-lock me-1"></i>Đóng ticket (Closed)
                             </label>
                         </div>
+                    </div>
+                </div>
+
+                {{-- Tùy chọn hành động tự động --}}
+                <div id="modalActionOptions" class="p-3 bg-light border rounded-3 mb-2 d-none">
+                    <div class="fw-semibold text-dark small mb-2">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1 text-warning"></i>
+                        Hành động tự động kèm theo:
+                    </div>
+                    <div class="form-check mb-2 d-none" id="optUnlockSellerWrap">
+                        <input class="form-check-input" type="checkbox" id="chkUnlockSeller">
+                        <label class="form-check-label small fw-semibold text-success" for="chkUnlockSeller">
+                            <i class="fa-solid fa-store me-1"></i>Đồng thời mở khóa lại gian hàng này (seller_profiles.status = 'approved')
+                        </label>
+                    </div>
+                    <div class="form-check d-none" id="optApproveProductWrap">
+                        <input class="form-check-input" type="checkbox" id="chkApproveProduct">
+                        <label class="form-check-label small fw-semibold text-primary" for="chkApproveProduct">
+                            <i class="fa-solid fa-box-check me-1"></i>Đồng thời phê duyệt lại sản phẩm này (products.status = 'approved')
+                        </label>
                     </div>
                 </div>
             </div>

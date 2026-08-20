@@ -41,11 +41,13 @@ class EnsureRole
         }
 
         if (! empty($roles)) {
-            // Tách các role truyền dạng "customer,seller"
+            // Tách các role truyền dạng "customer,seller" hoặc "admin|moderator"
             $allowedRoles = [];
             foreach ($roles as $role) {
-                foreach (explode(',', $role) as $r) {
-                    $allowedRoles[] = trim($r);
+                foreach (preg_split('/[,|]/', $role) as $r) {
+                    if (trim($r) !== '') {
+                        $allowedRoles[] = trim($r);
+                    }
                 }
             }
 
