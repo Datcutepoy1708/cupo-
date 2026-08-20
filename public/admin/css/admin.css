@@ -95,7 +95,8 @@ body.admin-body {
    =================================================== */
 .admin-sidebar {
     width: var(--sidebar-width);
-    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
     background-color: var(--sidebar-bg);
     display: flex;
     flex-direction: column;
@@ -104,8 +105,7 @@ body.admin-body {
     left: 0;
     z-index: 200;
     transition: transform var(--transition);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 /* Brand / Logo */
@@ -117,6 +117,7 @@ body.admin-body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     text-decoration: none;
     min-height: var(--topbar-height);
+    flex-shrink: 0;
 }
 
 .sidebar-brand .brand-logo {
@@ -146,10 +147,32 @@ body.admin-body {
     flex-shrink: 0;
 }
 
-/* Nav groups */
+/* Nav groups & Custom Scrollbar */
 .sidebar-nav {
     padding: 14px 0;
     flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: var(--cupo-red);
 }
 
 .sidebar-nav-label {
@@ -257,6 +280,8 @@ body.admin-body {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
+    background-color: var(--sidebar-bg);
 }
 
 .sidebar-footer .admin-avatar {

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminFlashSaleController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminSettingController;
@@ -166,5 +167,12 @@ Route::middleware(['auth', 'role:super-admin,admin,moderator,accountant'])->pref
         Route::get('/export', [AdminActivityLogController::class, 'export'])->name('export');
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
         Route::get('/{activityLog}', [AdminActivityLogController::class, 'show'])->name('show');
+    });
+
+    // Quan ly & Kiem duyet Danh gia san pham (Reviews)
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::get('/', [AdminReviewController::class, 'index'])->name('index');
+        Route::patch('/{review}/toggle', [AdminReviewController::class, 'toggleStatus'])->name('toggle');
+        Route::post('/{review}/resolve-report', [AdminReviewController::class, 'resolveReport'])->name('resolve-report');
     });
 });

@@ -43,6 +43,8 @@
         <link href="{{ asset('admin/css/shipping.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.activity-logs.*'))
         <link href="{{ asset('admin/css/activity-logs.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.reviews.*'))
+        <link href="{{ asset('admin/css/reviews.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -83,7 +85,7 @@
                     $isModerator    = ($role === 'moderator');
                     $isAccountant   = ($role === 'accountant');
 
-                    $isFloorActive    = request()->routeIs('admin.sellers.*', 'admin.products.*', 'admin.categories.*');
+                    $isFloorActive    = request()->routeIs('admin.sellers.*', 'admin.products.*', 'admin.categories.*', 'admin.reviews.*');
                     $isBusinessActive = request()->routeIs('admin.orders.*', 'admin.withdrawals.*', 'admin.disputes.*', 'admin.support-tickets.*', 'admin.shipping.*');
                     $isMarketingActive= request()->routeIs('admin.banners.*', 'admin.coupons.*', 'admin.flash-sales.*');
                     $isSystemActive   = request()->routeIs('admin.roles.*', 'admin.customers.*', 'admin.settings.*', 'admin.activity-logs.*');
@@ -114,6 +116,12 @@
                             class="sidebar-nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-tags"></i>
                             Danh mục
+                        </a>
+
+                        <a href="{{ route('admin.reviews.index') }}"
+                            class="sidebar-nav-item {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-star"></i>
+                            Quản lý Đánh giá
                         </a>
                     </div>
 
