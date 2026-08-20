@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminActivityLogController;
+use App\Http\Controllers\Admin\AdminAnalyticsController;
 use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCouponController;
@@ -174,5 +175,11 @@ Route::middleware(['auth', 'role:super-admin,admin,moderator,accountant'])->pref
         Route::get('/', [AdminReviewController::class, 'index'])->name('index');
         Route::patch('/{review}/toggle', [AdminReviewController::class, 'toggleStatus'])->name('toggle');
         Route::post('/{review}/resolve-report', [AdminReviewController::class, 'resolveReport'])->name('resolve-report');
+    });
+
+    // Bao cao Doanh thu & Thong ke Tai chinh (Financial Analytics)
+    Route::prefix('analytics')->name('analytics.')->group(function () {
+        Route::get('/export', [AdminAnalyticsController::class, 'export'])->name('export');
+        Route::get('/', [AdminAnalyticsController::class, 'index'])->name('index');
     });
 });

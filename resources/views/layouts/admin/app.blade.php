@@ -45,6 +45,8 @@
         <link href="{{ asset('admin/css/activity-logs.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.reviews.*'))
         <link href="{{ asset('admin/css/reviews.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.analytics.*'))
+        <link href="{{ asset('admin/css/analytics.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -86,7 +88,7 @@
                     $isAccountant   = ($role === 'accountant');
 
                     $isFloorActive    = request()->routeIs('admin.sellers.*', 'admin.products.*', 'admin.categories.*', 'admin.reviews.*');
-                    $isBusinessActive = request()->routeIs('admin.orders.*', 'admin.withdrawals.*', 'admin.disputes.*', 'admin.support-tickets.*', 'admin.shipping.*');
+                    $isBusinessActive = request()->routeIs('admin.orders.*', 'admin.withdrawals.*', 'admin.disputes.*', 'admin.support-tickets.*', 'admin.shipping.*', 'admin.analytics.*');
                     $isMarketingActive= request()->routeIs('admin.banners.*', 'admin.coupons.*', 'admin.flash-sales.*');
                     $isSystemActive   = request()->routeIs('admin.roles.*', 'admin.customers.*', 'admin.settings.*', 'admin.activity-logs.*');
                 @endphp
@@ -165,6 +167,13 @@
                         <a href="{{ route('admin.shipping.carriers.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.shipping.*') ? 'active' : '' }}">
                             <i class="fa-solid fa-truck-fast"></i>
                             Vận chuyển & Đối tác
+                        </a>
+                    @endif
+
+                    @if ($isSuperOrAdmin || $isAccountant)
+                        <a href="{{ route('admin.analytics.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            Báo cáo & Thống kê
                         </a>
                     @endif
                 </div>
