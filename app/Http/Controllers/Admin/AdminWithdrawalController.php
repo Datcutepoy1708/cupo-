@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SellerBalanceLog;
 use App\Models\SellerProfile;
 use App\Models\Withdrawal;
+use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -121,6 +122,18 @@ class AdminWithdrawalController extends Controller
             ]);
         });
 
+        ActivityLogService::log(
+            action: 'approve_withdrawal',
+            module: 'withdrawals',
+            description: 'Đã duyệt yêu cầu rút tiền #'.$withdrawal->id.' ('.number_format($withdrawal->amount).'đ) của Shop '.($withdrawal->seller->sellerProfile->shop_name ?? $withdrawal->seller->name ?? 'N/A'),
+            subject: $withdrawal,
+            properties: [
+                'amount' => $withdrawal->amount,
+                'bank_account' => $withdrawal->bank_account,
+                'bank_name' => $withdrawal->bank_name,
+            ]
+        );
+
         return response()->json([
             'message' => 'Đã duyệt yêu cầu rút tiền #'.$withdrawal->id.' thành công! Đã trừ '.number_format($withdrawal->amount).'đ từ ví của Seller.',
             'data' => $withdrawal->fresh(['seller.sellerProfile']),
@@ -150,6 +163,17 @@ class AdminWithdrawalController extends Controller
             'status' => 'rejected',
             'admin_note' => $validated['admin_note'],
         ]);
+
+        ActivityLogService::log(
+            action: 'reject_withdrawal',
+            module: 'withdrawals',
+            description: 'Đã từ chối yêu cầu rút tiền #'.$withdrawal->id.' ('.number_format($withdrawal->amount).'đ) của Shop '.($withdrawal->seller->sellerProfile->shop_name ?? $withdrawal->seller->name ?? 'N/A').'. Lý do: '.$validated['admin_note'],
+            subject: $withdrawal,
+            properties: [
+                'amount' => $withdrawal->amount,
+                'reason' => $validated['admin_note'],
+            ]
+        );
 
         return response()->json([
             'message' => 'Đã từ chối yêu cầu rút tiền #'.$withdrawal->id.'.',

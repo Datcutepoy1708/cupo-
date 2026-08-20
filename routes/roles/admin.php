@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminActivityLogController;
 use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminCouponController;
@@ -158,5 +159,12 @@ Route::middleware(['auth', 'role:super-admin,admin,moderator,accountant'])->pref
         Route::get('/orders', [AdminShippingController::class, 'orders'])->name('orders');
         Route::get('/tracking/{sellerOrder}', [AdminShippingController::class, 'tracking'])->name('tracking');
         Route::post('/simulate/{sellerOrder}', [AdminShippingController::class, 'simulateNextStep'])->name('simulate');
+    });
+
+    // Nhat ky Hoat dong & Kiem toan (Activity Logs)
+    Route::prefix('activity-logs')->name('activity-logs.')->group(function () {
+        Route::get('/export', [AdminActivityLogController::class, 'export'])->name('export');
+        Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
+        Route::get('/{activityLog}', [AdminActivityLogController::class, 'show'])->name('show');
     });
 });

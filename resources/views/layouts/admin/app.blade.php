@@ -41,6 +41,8 @@
         <link href="{{ asset('admin/css/withdrawals.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('admin.shipping.*'))
         <link href="{{ asset('admin/css/shipping.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('admin.activity-logs.*'))
+        <link href="{{ asset('admin/css/activity-logs.css') }}" rel="stylesheet">
     @endif
 
     @stack('styles')
@@ -84,7 +86,7 @@
                     $isFloorActive    = request()->routeIs('admin.sellers.*', 'admin.products.*', 'admin.categories.*');
                     $isBusinessActive = request()->routeIs('admin.orders.*', 'admin.withdrawals.*', 'admin.disputes.*', 'admin.support-tickets.*', 'admin.shipping.*');
                     $isMarketingActive= request()->routeIs('admin.banners.*', 'admin.coupons.*', 'admin.flash-sales.*');
-                    $isSystemActive   = request()->routeIs('admin.roles.*', 'admin.customers.*', 'admin.settings.*');
+                    $isSystemActive   = request()->routeIs('admin.roles.*', 'admin.customers.*', 'admin.settings.*', 'admin.activity-logs.*');
                 @endphp
 
                 {{-- 1. Quản lý sàn: Dành cho Admin & Moderator --}}
@@ -214,6 +216,11 @@
                             <a href="{{ route('admin.settings.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                                 <i class="fa-solid fa-gear"></i>
                                 Cài đặt
+                            </a>
+
+                            <a href="{{ route('admin.activity-logs.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.activity-logs.*') ? 'active' : '' }}">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                Nhật ký hoạt động
                             </a>
                         @endif
                     </div>
