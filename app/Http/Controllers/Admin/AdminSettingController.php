@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TestMailRequest;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Mail\TestSmtpMail;
+use App\Services\ActivityLogService;
 use App\Services\SettingService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -57,6 +58,8 @@ class AdminSettingController extends Controller
             'vnpay_sandbox',
             'enable_momo',
             'momo_sandbox',
+            'bct_registered',
+            'dmca_protected',
         ];
 
         // Xu ly cac boolean keys cua tab hien tai dang submit
@@ -67,6 +70,15 @@ class AdminSettingController extends Controller
         }
 
         $this->settingService->updateMany($data, $files);
+
+        // Ghi nhat ky kiem toan he thong
+        ActivityLogService::log(
+            'update_settings',
+            'settings',
+            'Cập nhật cấu hình hệ thống sàn',
+            null,
+            ['updated_keys' => array_keys($data)]
+        );
 
         if ($request->wantsJson()) {
             return response()->json([

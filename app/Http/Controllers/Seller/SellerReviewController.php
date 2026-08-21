@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewReply;
+use App\Models\User;
+use App\Notifications\GeneralNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\View\View;
 
 class SellerReviewController extends Controller
@@ -130,6 +133,18 @@ class SellerReviewController extends Controller
             'report_reason' => $validated['report_reason'],
             'report_status' => 'pending',
         ]);
+
+        // Gửi thông báo cho Admin & Moderator
+        $admins = User::whereIn('role', ['super-admin', 'admin', 'moderator'])->get();
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new GeneralNotification(
+                'Báo cáo đánh giá vi phạm',
+                'Gian hàng '.($review->product->seller->sellerProfile->shop_name ?? 'Shop').' vừa báo cáo 1 đánh giá vi phạm.',
+                route('admin.reviews.index'),
+                'fa-solid fa-flag',
+                'warning'
+            ));
+        }
 
         return response()->json([
             'message' => 'Đã gửi khiếu nại báo cáo vi phạm lên Ban quản trị sàn!',

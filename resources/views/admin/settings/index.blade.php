@@ -68,6 +68,10 @@
                         <i class="fa-solid fa-share-nodes"></i>
                         <span>SEO & Mạng xã hội</span>
                     </button>
+                    <button type="button" class="settings-nav-item" data-target="#tab-footer">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                        <span>Chân trang & Liên hệ</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -81,6 +85,7 @@
                 @include('admin.settings.partials._tab-payment')
                 @include('admin.settings.partials._tab-mail')
                 @include('admin.settings.partials._tab-seo')
+                @include('admin.settings.partials._tab-footer')
 
                 {{-- Footer Save Button --}}
                 <div class="settings-footer-actions mt-4 pt-3 border-top d-flex align-items-center justify-content-between">

@@ -25,8 +25,11 @@ class AnalyticsService
         // GMV: Tổng giá trị hàng hóa hoàn tất
         $gmv = (float) $completedQuery->sum('grand_total');
 
-        // Doanh thu hoa hồng sàn thu được (nếu commission_amount = 0 thì tính 5% sub_total)
-        $commissionRevenue = (float) $completedQuery->sum(DB::raw('COALESCE(NULLIF(commission_amount, 0), sub_total * 0.05)'));
+        $ratePercent = (float) setting('default_commission_rate', 5);
+        $rateRatio = $ratePercent / 100;
+
+        // Doanh thu hoa hồng sàn thu được (nếu commission_amount = 0 thì tính theo default_commission_rate)
+        $commissionRevenue = (float) $completedQuery->sum(DB::raw("COALESCE(NULLIF(commission_amount, 0), sub_total * {$rateRatio})"));
 
         // Tiền đã giải ngân chi trả cho Seller
         $disbursedWithdrawals = (float) Withdrawal::where('status', 'approved')
@@ -80,7 +83,9 @@ class AnalyticsService
                 ->get();
 
             $dayGmv = (float) $dayOrders->sum('grand_total');
-            $dayCommission = (float) $dayOrders->sum(fn ($o) => $o->commission_amount > 0 ? $o->commission_amount : ($o->sub_total * 0.05));
+            $ratePercent = (float) setting('default_commission_rate', 5);
+            $rateRatio = $ratePercent / 100;
+            $dayCommission = (float) $dayOrders->sum(fn ($o) => $o->commission_amount > 0 ? $o->commission_amount : ($o->sub_total * $rateRatio));
 
             $gmvSeries[] = $dayGmv;
             $commissionSeries[] = $dayCommission;
@@ -200,7 +205,9 @@ class AnalyticsService
             ->through(function ($profile) {
                 $orders = SellerOrder::where('seller_id', $profile->user_id)->where('status', 'completed')->get();
                 $totalGmv = (float) $orders->sum('grand_total');
-                $totalCommission = (float) $orders->sum(fn ($o) => $o->commission_amount > 0 ? $o->commission_amount : ($o->sub_total * 0.05));
+                $ratePercent = (float) setting('default_commission_rate', 5);
+                $rateRatio = $ratePercent / 100;
+                $totalCommission = (float) $orders->sum(fn ($o) => $o->commission_amount > 0 ? $o->commission_amount : ($o->sub_total * $rateRatio));
                 $netEarnings = $totalGmv - $totalCommission;
 
                 $totalWithdrawn = (float) Withdrawal::where('seller_id', $profile->user_id)->where('status', 'approved')->sum('amount');

@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\SellerRegistrationRequest;
 use App\Models\Category;
 use App\Models\SellerProfile;
+use App\Models\User;
+use App\Notifications\GeneralNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -49,6 +52,9 @@ class SellerRegistrationController extends Controller
             $existingProfile = $user->sellerProfile;
             $slug = $existingProfile?->slug ?? (Str::slug($request->shop_name).'-'.Str::random(5));
 
+            $autoApprove = (setting('auto_approve_sellers', '0') == '1');
+            $status = $autoApprove ? 'approved' : 'pending';
+
             $sellerProfile = SellerProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -58,7 +64,7 @@ class SellerRegistrationController extends Controller
                     'address' => $request->address,
                     'description' => $request->description,
                     'national_id' => $request->national_id,
-                    'status' => 'pending', // Chuyển lại trạng thái Chờ duyệt
+                    'status' => $status,
                     'admin_note' => null,  // Xóa lý do từ chối trước đó
                 ]
             );
@@ -66,7 +72,23 @@ class SellerRegistrationController extends Controller
             if ($request->filled('category_ids')) {
                 $sellerProfile->categories()->sync($request->category_ids);
             }
+
+            // Gửi thông báo cho Ban Quản Trị
+            $admins = User::whereIn('role', ['super-admin', 'admin'])->get();
+            if ($admins->isNotEmpty()) {
+                Notification::send($admins, new GeneralNotification(
+                    'Gian hàng mới đăng ký',
+                    "Shop '{$request->shop_name}' vừa nộp hồ sơ đăng ký kinh doanh.",
+                    route('admin.sellers.index'),
+                    'fa-solid fa-store',
+                    'info'
+                ));
+            }
         });
+
+        if (setting('auto_approve_sellers', '0') == '1') {
+            return redirect()->route('seller.dashboard')->with('success', 'Chào mừng bạn! Hồ sơ gian hàng đã được tự động phê duyệt.');
+        }
 
         return redirect()->route('seller.pending-approval')->with('success', 'Đã nộp hồ sơ đăng ký gian hàng thành công! Vui lòng chờ Ban Quản Trị phê duyệt.');
     }

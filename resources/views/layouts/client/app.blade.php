@@ -20,6 +20,8 @@
     <link href="{{ asset('client/css/common.css') }}" rel="stylesheet">
     {{-- embed header css --}}
     <link href="{{ asset('client/css/header.css') }}" rel="stylesheet">
+    {{-- embed footer css --}}
+    <link href="{{ asset('client/css/footer.css') }}" rel="stylesheet">
     {{-- embed content css --}}
     @if (request()->routeIs('promotions'))
         <link href="{{ asset('client/css/promotions.css') }}" rel="stylesheet">

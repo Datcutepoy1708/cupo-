@@ -106,6 +106,29 @@ class AdminSettingTest extends TestCase
         $response->assertSessionHasErrors(['default_commission_rate']);
     }
 
+    public function test_admin_can_update_footer_settings(): void
+    {
+        $data = [
+            'company_name' => 'Công Ty TNHH Cupo Toàn Cầu',
+            'business_license' => 'MST: 0109999999 do Sở KH&ĐT cấp',
+            'footer_slogan' => 'Mua sắm thả ga với Cupo',
+            'working_hours' => '24/7 hàng ngày',
+            'copyright_text' => 'Bản quyền © 2026 Cupo Inc.',
+            'bct_registered' => '1',
+            '_tab_bct_registered' => '1',
+            'dmca_protected' => '1',
+            '_tab_dmca_protected' => '1',
+        ];
+
+        $response = $this->actingAs($this->admin)->post(route('admin.settings.update'), $data);
+
+        $response->assertRedirect();
+        $this->assertEquals('Công Ty TNHH Cupo Toàn Cầu', setting('company_name'));
+        $this->assertEquals('MST: 0109999999 do Sở KH&ĐT cấp', setting('business_license'));
+        $this->assertEquals('24/7 hàng ngày', setting('working_hours'));
+        $this->assertEquals('1', setting('bct_registered'));
+    }
+
     // ----------- Helper & Cache -----------
 
     public function test_setting_helper_retrieves_cached_values(): void
@@ -138,6 +161,49 @@ class AdminSettingTest extends TestCase
     }
 
     // ----------- Authorization -----------
+
+    public function test_super_admin_can_update_settings_and_logs_audit_trail(): void
+    {
+        $superAdmin = User::factory()->create(['role' => 'super-admin', 'status' => 'active']);
+
+        $response = $this->actingAs($superAdmin)->post(route('admin.settings.update'), [
+            'site_name' => 'Cupo Global Mall',
+            'default_commission_rate' => 8.5,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertEquals('Cupo Global Mall', setting('site_name'));
+        $this->assertEquals('8.5', setting('default_commission_rate'));
+
+        $this->assertDatabaseHas('admin_activity_logs', [
+            'user_id' => $superAdmin->id,
+            'action' => 'update_settings',
+            'module' => 'settings',
+        ]);
+    }
+
+    public function test_auto_approve_sellers_setting_works_on_registration(): void
+    {
+        setting(['auto_approve_sellers' => '1']);
+
+        $customer = User::factory()->create(['role' => 'customer', 'status' => 'active']);
+
+        $response = $this->actingAs($customer)->post(route('seller.register.store'), [
+            'shop_name' => 'Shop Tu Dong Duyet',
+            'business_type' => 'personal',
+            'address' => '789 Da Nang',
+            'national_id' => '012345678901',
+            'phone' => '0912345678',
+            'date_of_birth' => '15/08/1995',
+        ]);
+
+        $response->assertRedirect(route('seller.dashboard'));
+        $this->assertDatabaseHas('seller_profiles', [
+            'user_id' => $customer->id,
+            'shop_name' => 'Shop Tu Dong Duyet',
+            'status' => 'approved',
+        ]);
+    }
 
     public function test_non_admin_cannot_access_settings(): void
     {

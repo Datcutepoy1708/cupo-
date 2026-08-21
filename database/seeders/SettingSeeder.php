@@ -283,6 +283,50 @@ class SettingSeeder extends Seeder
                 'value' => 'https://zalo.me/cupo',
                 'type' => 'text',
             ],
+
+            // 7. Footer & Legal Settings
+            [
+                'group' => 'footer',
+                'key' => 'company_name',
+                'value' => 'Công ty Cổ phần Thương Mại Điện Tử Cupo Việt Nam',
+                'type' => 'text',
+            ],
+            [
+                'group' => 'footer',
+                'key' => 'business_license',
+                'value' => 'Mã số doanh nghiệp: 0109876543 do Sở Kế hoạch & Đầu tư TP. Hà Nội cấp lần đầu ngày 15/08/2024',
+                'type' => 'text',
+            ],
+            [
+                'group' => 'footer',
+                'key' => 'footer_slogan',
+                'value' => 'Cupo — Nền tảng sàn thương mại điện tử mua sắm trực tuyến hàng đầu, kết nối hàng triệu người mua và người bán uy tín trên toàn quốc.',
+                'type' => 'text',
+            ],
+            [
+                'group' => 'footer',
+                'key' => 'working_hours',
+                'value' => '08:00 - 22:00 hàng ngày',
+                'type' => 'text',
+            ],
+            [
+                'group' => 'footer',
+                'key' => 'copyright_text',
+                'value' => '© 2026 Cupo. Tất cả quyền được bảo lưu.',
+                'type' => 'text',
+            ],
+            [
+                'group' => 'footer',
+                'key' => 'bct_registered',
+                'value' => '1',
+                'type' => 'boolean',
+            ],
+            [
+                'group' => 'footer',
+                'key' => 'dmca_protected',
+                'value' => '1',
+                'type' => 'boolean',
+            ],
         ];
 
         foreach ($settings as $s) {

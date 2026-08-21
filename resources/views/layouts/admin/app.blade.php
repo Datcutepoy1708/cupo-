@@ -49,6 +49,9 @@
         <link href="{{ asset('admin/css/analytics.css') }}" rel="stylesheet">
     @endif
 
+    {{-- Notification Dropdown CSS --}}
+    <link href="{{ asset('common/css/notifications.css') }}" rel="stylesheet">
+
     @stack('styles')
 </head>
 
@@ -311,11 +314,29 @@
                     } }}
                 </span>
 
-                {{-- Thong bao --}}
-                <button type="button" class="topbar-icon-btn" title="Thong bao">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="notif-dot"></span>
-                </button>
+                {{-- Notification Dropdown --}}
+                <div class="dropdown" id="notificationDropdownWrap">
+                    <button type="button" class="topbar-icon-btn position-relative" data-bs-toggle="dropdown" id="notifBellBtn" aria-expanded="false" title="Thông báo">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-badge-count d-none" id="notifBadgeCount">0</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end notif-dropdown-menu shadow-lg border-0 rounded-3 p-0" aria-labelledby="notifBellBtn">
+                        <div class="notif-header p-3 border-bottom d-flex justify-content-between align-items-center bg-light rounded-top-3">
+                            <h6 class="fw-bold mb-0 text-dark fs-7">
+                                <i class="fa-solid fa-bell text-danger me-1"></i>Thông báo
+                            </h6>
+                            <button type="button" class="btn btn-link btn-sm text-decoration-none text-muted p-0" id="btnMarkAllRead">
+                                <i class="fa-solid fa-check-double me-1"></i>Đọc tất cả
+                            </button>
+                        </div>
+                        <div class="notif-list-container" id="notifListContainer" style="max-height: 360px; overflow-y: auto;">
+                            <div class="p-4 text-center text-muted notif-empty-state">
+                                <i class="fa-regular fa-bell-slash fs-3 mb-2 text-secondary"></i>
+                                <div class="small">Chưa có thông báo nào mới</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Light / Dark toggle --}}
                 <button type="button" id="themeToggleBtn" class="theme-toggle-btn" title="Đổi giao diện">
@@ -402,6 +423,9 @@
 
     {{-- Admin JS --}}
     <script src="{{ asset('admin/js/admin.js') }}"></script>
+
+    {{-- Notifications JS --}}
+    <script src="{{ asset('common/js/notifications.js') }}"></script>
 
     @stack('scripts')
 

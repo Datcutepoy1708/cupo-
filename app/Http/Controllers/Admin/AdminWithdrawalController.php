@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SellerBalanceLog;
 use App\Models\SellerProfile;
 use App\Models\Withdrawal;
+use App\Notifications\GeneralNotification;
 use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -134,6 +135,15 @@ class AdminWithdrawalController extends Controller
             ]
         );
 
+        // Gửi thông báo cho Seller
+        $withdrawal->seller?->notify(new GeneralNotification(
+            'Lệnh rút tiền thành công',
+            'Yêu cầu rút '.number_format($withdrawal->amount).'đ về tài khoản '.$withdrawal->bank_name.' đã được chuyển khoản thành công.',
+            route('seller.shop'),
+            'fa-solid fa-money-bill-transfer',
+            'success'
+        ));
+
         return response()->json([
             'message' => 'Đã duyệt yêu cầu rút tiền #'.$withdrawal->id.' thành công! Đã trừ '.number_format($withdrawal->amount).'đ từ ví của Seller.',
             'data' => $withdrawal->fresh(['seller.sellerProfile']),
@@ -174,6 +184,15 @@ class AdminWithdrawalController extends Controller
                 'reason' => $validated['admin_note'],
             ]
         );
+
+        // Gửi thông báo cho Seller
+        $withdrawal->seller?->notify(new GeneralNotification(
+            'Lệnh rút tiền bị từ chối',
+            'Yêu cầu rút '.number_format($withdrawal->amount).'đ đã bị từ chối. Lý do: '.$validated['admin_note'],
+            route('seller.shop'),
+            'fa-solid fa-triangle-exclamation',
+            'danger'
+        ));
 
         return response()->json([
             'message' => 'Đã từ chối yêu cầu rút tiền #'.$withdrawal->id.'.',
