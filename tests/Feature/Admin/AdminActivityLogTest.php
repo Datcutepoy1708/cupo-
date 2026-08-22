@@ -133,12 +133,12 @@ class AdminActivityLogTest extends TestCase
         ]);
 
         $withdrawal = Withdrawal::create([
-            'seller_id'    => $seller->id,
-            'amount'       => 500000,
-            'bank_name'    => 'Vietcombank',
+            'seller_id' => $seller->id,
+            'amount' => 500000,
+            'bank_name' => 'Vietcombank',
             'bank_account' => '1234567890',
-            'bank_owner'   => 'NGUYEN VAN A',
-            'status'       => 'pending',
+            'bank_owner' => 'NGUYEN VAN A',
+            'status' => 'pending',
         ]);
 
         $this->actingAs($this->admin)

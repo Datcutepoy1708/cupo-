@@ -55,29 +55,29 @@ class SellerReviewTest extends TestCase
         $category = Category::create(['name' => 'Thời trang', 'slug' => 'thoi-trang']);
 
         $this->product = Product::create([
-            'seller_id'   => $this->seller->id,
+            'seller_id' => $this->seller->id,
             'category_id' => $category->id,
-            'name'        => 'Áo Thun Nam Cao Cấp',
-            'slug'        => 'ao-thun-nam-cao-cap',
-            'sku'         => 'SKU-AO-THUN-01',
-            'thumbnail'   => 'products/ao-thun.jpg',
+            'name' => 'Áo Thun Nam Cao Cấp',
+            'slug' => 'ao-thun-nam-cao-cap',
+            'sku' => 'SKU-AO-THUN-01',
+            'thumbnail' => 'products/ao-thun.jpg',
             'description' => 'Mô tả chi tiết áo thun nam cao cấp',
-            'price'       => 150000,
-            'stock'       => 100,
-            'status'      => 'approved',
+            'price' => 150000,
+            'stock' => 100,
+            'status' => 'approved',
         ]);
 
         $this->otherProduct = Product::create([
-            'seller_id'   => $this->otherSeller->id,
+            'seller_id' => $this->otherSeller->id,
             'category_id' => $category->id,
-            'name'        => 'Quần Jean Nam',
-            'slug'        => 'quan-jean-nam',
-            'sku'         => 'SKU-QUAN-JEAN-02',
-            'thumbnail'   => 'products/quan-jean.jpg',
+            'name' => 'Quần Jean Nam',
+            'slug' => 'quan-jean-nam',
+            'sku' => 'SKU-QUAN-JEAN-02',
+            'thumbnail' => 'products/quan-jean.jpg',
             'description' => 'Mô tả chi tiết quần jean nam',
-            'price'       => 350000,
-            'stock'       => 50,
-            'status'      => 'approved',
+            'price' => 350000,
+            'stock' => 50,
+            'status' => 'approved',
         ]);
 
         $this->review = Review::create([

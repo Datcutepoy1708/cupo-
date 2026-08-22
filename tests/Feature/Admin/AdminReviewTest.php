@@ -47,16 +47,16 @@ class AdminReviewTest extends TestCase
         $category = Category::create(['name' => 'Thời trang', 'slug' => 'thoi-trang']);
 
         $this->product = Product::create([
-            'seller_id'   => $this->seller->id,
+            'seller_id' => $this->seller->id,
             'category_id' => $category->id,
-            'name'        => 'Giày Sneaker',
-            'slug'        => 'giay-sneaker',
-            'sku'         => 'SKU-SNEAKER-01',
-            'thumbnail'   => 'products/sneaker.jpg',
+            'name' => 'Giày Sneaker',
+            'slug' => 'giay-sneaker',
+            'sku' => 'SKU-SNEAKER-01',
+            'thumbnail' => 'products/sneaker.jpg',
             'description' => 'Mô tả chi tiết giày sneaker',
-            'price'       => 500000,
-            'stock'       => 20,
-            'status'      => 'approved',
+            'price' => 500000,
+            'stock' => 20,
+            'status' => 'approved',
         ]);
 
         $this->review = Review::create([
