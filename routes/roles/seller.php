@@ -5,6 +5,7 @@ use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerProductController;
 use App\Http\Controllers\Seller\SellerProfileController;
 use App\Http\Controllers\Seller\SellerRegistrationController;
+use App\Http\Controllers\Seller\SellerReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('seller')->group(function () {
@@ -46,6 +47,13 @@ Route::prefix('seller')->group(function () {
             Route::post('/', [SellerFlashSaleRegistrationController::class, 'store'])->name('store');
             Route::get('/mine', [SellerFlashSaleRegistrationController::class, 'myRegistrations'])->name('mine');
             Route::delete('/{registration}', [SellerFlashSaleRegistrationController::class, 'destroy'])->name('destroy');
+        });
+
+        // Reviews — Seller Quan ly & Phan hoi Danh gia
+        Route::prefix('reviews')->name('reviews.')->group(function () {
+            Route::get('/', [SellerReviewController::class, 'index'])->name('index');
+            Route::post('/{review}/reply', [SellerReviewController::class, 'reply'])->name('reply');
+            Route::post('/{review}/report', [SellerReviewController::class, 'report'])->name('report');
         });
     });
 });

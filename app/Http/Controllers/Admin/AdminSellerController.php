@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SellerProfile;
+use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\StreamedResponse;
@@ -70,6 +71,14 @@ class AdminSellerController extends Controller
             'admin_note' => null,
         ]);
 
+        ActivityLogService::log(
+            action: 'approve_seller',
+            module: 'sellers',
+            description: 'Đã duyệt mở gian hàng cho Shop '.$sellerProfile->shop_name,
+            subject: $sellerProfile,
+            properties: ['shop_name' => $sellerProfile->shop_name, 'user_id' => $sellerProfile->user_id]
+        );
+
         return response()->json([
             'message' => 'Duyệt gian hàng thành công!',
             'data' => $sellerProfile->fresh('user'),
@@ -93,6 +102,14 @@ class AdminSellerController extends Controller
             'admin_note' => $validated['admin_note'],
         ]);
 
+        ActivityLogService::log(
+            action: 'reject_seller',
+            module: 'sellers',
+            description: 'Đã từ chối đơn đăng ký gian hàng của Shop '.$sellerProfile->shop_name.'. Lý do: '.$validated['admin_note'],
+            subject: $sellerProfile,
+            properties: ['shop_name' => $sellerProfile->shop_name, 'reason' => $validated['admin_note']]
+        );
+
         return response()->json([
             'message' => 'Đã từ chối đơn đăng ký gian hàng!',
             'data' => $sellerProfile->fresh('user'),
@@ -115,6 +132,14 @@ class AdminSellerController extends Controller
             'status' => 'blocked',
             'admin_note' => $validated['admin_note'],
         ]);
+
+        ActivityLogService::log(
+            action: 'block_seller',
+            module: 'sellers',
+            description: 'Đã khóa gian hàng của Shop '.$sellerProfile->shop_name.'. Lý do: '.$validated['admin_note'],
+            subject: $sellerProfile,
+            properties: ['shop_name' => $sellerProfile->shop_name, 'reason' => $validated['admin_note']]
+        );
 
         return response()->json([
             'message' => 'Đã khóa gian hàng người bán!',

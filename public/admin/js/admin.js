@@ -63,4 +63,43 @@
         });
     }
 
+    /* ─── 3. Sidebar groups collapse state persistence ─────── */
+    const collapseGroups = document.querySelectorAll('.sidebar-nav .collapse');
+    const COLLAPSE_STORAGE_PREFIX = 'cupo_sidebar_group_';
+
+    collapseGroups.forEach(group => {
+        const id = group.id;
+        if (!id) return;
+
+        // Nếu nhóm chứa mục đang active thì ưu tiên luôn mở
+        if (group.querySelector('.sidebar-nav-item.active')) {
+            group.classList.add('show');
+            const label = document.querySelector(`[data-bs-target="#${id}"]`);
+            if (label) {
+                label.classList.remove('collapsed');
+                label.setAttribute('aria-expanded', 'true');
+            }
+        } else {
+            // Đọc trạng thái đã lưu
+            const savedState = localStorage.getItem(COLLAPSE_STORAGE_PREFIX + id);
+            if (savedState === 'collapsed') {
+                group.classList.remove('show');
+                const label = document.querySelector(`[data-bs-target="#${id}"]`);
+                if (label) {
+                    label.classList.add('collapsed');
+                    label.setAttribute('aria-expanded', 'false');
+                }
+            }
+        }
+
+        // Lắng nghe sự kiện đóng/mở để lưu lại
+        group.addEventListener('hidden.bs.collapse', function () {
+            localStorage.setItem(COLLAPSE_STORAGE_PREFIX + id, 'collapsed');
+        });
+
+        group.addEventListener('shown.bs.collapse', function () {
+            localStorage.setItem(COLLAPSE_STORAGE_PREFIX + id, 'expanded');
+        });
+    });
+
 })();

@@ -8,7 +8,7 @@ class UpdateSettingsRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->role === 'admin';
+        return in_array($this->user()?->role, ['super-admin', 'admin']);
     }
 
     public function rules(): array
@@ -68,6 +68,15 @@ class UpdateSettingsRequest extends FormRequest
             'social_tiktok' => ['nullable', 'url', 'max:255'],
             'social_youtube' => ['nullable', 'url', 'max:255'],
             'social_zalo' => ['nullable', 'url', 'max:255'],
+
+            // Footer & Company Info
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'business_license' => ['nullable', 'string', 'max:500'],
+            'footer_slogan' => ['nullable', 'string', 'max:1000'],
+            'working_hours' => ['nullable', 'string', 'max:200'],
+            'copyright_text' => ['nullable', 'string', 'max:300'],
+            'bct_registered' => ['nullable', 'in:0,1'],
+            'dmca_protected' => ['nullable', 'in:0,1'],
         ];
     }
 

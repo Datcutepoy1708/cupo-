@@ -16,13 +16,13 @@ class StoreCouponRequest extends FormRequest
         return [
             'code' => ['required', 'string', 'max:50', 'alpha_dash', 'unique:coupons,code'],
             'seller_id' => ['nullable', 'exists:users,id'],
-            'type' => ['required', 'in:fixed_amount,percentage'],
+            'type' => ['required', 'in:fixed_amount,percentage,free_shipping'],
             'value' => [
                 'required',
                 'numeric',
                 'min:0.01',
                 function ($attribute, $value, $fail) {
-                    if ($this->input('type') === 'percentage' && $value > 100) {
+                    if (in_array($this->input('type'), ['percentage', 'free_shipping']) && $value > 100) {
                         $fail('Gia tri phan tram giam gia khong the vuot qua 100%.');
                     }
                 },

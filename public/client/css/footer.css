@@ -1,0 +1,179 @@
+/* =========================================================
+   CUPO CLIENT - DETAILED MODERN FOOTER CSS
+   ========================================================= */
+
+.site-footer {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: 40px;
+}
+
+.site-footer .footer-top {
+    padding: 48px 0 32px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.site-footer .footer-brand-title {
+    font-family: "Pacifico", cursive;
+    font-size: 26px;
+    color: #ef4444;
+    margin-bottom: 10px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.site-footer .footer-slogan {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+.site-footer .footer-heading {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #1e293b;
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.site-footer .footer-links {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.site-footer .footer-links li {
+    margin-bottom: 10px;
+}
+
+.site-footer .footer-links a {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+    display: inline-block;
+}
+
+.site-footer .footer-links a:hover {
+    color: #ef4444;
+    padding-left: 4px;
+}
+
+.site-footer .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #64748b;
+}
+
+.site-footer .contact-item i {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.site-footer .contact-item strong {
+    color: #1e293b;
+}
+
+/* Payment & Shipping Badge Grid */
+.footer-badge-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.footer-badge-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #334155;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.footer-badge-item i {
+    font-size: 13px;
+}
+
+/* Social Buttons */
+.footer-social-links {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.footer-social-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.footer-social-btn:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+}
+
+/* Certifications (BCT, DMCA) */
+.footer-cert-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.cert-bct {
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+}
+
+.cert-dmca {
+    background: #e0f2fe;
+    border: 1px solid #7dd3fc;
+    color: #0369a1;
+}
+
+/* Footer Bottom */
+.site-footer .footer-bottom {
+    padding: 24px 0;
+    background-color: #f1f5f9;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.site-footer .footer-company-meta {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.8;
+}

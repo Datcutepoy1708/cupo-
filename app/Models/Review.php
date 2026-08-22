@@ -16,6 +16,15 @@ class Review extends Model
         'rating',
         'comment',
         'status',
+        'is_reported',
+        'report_reason',
+        'report_status',
+        'admin_note',
+    ];
+
+    protected $casts = [
+        'rating' => 'integer',
+        'is_reported' => 'boolean',
     ];
 
     public function product()
@@ -36,5 +45,15 @@ class Review extends Model
     public function reply()
     {
         return $this->hasOne(ReviewReply::class);
+    }
+
+    public function isReported(): bool
+    {
+        return $this->is_reported && $this->report_status === 'pending';
+    }
+
+    public function hasReply(): bool
+    {
+        return $this->reply()->exists();
     }
 }

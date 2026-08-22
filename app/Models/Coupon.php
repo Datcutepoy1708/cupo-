@@ -61,6 +61,21 @@ class Coupon extends Model
             && ($this->usage_limit == 0 || $this->used_count < $this->usage_limit);
     }
 
+    public function isFreeShipping(): bool
+    {
+        return $this->type === 'free_shipping';
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->type) {
+            'fixed_amount' => 'Số tiền cố định',
+            'percentage' => 'Phần trăm (%)',
+            'free_shipping' => 'Miễn phí vận chuyển (Freeship)',
+            default => $this->type,
+        };
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', true)

@@ -4,6 +4,7 @@ use App\Http\Controllers\Client\ClientCategoryController;
 use App\Http\Controllers\Client\ClientProductController;
 use App\Http\Controllers\Client\ClientShopController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Storefront Public Routes
@@ -33,6 +34,14 @@ Route::get('/help', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Notifications API (auth required)
+Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
+    Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+});
 
 require __DIR__.'/auth.php';
 require __DIR__.'/roles/customer.php';

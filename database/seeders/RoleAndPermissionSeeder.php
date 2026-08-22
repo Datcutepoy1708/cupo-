@@ -37,6 +37,9 @@ class RoleAndPermissionSeeder extends Seeder
             // 7. Tranh chấp & Khiếu nại
             'disputes.view', 'disputes.edit', 'disputes.resolve',
 
+            // 8. Quản lý Vận chuyển & Đối tác
+            'shipping.view', 'shipping.manage', 'shipping.simulate',
+
             // Seller permissions
             'manage own products', 'manage own orders', 'view own dashboard', 'manage own coupons',
         ];
@@ -59,6 +62,7 @@ class RoleAndPermissionSeeder extends Seeder
             'banners.view', 'banners.create', 'banners.edit', 'banners.delete',
             'withdrawals.view', 'withdrawals.approve', 'reports.view',
             'disputes.view', 'disputes.edit', 'disputes.resolve',
+            'shipping.view', 'shipping.manage', 'shipping.simulate',
         ]);
 
         // 3. Moderator Role (Kiểm duyệt viên)
@@ -67,12 +71,14 @@ class RoleAndPermissionSeeder extends Seeder
             'products.view', 'products.approve', 'products.delete',
             'sellers.view', 'sellers.approve', 'sellers.block',
             'disputes.view', 'disputes.edit', 'disputes.resolve',
+            'shipping.view', 'shipping.simulate',
         ]);
 
         // 4. Accountant Role (Kế toán)
         $accountantRole = Role::firstOrCreate(['name' => 'accountant']);
         $accountantRole->givePermissionTo([
             'withdrawals.view', 'withdrawals.approve', 'reports.view',
+            'shipping.view',
         ]);
 
         // 5. Seller Role

@@ -1,0 +1,56 @@
+/* =========================================================
+   CUPO ADMIN - PRODUCT REVIEWS MODERATION CSS
+   ========================================================= */
+
+.review-stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 18px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
+.review-comment-cell {
+    max-width: 320px;
+    word-break: break-word;
+}
+
+.report-reason-box {
+    background: #fef2f2;
+    border-left: 3px solid #ef4444;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #991b1b;
+}
+
+.seller-reply-preview {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #166534;
+}
+
+/* Pagination fix */
+.pagination svg {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+    vertical-align: middle;
+}
+
+.pagination .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
