@@ -31,6 +31,15 @@
         rejected: { label: 'Từ chối',   cls: 'badge-rejected' },
     };
 
+    /* ---- Helper helper to resolve image URL ---- */
+    function resolveImgUrl(p) {
+        if (!p) return '';
+        if (p.thumbnail_url) return p.thumbnail_url;
+        if (!p.thumbnail) return '';
+        if (p.thumbnail.startsWith('http://') || p.thumbnail.startsWith('https://')) return p.thumbnail;
+        return '/storage/' + p.thumbnail.replace(/^\//, '');
+    }
+
     /* ---- State ---- */
     let currentStatus  = 'pending';   // Mặc định tab "Chờ duyệt"
     let currentPage    = 1;
@@ -123,8 +132,9 @@
 
         tbody.innerHTML = products.map((p, i) => {
             const st = STATUS_MAP[p.status] || { label: p.status, cls: '' };
-            const thumb = p.thumbnail
-                ? `<img src="${p.thumbnail}" class="product-thumb-sm" alt="${escHtml(p.name)}">`
+            const thumbUrl = resolveImgUrl(p);
+            const thumb = thumbUrl
+                ? `<img src="${thumbUrl}" class="product-thumb-sm" alt="${escHtml(p.name)}">`
                 : `<div class="product-thumb-letter">${p.name.charAt(0).toUpperCase()}</div>`;
 
             const shopName  = escHtml(p.seller?.seller_profile?.shop_name ?? p.seller?.name ?? 'N/A');
@@ -389,8 +399,9 @@
         const st = STATUS_MAP[product.status] || { label: product.status, cls: '' };
 
         const thumbEl = document.getElementById('modalProductThumb');
-        if (product.thumbnail) {
-            thumbEl.innerHTML = `<img src="${product.thumbnail}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
+        const modalThumbUrl = resolveImgUrl(product);
+        if (modalThumbUrl) {
+            thumbEl.innerHTML = `<img src="${modalThumbUrl}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
         } else {
             thumbEl.textContent = product.name.charAt(0).toUpperCase();
         }

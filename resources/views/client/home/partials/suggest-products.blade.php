@@ -22,7 +22,7 @@
                             @if (($product->discount_percent ?? 0) > 0)
                                 <span class="discount-badge">-{{ $product->discount_percent }}%</span>
                             @endif
-                            <img src="{{ $product->thumbnail }}" alt="{{ $product->name }}" loading="lazy">
+                            <img src="{{ $product->thumbnail_url ?? $product->thumbnail }}" alt="{{ $product->name }}" loading="lazy">
                         </a>
 
                         <div class="suggest-info">
