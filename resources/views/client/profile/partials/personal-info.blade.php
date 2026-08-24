@@ -47,6 +47,7 @@
                     <label class="form-label">Ngày sinh</label>
                     <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror"
                         name="date_of_birth"
+                        max="{{ now()->format('Y-m-d') }}"
                         value="{{ old('date_of_birth', auth()->user()->date_of_birth?->format('Y-m-d')) }}">
                     @error('date_of_birth')
                         <div class="invalid-feedback">{{ $message }}</div>

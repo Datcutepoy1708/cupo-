@@ -186,11 +186,14 @@
                             placeholder="0987654321" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Ngày sinh (dd/mm/yyyy) <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="date_of_birth"
+                        <label class="form-label">Ngày sinh <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" name="date_of_birth"
                             value="{{ old('date_of_birth', Auth::user()->date_of_birth?->format('Y-m-d')) }}"
-                            placeholder="VD: 15/08/2000" required>
-                        <small class="text-muted">Người bán phải từ đủ 18 tuổi trở lên.</small>
+                            max="{{ now()->subYears(18)->format('Y-m-d') }}" required>
+                        @error('date_of_birth')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted d-block mt-1">Người bán phải từ đủ 18 tuổi trở lên.</small>
                     </div>
                 </div>
 

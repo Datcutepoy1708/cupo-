@@ -110,31 +110,30 @@
             </div>
 
             @if ($flashSale && $flashSale->products->isNotEmpty())
-                <div class="promo-fs-wrap" id="promoFsData" data-ends-at="{{ $flashSale->ends_at?->toIso8601String() }}"
-                    data-save-url="{{ url('/customer/vouchers/__ID__/save') }}" data-login-url="{{ route('login') }}"
-                    data-csrf="{{ csrf_token() }}">
-
-                    <button class="promo-fs-nav promo-fs-prev" id="promoPrev" aria-label="Trước">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-
-                    <div class="promo-fs-track" id="promoFsTrack">
-                        @foreach ($flashSale->products as $fsp)
-                            @if ($fsp->product)
-                                @php
-                                    $product = $fsp->product;
-                                    $thumb = $product->thumbnail
-                                        ? asset('storage/' . $product->thumbnail)
-                                        : 'https://placehold.co/320x200?text=No+Image';
-                                    $origPrice = (float) $product->price;
-                                    $salePrice = (float) $fsp->flash_sale_price;
-                                    $discount =
-                                        $origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0;
-                                    $soldPct =
-                                        $fsp->quantity_limit > 0
-                                            ? min(100, round(($fsp->quantity_sold / $fsp->quantity_limit) * 100))
-                                            : 0;
-                                @endphp
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+                    @foreach ($flashSale->products as $fsp)
+                        @if ($fsp->product)
+                            @php
+                                $product = $fsp->product;
+                                $rawPath = $product->thumbnail;
+                                if (!$rawPath) {
+                                    $thumb = 'https://placehold.co/320x200?text=No+Image';
+                                } elseif (Str::startsWith($rawPath, ['http://', 'https://'])) {
+                                    $thumb = $rawPath;
+                                } elseif (Str::startsWith($rawPath, ['/storage/', 'storage/'])) {
+                                    $thumb = asset(ltrim($rawPath, '/'));
+                                } else {
+                                    $thumb = asset('storage/' . $rawPath);
+                                }
+                                $origPrice = (float) $product->price;
+                                $salePrice = (float) $fsp->flash_sale_price;
+                                $discount = $origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0;
+                                $soldPct =
+                                    $fsp->quantity_limit > 0
+                                        ? min(100, round(($fsp->quantity_sold / $fsp->quantity_limit) * 100))
+                                        : 0;
+                            @endphp
+                            <div class="col">
                                 <a href="{{ route('products.show', $product->slug) }}" class="promo-fs-card">
                                     <div class="promo-fs-img">
                                         <span class="promo-discount-badge">-{{ $discount }}%</span>
@@ -154,13 +153,9 @@
                                         <span class="promo-sold-text">Đã bán {{ $soldPct }}%</span>
                                     </div>
                                 </a>
-                            @endif
-                        @endforeach
-                    </div>
-
-                    <button class="promo-fs-nav promo-fs-next" id="promoNext" aria-label="Tiếp">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                            </div>
+                        @endif
+                    @endforeach
                 </div>
             @elseif($flashSaleStatus === 'upcoming' && $flashSale)
                 <div class="promo-empty-box">
@@ -175,6 +170,88 @@
                 </div>
             @endif
 
+        </div>
+    </section>
+
+    {{-- ===== Đang Giảm Giá Sâu Section ===== --}}
+    <section class="promo-section promo-section--deep-deals">
+        <div class="container-xl px-3 px-md-4">
+            <div class="promo-section-header">
+                <div class="promo-section-title-group">
+                    <div>
+                        <h2 class="promo-section-title">Đang Giảm Giá Sâu</h2>
+                        <p class="promo-section-sub">Ưu đãi giảm giá cực tốt do các gian hàng tự cấu hình</p>
+                    </div>
+                </div>
+                <div class="promo-badge-hot">
+                    <i class="fa-solid fa-bolt-lightning me-1"></i> Deal Hời Mỗi Ngày
+                </div>
+            </div>
+
+            @if ($deepDiscountProducts->isNotEmpty())
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+                    @foreach ($deepDiscountProducts as $product)
+                        @php
+                            $rawPath = $product->thumbnail;
+                            if (!$rawPath) {
+                                $thumb = 'https://placehold.co/320x240?text=No+Image';
+                            } elseif (Str::startsWith($rawPath, ['http://', 'https://'])) {
+                                $thumb = $rawPath;
+                            } elseif (Str::startsWith($rawPath, ['/storage/', 'storage/'])) {
+                                $thumb = asset(ltrim($rawPath, '/'));
+                            } else {
+                                $thumb = asset('storage/' . $rawPath);
+                            }
+                            $origPrice = (float) $product->price;
+                            $salePrice = (float) $product->sale_price;
+                            $discount =
+                                $product->discount_percentage ??
+                                ($origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0);
+                            $savedAmount = $origPrice - $salePrice;
+                            $shopName =
+                                $product->seller?->sellerProfile?->shop_name ??
+                                ($product->seller?->name ?? 'Gian hàng Cupo');
+                        @endphp
+                        <div class="col">
+                            <div class="promo-deal-card">
+                                <a href="{{ route('products.show', $product->slug) }}" class="promo-deal-img-link">
+                                    <div class="promo-deal-img-wrap">
+                                        <span class="promo-deal-badge">-{{ $discount }}%</span>
+                                        <img src="{{ $thumb }}" alt="{{ $product->name }}" loading="lazy">
+                                    </div>
+                                </a>
+                                <div class="promo-deal-body">
+                                    <div class="promo-deal-shop">
+                                        <i class="fa-solid fa-store me-1 text-danger"></i>
+                                        <span class="text-truncate">{{ $shopName }}</span>
+                                    </div>
+                                    <h3 class="promo-deal-name">
+                                        <a href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a>
+                                    </h3>
+                                    <div class="promo-deal-prices">
+                                        <span class="promo-deal-price-sale">{{ number_format($salePrice) }}₫</span>
+                                        <del class="promo-deal-price-orig">{{ number_format($origPrice) }}₫</del>
+                                    </div>
+                                    <div class="promo-deal-saving">
+                                        <i class="fa-solid fa-circle-check me-1"></i>Tiết kiệm
+                                        <strong>{{ number_format($savedAmount) }}₫</strong>
+                                    </div>
+                                </div>
+                                <div class="promo-deal-action">
+                                    <a href="{{ route('products.show', $product->slug) }}" class="btn promo-deal-btn">
+                                        <i class="fa-solid fa-bag-shopping me-1"></i> Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="promo-empty-box">
+                    <i class="fa-solid fa-tags fa-2x mb-2"></i>
+                    <p>Hiện chưa có sản phẩm nào đang giảm giá sâu. Hãy quay lại sau nhé!</p>
+                </div>
+            @endif
         </div>
     </section>
 

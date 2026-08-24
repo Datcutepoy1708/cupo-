@@ -16,6 +16,7 @@ class Product extends Model
         'slug',
         'sku',
         'price',
+        'sale_price',
         'has_variants',
         'stock',
         'thumbnail',
@@ -30,11 +31,31 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
         'has_variants' => 'boolean',
         'attributes' => 'array',
         'views_count' => 'integer',
         'likes_count' => 'integer',
     ];
+
+    public function getIsOnSaleAttribute(): bool
+    {
+        return !is_null($this->sale_price) && $this->sale_price > 0 && $this->sale_price < $this->price;
+    }
+
+    public function getDiscountPercentageAttribute(): int
+    {
+        if ($this->is_on_sale && $this->price > 0) {
+            return (int) round((($this->price - $this->sale_price) / $this->price) * 100);
+        }
+
+        return 0;
+    }
+
+    public function getCurrentPriceAttribute(): float
+    {
+        return $this->is_on_sale ? (float) $this->sale_price : (float) $this->price;
+    }
 
     public function seller()
     {

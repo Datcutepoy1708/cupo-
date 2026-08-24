@@ -62,12 +62,24 @@ class PromotionsController extends Controller
                 ->pluck('coupons.id');
         }
 
+        // 5. San pham dang giam gia sau do Seller tu cau hinh (sale_price < price)
+        $deepDiscountProducts = \App\Models\Product::where('status', 'approved')
+            ->whereNotNull('sale_price')
+            ->where('sale_price', '>', 0)
+            ->whereColumn('sale_price', '<', 'price')
+            ->with(['seller.sellerProfile', 'category', 'images'])
+            ->selectRaw('products.*, ROUND(((price - sale_price) / price) * 100) as discount_rate')
+            ->orderByDesc('discount_rate')
+            ->take(16)
+            ->get();
+
         return view('client.promotions.index', compact(
             'flashSale',
             'flashSaleStatus',
             'platformCoupons',
             'shopCoupons',
             'savedCouponIds',
+            'deepDiscountProducts',
         ));
     }
 }

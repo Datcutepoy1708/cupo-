@@ -22,15 +22,26 @@ class SellerRegistrationRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'date_of_birth' => [
                 'required',
-                'date_format:d/m/Y',
                 function ($attribute, $value, $fail) {
+                    $dob = null;
                     try {
-                        $dob = Carbon::createFromFormat('d/m/Y', $value);
-                        if ($dob->age < 18) {
-                            $fail('Người bán phải từ đủ 18 tuổi trở lên.');
+                        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                            $dob = Carbon::createFromFormat('Y-m-d', $value);
+                        } elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $value)) {
+                            $dob = Carbon::createFromFormat('d/m/Y', $value);
+                        } else {
+                            $dob = Carbon::parse($value);
                         }
                     } catch (\Exception $e) {
-                        $fail('Ngày sinh không đúng định dạng dd/mm/yyyy.');
+                        return $fail('Ngày sinh không đúng định dạng hợp lệ.');
+                    }
+
+                    if (! $dob || $dob->isFuture()) {
+                        return $fail('Ngày sinh không hợp lệ.');
+                    }
+
+                    if ($dob->age < 18) {
+                        return $fail('Người bán phải từ đủ 18 tuổi trở lên.');
                     }
                 },
             ],

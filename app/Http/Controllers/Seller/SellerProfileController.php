@@ -25,7 +25,7 @@ class SellerProfileController extends Controller
         $allCategories = collect();
 
         if ($shop->status === 'approved') {
-            $shop->product_count = Product::where('seller_id', $shop->id)->count();
+            $shop->product_count = Product::where('seller_id', $shop->user_id)->count();
 
             $shop->pending_orders = SellerOrder::where('seller_id', $shop->user_id)
                 ->where('status', 'pending')
@@ -49,12 +49,13 @@ class SellerProfileController extends Controller
                 ->latest()
                 ->get();
 
-            $shop->products = Product::where('seller_id', $shop->id)
+            $shop->products = Product::where('seller_id', $shop->user_id)
+                ->with('category')
                 ->latest()
                 ->get();
 
             $shop->reviews = Review::whereHas('product', function ($q) use ($shop) {
-                $q->where('seller_id', $shop->id);
+                $q->where('seller_id', $shop->user_id);
             })
                 ->latest()
                 ->get();
@@ -64,15 +65,34 @@ class SellerProfileController extends Controller
 
             $shop->followers_count = $shop->followers()->count();
 
-            $shop->load('categories');
+            $shop->load(['categories' => function ($q) {
+                $q->where('status', true);
+            }]);
 
-            $allCategories = Category::where('status', true)
-                ->whereNull('parent_id')
-                ->with(['children' => function ($q) {
-                    $q->where('status', true)->orderBy('name');
-                }])
-                ->orderBy('name')
-                ->get();
+            $registeredCategoryIds = $shop->categories->pluck('id')->toArray();
+
+            if (!empty($registeredCategoryIds)) {
+                $allCategories = Category::where('status', true)
+                    ->whereNull('parent_id')
+                    ->where(function ($q) use ($registeredCategoryIds) {
+                        $q->whereIn('id', $registeredCategoryIds)
+                          ->orWhereHas('children', function ($sub) use ($registeredCategoryIds) {
+                              $sub->whereIn('id', $registeredCategoryIds);
+                          });
+                    })
+                    ->with(['children' => function ($q) use ($registeredCategoryIds) {
+                        $q->where('status', true)
+                          ->where(function ($sub) use ($registeredCategoryIds) {
+                              $sub->whereIn('id', $registeredCategoryIds)
+                                  ->orWhereIn('parent_id', $registeredCategoryIds);
+                          })
+                          ->orderBy('name');
+                    }])
+                    ->orderBy('name')
+                    ->get();
+            } else {
+                $allCategories = collect();
+            }
         }
 
         return view('client.seller-store.index', compact('shop', 'allCategories'));

@@ -43,10 +43,14 @@ class SellerRegistrationController extends Controller
         $user = $request->user();
 
         DB::transaction(function () use ($user, $request) {
+            $dob = preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $request->date_of_birth)
+                ? Carbon::createFromFormat('d/m/Y', $request->date_of_birth)
+                : Carbon::parse($request->date_of_birth);
+
             $user->update([
                 'role' => 'seller',
                 'phone' => $request->phone ?? $user->phone,
-                'date_of_birth' => Carbon::createFromFormat('d/m/Y', $request->date_of_birth)->format('Y-m-d'),
+                'date_of_birth' => $dob->format('Y-m-d'),
             ]);
 
             $existingProfile = $user->sellerProfile;
@@ -87,24 +91,17 @@ class SellerRegistrationController extends Controller
         });
 
         if (setting('auto_approve_sellers', '0') == '1') {
-            return redirect()->route('seller.dashboard')->with('success', 'Chào mừng bạn! Hồ sơ gian hàng đã được tự động phê duyệt.');
+            return redirect()->route('seller.shop')->with('success', 'Chào mừng bạn! Hồ sơ gian hàng đã được tự động phê duyệt.');
         }
 
-        return redirect()->route('seller.pending-approval')->with('success', 'Đã nộp hồ sơ đăng ký gian hàng thành công! Vui lòng chờ Ban Quản Trị phê duyệt.');
+        return redirect()->route('seller.shop')->with('success', 'Đã nộp hồ sơ đăng ký gian hàng thành công! Vui lòng chờ Ban Quản Trị phê duyệt.');
     }
 
     /**
-     * Trang thông báo trạng thái phê duyệt hồ sơ gian hàng.
+     * Trang thông báo trạng thái phê duyệt hồ sơ gian hàng -> Chuyển hướng sang Kênh người bán (seller.shop).
      */
-    public function pendingApproval(): View|RedirectResponse
+    public function pendingApproval(): RedirectResponse
     {
-        $user = auth()->user();
-        $sellerProfile = $user->sellerProfile;
-
-        if ($sellerProfile && $sellerProfile->status === 'approved') {
-            return redirect()->route('seller.dashboard');
-        }
-
-        return view('seller.pending-approval', compact('sellerProfile'));
+        return redirect()->route('seller.shop');
     }
 }

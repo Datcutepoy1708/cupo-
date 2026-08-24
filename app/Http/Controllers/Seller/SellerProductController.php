@@ -37,11 +37,21 @@ class SellerProductController extends Controller
         $validated = $request->validated();
         $validated['seller_id'] = $request->user()->id;
         $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(5);
+        if (empty($validated['sku'])) {
+            $validated['sku'] = 'SKU-'.strtoupper(Str::random(8));
+        }
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $validated['thumbnail'] = $path;
+        } elseif (empty($validated['thumbnail'])) {
+            $validated['thumbnail'] = 'products/default.png';
+        }
         $validated['status'] = 'pending'; // Bắt buộc chờ Admin duyệt
 
         $product = Product::create($validated);
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Đăng sản phẩm mới thành công! Đang chờ Admin kiểm duyệt.',
             'data' => $product->load('category'),
         ], 201);
@@ -59,6 +69,7 @@ class SellerProductController extends Controller
         }
 
         return response()->json([
+            'status' => 'success',
             'data' => $product->load(['category', 'images', 'variants']),
         ]);
     }
@@ -75,13 +86,18 @@ class SellerProductController extends Controller
         }
 
         $validated = $request->validated();
-        if ($validated['name'] !== $product->name) {
+        if (isset($validated['name']) && $validated['name'] !== $product->name) {
             $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(5);
+        }
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('products', 'public');
+            $validated['thumbnail'] = $path;
         }
 
         $product->update($validated);
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Cập nhật thông tin sản phẩm thành công!',
             'data' => $product->fresh('category'),
         ]);

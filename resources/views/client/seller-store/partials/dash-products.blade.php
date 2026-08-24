@@ -12,36 +12,93 @@
                 <tr>
                     <th></th>
                     <th>Tên sản phẩm</th>
+                    <th>Loại sản phẩm</th>
                     <th>Giá</th>
                     <th>Kho</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
+                    <th class="text-end">Hành động</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($shop->products ?? [] as $product)
-                    <tr>
-                        <td><img src="{{ $product->thumbnail }}" class="dash-product-thumb"></td>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ number_format($product->price) }}₫</td>
-                        <td>{{ $product->stock }}</td>
+                    @php
+                        $thumbUrl = $product->thumbnail 
+                            ? (Str::startsWith($product->thumbnail, 'http') ? $product->thumbnail : asset('storage/' . $product->thumbnail))
+                            : 'https://placehold.co/100x100?text=No+Image';
+                    @endphp
+                    <tr id="product-row-{{ $product->id }}">
                         <td>
-                            @if ($product->stock <= 0)
-                                <span class="badge bg-secondary">Hết hàng</span>
-                            @else
-                                <span class="badge bg-success">Đang bán</span>
-                            @endif
+                            <img src="{{ $thumbUrl }}" class="dash-product-thumb" alt="{{ $product->name }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px;">
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-secondary" data-id="{{ $product->id }}"><i
-                                    class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-sm btn-outline-danger" data-id="{{ $product->id }}"><i
-                                    class="fa-solid fa-trash"></i></button>
+                            <div class="fw-semibold text-dark">{{ $product->name }}</div>
+                            <small class="text-muted">SKU: {{ $product->sku }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="fa-solid fa-tag me-1 text-primary"></i>
+                                {{ $product->category->name ?? 'Chưa phân loại' }}
+                            </span>
+                        </td>
+                        <td>
+                            @if ($product->is_on_sale)
+                                <div class="fw-bold text-danger">{{ number_format($product->sale_price) }}₫</div>
+                                <div class="d-flex align-items-center gap-1">
+                                    <del class="text-muted small">{{ number_format($product->price) }}₫</del>
+                                    <span class="badge bg-danger-subtle text-danger small" style="font-size: 0.7rem;">-{{ $product->discount_percentage }}%</span>
+                                </div>
+                            @else
+                                <div class="fw-bold text-dark">{{ number_format($product->price) }}₫</div>
+                            @endif
+                        </td>
+                        <td>{{ $product->stock }}</td>
+                        <td>
+                            @if ($product->status === 'approved')
+                                @if ($product->stock <= 0)
+                                    <span class="badge bg-secondary">Hết hàng</span>
+                                @else
+                                    <span class="badge bg-success">Đang bán</span>
+                                @endif
+                            @elseif ($product->status === 'pending')
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            @elseif ($product->status === 'rejected')
+                                <span class="badge bg-danger">Bị từ chối</span>
+                            @elseif ($product->status === 'blocked')
+                                <span class="badge bg-dark">Bị khóa</span>
+                            @else
+                                <span class="badge bg-secondary">Bản nháp</span>
+                            @endif
+                        </td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-edit-product me-1" 
+                                data-id="{{ $product->id }}"
+                                data-name="{{ $product->name }}"
+                                data-category_id="{{ $product->category_id }}"
+                                data-sku="{{ $product->sku }}"
+                                data-price="{{ (float)$product->price }}"
+                                data-sale_price="{{ $product->sale_price ? (float)$product->sale_price : '' }}"
+                                data-stock="{{ $product->stock }}"
+                                data-description="{{ $product->description }}"
+                                data-thumbnail="{{ $thumbUrl }}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editProductModal"
+                                title="Chỉnh sửa sản phẩm">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-product" 
+                                data-id="{{ $product->id }}"
+                                data-name="{{ $product->name }}"
+                                title="Xóa sản phẩm">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted">Chưa có sản phẩm nào</td>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-box-open fa-2x mb-2 d-block text-secondary opacity-50"></i>
+                            Chưa có sản phẩm nào. Hãy bấm <strong>Thêm sản phẩm</strong> để đăng bán!
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
