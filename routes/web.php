@@ -4,6 +4,7 @@ use App\Http\Controllers\Client\ClientCategoryController;
 use App\Http\Controllers\Client\ClientProductController;
 use App\Http\Controllers\Client\ClientShopController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\PromotionsController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,9 +23,7 @@ Route::post('/products/{product}/like', [ClientProductController::class, 'toggle
 Route::get('/categories', [ClientCategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{slug}', [ClientCategoryController::class, 'show'])->name('categories.show');
 
-Route::get('/promotions', function () {
-    return view('client.promotions');
-})->name('promotions');
+Route::get('/promotions', [PromotionsController::class, 'index'])->name('promotions');
 
 Route::get('/help', function () {
     return view('client.help');

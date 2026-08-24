@@ -1,0 +1,53 @@
+.shop-status-card {
+    max-width: 560px;
+    margin: 60px auto;
+    text-align: center;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 48px 32px;
+}
+
+.shop-status-card i {
+    font-size: 56px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.shop-status-card h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+.shop-status-card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.shop-status-card .reject-reason {
+    background: #fdecea;
+    color: #b71c1c;
+    border-radius: 8px;
+    padding: 14px 18px;
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.status-pending i {
+    color: #f5a623;
+}
+
+.status-rejected i {
+    color: #c62828;
+}
+
+.status-blocked i {
+    color: #555;
+}
+.status-blocked {
+    background: #f8f9fa;
+}

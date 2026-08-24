@@ -76,6 +76,8 @@
         <script src="{{ asset('client/js/seller-register.js') }}"></script>
     @elseif (request()->routeIs('home'))
         <script src="{{ asset('client/js/home.js') }}"></script>
+    @elseif (request()->routeIs('promotions'))
+        <script src="{{ asset('client/js/promotions.js') }}"></script>
     @elseif (request()->routeIs('categories.*'))
         <script src="{{ asset('client/js/category-show.js') }}"></script>
     @elseif (request()->routeIs('products.*'))

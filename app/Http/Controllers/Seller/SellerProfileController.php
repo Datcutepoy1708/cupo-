@@ -18,6 +18,10 @@ class SellerProfileController extends Controller
 
         abort_if(! $shop, 404, 'Bạn chưa đăng ký gian hàng.');
 
+        if ($shop->status === 'blocked') {
+            return view('client.seller-store.blocked', compact('shop'));
+        }
+
         $allCategories = collect();
 
         if ($shop->status === 'approved') {
@@ -60,10 +64,8 @@ class SellerProfileController extends Controller
 
             $shop->followers_count = $shop->followers()->count();
 
-            // load quan hệ categories() có sẵn để blade dùng $shop->categories
             $shop->load('categories');
 
-            // Ngành hàng chia 2 cấp: danh mục cha kèm danh mục con đang bật (status = true)
             $allCategories = Category::where('status', true)
                 ->whereNull('parent_id')
                 ->with(['children' => function ($q) {
