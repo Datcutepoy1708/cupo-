@@ -33,6 +33,9 @@ Route::prefix('seller')->group(function () {
             return view('seller.dashboard');
         })->name('dashboard');
 
+        // Route dang ky bo sung nganh hang kinh doanh
+        Route::post('/categories/request', [SellerProfileController::class, 'requestCategories'])->name('categories.request');
+
         // API RESTful Seller Quan ly San pham (/seller/products)
         Route::apiResource('products', SellerProductController::class);
 

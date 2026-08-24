@@ -40,7 +40,7 @@ class Product extends Model
 
     public function getIsOnSaleAttribute(): bool
     {
-        return !is_null($this->sale_price) && $this->sale_price > 0 && $this->sale_price < $this->price;
+        return ! is_null($this->sale_price) && $this->sale_price > 0 && $this->sale_price < $this->price;
     }
 
     public function getDiscountPercentageAttribute(): int

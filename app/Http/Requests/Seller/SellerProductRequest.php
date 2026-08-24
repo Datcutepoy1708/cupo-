@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Seller;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,10 +25,10 @@ class SellerProductRequest extends FormRequest
                     $sellerProfile = auth()->user()?->sellerProfile;
                     if ($sellerProfile) {
                         $registeredIds = $sellerProfile->categories()->pluck('categories.id')->toArray();
-                        if (!empty($registeredIds)) {
-                            $category = \App\Models\Category::find($value);
+                        if (! empty($registeredIds)) {
+                            $category = Category::find($value);
                             $isAllowed = in_array($value, $registeredIds) || ($category && in_array($category->parent_id, $registeredIds));
-                            if (!$isAllowed) {
+                            if (! $isAllowed) {
                                 $fail('Loại sản phẩm này không thuộc các ngành hàng bạn đã đăng ký với sàn.');
                             }
                         }

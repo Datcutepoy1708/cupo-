@@ -129,7 +129,7 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Đơn đăng ký bổ sung ngành hàng của bạn đã được gửi thành công tới Quản trị viên (Admin) để xét duyệt!'); bootstrap.Modal.getInstance(document.getElementById('categoryRequestModal')).hide();">
+                <form action="{{ route('seller.categories.request') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <p class="small text-muted mb-3">
@@ -142,7 +142,7 @@
                                 $registeredIds = $shop->categories ? $shop->categories->pluck('id')->toArray() : [];
                             @endphp
                             <div class="border rounded p-3 bg-light" style="max-height: 220px; overflow-y: auto;">
-                                @forelse ($allCategories ?? [] as $parent)
+                                @forelse ($allCategoriesForSelection ?? [] as $parent)
                                     <div class="fw-bold text-dark mt-2 mb-1 fs-6">{{ $parent->name }}</div>
                                     @forelse ($parent->children as $child)
                                         @if (!in_array($child->id, $registeredIds))

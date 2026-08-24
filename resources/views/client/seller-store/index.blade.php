@@ -30,6 +30,13 @@
                 </div>
             @elseif ($shop->status === 'approved')
                 {{-- ===== TRẠNG THÁI: ĐÃ DUYỆT — DASHBOARD ĐẦY ĐỦ ===== --}}
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                        <i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 @include('client.seller-store.partials.info-header')
                 @include('client.seller-store.partials.navigation')
 

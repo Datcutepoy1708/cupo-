@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\FlashSale;
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -66,7 +67,7 @@ class PromotionsController extends Controller
         }
 
         // 5. San pham dang giam gia sau do Seller tu cau hinh (sale_price < price)
-        $deepDiscountProducts = \App\Models\Product::where('status', 'approved')
+        $deepDiscountProducts = Product::where('status', 'approved')
             ->whereNotNull('sale_price')
             ->where('sale_price', '>', 0)
             ->whereColumn('sale_price', '<', 'price')
