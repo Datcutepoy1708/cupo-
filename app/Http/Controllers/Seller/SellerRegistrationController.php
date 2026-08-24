@@ -91,17 +91,24 @@ class SellerRegistrationController extends Controller
         });
 
         if (setting('auto_approve_sellers', '0') == '1') {
-            return redirect()->route('seller.shop')->with('success', 'Chào mừng bạn! Hồ sơ gian hàng đã được tự động phê duyệt.');
+            return redirect()->route('seller.dashboard')->with('success', 'Chào mừng bạn! Hồ sơ gian hàng đã được tự động phê duyệt.');
         }
 
-        return redirect()->route('seller.shop')->with('success', 'Đã nộp hồ sơ đăng ký gian hàng thành công! Vui lòng chờ Ban Quản Trị phê duyệt.');
+        return redirect()->route('seller.pending-approval')->with('success', 'Đã nộp hồ sơ đăng ký gian hàng thành công! Vui lòng chờ Ban Quản Trị phê duyệt.');
     }
 
     /**
-     * Trang thông báo trạng thái phê duyệt hồ sơ gian hàng -> Chuyển hướng sang Kênh người bán (seller.shop).
+     * Trang thông báo trạng thái phê duyệt hồ sơ gian hàng.
      */
-    public function pendingApproval(): RedirectResponse
+    public function pendingApproval(): View|RedirectResponse
     {
-        return redirect()->route('seller.shop');
+        $user = auth()->user();
+        $sellerProfile = $user->sellerProfile;
+
+        if ($sellerProfile && $sellerProfile->status === 'approved') {
+            return redirect()->route('seller.dashboard');
+        }
+
+        return view('seller.pending-approval', compact('sellerProfile'));
     }
 }
