@@ -71,22 +71,22 @@ class SellerProfileController extends Controller
 
             $registeredCategoryIds = $shop->categories->pluck('id')->toArray();
 
-            if (!empty($registeredCategoryIds)) {
+            if (! empty($registeredCategoryIds)) {
                 $allCategories = Category::where('status', true)
                     ->whereNull('parent_id')
                     ->where(function ($q) use ($registeredCategoryIds) {
                         $q->whereIn('id', $registeredCategoryIds)
-                          ->orWhereHas('children', function ($sub) use ($registeredCategoryIds) {
-                              $sub->whereIn('id', $registeredCategoryIds);
-                          });
+                            ->orWhereHas('children', function ($sub) use ($registeredCategoryIds) {
+                                $sub->whereIn('id', $registeredCategoryIds);
+                            });
                     })
                     ->with(['children' => function ($q) use ($registeredCategoryIds) {
                         $q->where('status', true)
-                          ->where(function ($sub) use ($registeredCategoryIds) {
-                              $sub->whereIn('id', $registeredCategoryIds)
-                                  ->orWhereIn('parent_id', $registeredCategoryIds);
-                          })
-                          ->orderBy('name');
+                            ->where(function ($sub) use ($registeredCategoryIds) {
+                                $sub->whereIn('id', $registeredCategoryIds)
+                                    ->orWhereIn('parent_id', $registeredCategoryIds);
+                            })
+                            ->orderBy('name');
                     }])
                     ->orderBy('name')
                     ->get();
