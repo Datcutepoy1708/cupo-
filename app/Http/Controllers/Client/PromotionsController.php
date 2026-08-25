@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\FlashSale;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class PromotionsController extends Controller
@@ -56,8 +58,9 @@ class PromotionsController extends Controller
 
         // 4. Danh sach coupon da luu cua nguoi dung (de check trang thai nut)
         $savedCouponIds = collect();
-        if (auth()->check()) {
-            $savedCouponIds = auth()->user()
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $savedCouponIds = $user
                 ->savedCoupons()
                 ->wherePivot('status', 'saved')
                 ->pluck('coupons.id');
