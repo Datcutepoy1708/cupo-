@@ -29,14 +29,25 @@ class Product extends Model
         'likes_count',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-        'sale_price' => 'decimal:2',
-        'has_variants' => 'boolean',
-        'attributes' => 'array',
-        'views_count' => 'integer',
-        'likes_count' => 'integer',
+    protected $appends = [
+        'is_on_sale',
+        'discount_percentage',
+        'current_price',
+        'thumbnail_url',
     ];
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if (! $this->thumbnail) {
+            return null;
+        }
+
+        if (str_starts_with($this->thumbnail, 'http://') || str_starts_with($this->thumbnail, 'https://')) {
+            return $this->thumbnail;
+        }
+
+        return asset('storage/'.ltrim($this->thumbnail, '/'));
+    }
 
     public function getIsOnSaleAttribute(): bool
     {
