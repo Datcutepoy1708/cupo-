@@ -427,6 +427,34 @@
         setText('dShortDesc',   product.short_description ?? '--');
         document.getElementById('dFullDesc').innerHTML = product.description ?? 'Không có mô tả chi tiết';
 
+        // Render bảng biến thể nếu có
+        const variantsWrap = document.getElementById('dVariantsWrap');
+        const variantsTbody = document.getElementById('dVariantsTbody');
+        const variantsCountEl = document.getElementById('dVariantsCount');
+
+        if (variantsWrap && variantsTbody && product.has_variants && product.variants && product.variants.length > 0) {
+            variantsWrap.classList.remove('d-none');
+            if (variantsCountEl) variantsCountEl.textContent = product.variants.length;
+            variantsTbody.innerHTML = product.variants.map(v => {
+                const imgUrl = v.image_url || (v.image_path ? (v.image_path.startsWith('http') ? v.image_path : '/storage/' + v.image_path.replace(/^\//, '')) : '');
+                const imgHtml = imgUrl ? `<img src="${imgUrl}" style="width:28px;height:28px;object-fit:cover;border-radius:3px;border:1px solid #dee2e6;">` : '--';
+                const priceHtml = formatVnd(v.price);
+                const salePriceHtml = (v.sale_price && parseFloat(v.sale_price) > 0) ? formatVnd(v.sale_price) : '--';
+                return `
+                    <tr>
+                        <td>${imgHtml}</td>
+                        <td class="text-start fw-semibold">${v.name || '--'}</td>
+                        <td><small class="text-muted">${v.sku || '--'}</small></td>
+                        <td class="text-danger fw-bold">${priceHtml}</td>
+                        <td class="text-muted">${salePriceHtml}</td>
+                        <td>${v.stock ?? 0}</td>
+                    </tr>
+                `;
+            }).join('');
+        } else if (variantsWrap) {
+            variantsWrap.classList.add('d-none');
+        }
+
         const shopName  = product.seller?.seller_profile?.shop_name ?? product.seller?.name ?? '--';
         const ownerName = product.seller?.name ?? '--';
         const ownerMail = product.seller?.email ?? '--';

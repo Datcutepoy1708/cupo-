@@ -13,11 +13,35 @@ class SellerProductRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('has_variants')) {
+            $this->merge([
+                'has_variants' => filter_var($this->has_variants, FILTER_VALIDATE_BOOLEAN),
+            ]);
+        }
+
+        if (is_string($this->input('attributes'))) {
+            $decoded = json_decode($this->input('attributes'), true);
+            if (is_array($decoded)) {
+                $this->merge(['attributes' => $decoded]);
+            }
+        }
+
+        if (is_string($this->input('variants'))) {
+            $decoded = json_decode($this->input('variants'), true);
+            if (is_array($decoded)) {
+                $this->merge(['variants' => $decoded]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         $productId = $this->route('product')?->id;
+        $hasVariants = $this->boolean('has_variants');
 
-        return [
+        $rules = [
             'category_id' => [
                 'required',
                 'exists:categories,id',
@@ -42,13 +66,32 @@ class SellerProductRequest extends FormRequest
                 'max:100',
                 Rule::unique('products', 'sku')->ignore($productId),
             ],
-            'price' => ['required', 'numeric', 'min:0'],
-            'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
-            'stock' => ['required', 'integer', 'min:0'],
+            'has_variants' => ['nullable', 'boolean'],
+            'attributes' => ['nullable', 'array'],
+            'variants' => ['nullable', 'array'],
+            'variants.*.name' => ['required_with:variants', 'string', 'max:100'],
+            'variants.*.sku' => ['nullable', 'string', 'max:100'],
+            'variants.*.price' => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.sale_price' => ['nullable', 'numeric', 'min:0'],
+            'variants.*.stock' => ['required_with:variants', 'integer', 'min:0'],
+            'variants.*.image_path' => ['nullable', 'string'],
             'thumbnail' => ['nullable'],
             'description' => ['nullable', 'string'],
             'short_description' => ['nullable', 'string'],
         ];
+
+        if ($hasVariants) {
+            $rules['price'] = ['nullable', 'numeric', 'min:0'];
+            $rules['sale_price'] = ['nullable', 'numeric', 'min:0'];
+            $rules['stock'] = ['nullable', 'integer', 'min:0'];
+            $rules['variants'] = ['required', 'array', 'min:1'];
+        } else {
+            $rules['price'] = ['required', 'numeric', 'min:0'];
+            $rules['sale_price'] = ['nullable', 'numeric', 'min:0', 'lt:price'];
+            $rules['stock'] = ['required', 'integer', 'min:0'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -65,6 +108,8 @@ class SellerProductRequest extends FormRequest
             'sale_price.min' => 'Giá khuyến mãi phải lớn hơn hoặc bằng 0.',
             'sale_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá bán gốc.',
             'stock.required' => 'Vui lòng nhập số lượng tồn kho.',
+            'variants.required' => 'Vui lòng thiết lập ít nhất 1 biến thể khi bật phân loại hàng.',
+            'variants.min' => 'Vui lòng thiết lập ít nhất 1 biến thể khi bật phân loại hàng.',
             'thumbnail.required' => 'Vui lòng cung cấp ảnh đại diện sản phẩm.',
             'description.required' => 'Vui lòng nhập mô tả chi tiết sản phẩm.',
         ];

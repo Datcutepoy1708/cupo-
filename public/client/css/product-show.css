@@ -151,17 +151,107 @@
     color: #c62828;
 }
 
-/* Variant & Buttons */
-.btn-variant {
-    font-size: 13px;
-    padding: 6px 16px;
-    border-radius: 2px;
+/* ===== Shopee & TikTok Shop Style Product Variants ===== */
+.prod-variants-section {
+    position: relative;
 }
-.btn-variant.active {
+
+.variant-group-row {
+    margin-bottom: 14px;
+}
+
+.variant-group-label {
+    min-width: 90px;
+    font-size: 13px;
+}
+
+.btn-variant-option {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    color: #333333;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.btn-variant-option:hover {
+    border-color: #c62828;
+    color: #c62828;
+    background: #fff;
+}
+
+.btn-variant-option.active {
+    border: 2px solid #c62828;
     background: #fdecea;
     color: #c62828;
-    border-color: #c62828;
     font-weight: 600;
+    padding: 5px 13px; /* Giữ kích thước tương đương khi viền 2px */
+}
+
+.btn-variant-with-img {
+    gap: 8px;
+    padding: 4px 10px;
+}
+
+.btn-variant-with-img.active {
+    padding: 3px 9px;
+}
+
+.variant-thumb-mini {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 3px;
+    border: 1px solid #e9ecef;
+}
+
+.variant-check-icon {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 8px;
+    background: #c62828;
+    color: #ffffff;
+    padding: 2px 3px;
+    border-radius: 3px 0 0 0;
+    line-height: 1;
+}
+
+.btn-variant-option.active .variant-check-icon {
+    display: block;
+}
+
+.btn-variant-option.out-of-stock {
+    background: #f8f9fa;
+    border: 1px dashed #ced4da;
+    color: #adb5bd;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Rung cảnh báo khi chưa chọn biến thể */
+.variant-shake-warning {
+    animation: variantShake 0.4s ease;
+    border: 1px solid #dc3545 !important;
+    border-radius: 6px;
+    padding: 8px;
+    background: #fff5f5;
+}
+
+@keyframes variantShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
 }
 
 .btn-cart-add {

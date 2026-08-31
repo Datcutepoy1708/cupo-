@@ -49,7 +49,8 @@
                 </div>
 
                 {{-- ===== MODAL: THÊM SẢN PHẨM ===== --}}
-                <x-modal name="addProductModal" title="Thêm sản phẩm mới" max-width="lg">
+                {{-- ===== MODAL: THÊM SẢN PHẨM ===== --}}
+                <x-modal name="addProductModal" title="Thêm sản phẩm mới" max-width="xl">
                     <form id="addProductForm" method="post" action="{{ route('seller.products.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="row mb-3">
@@ -78,11 +79,13 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+
+                        {{-- GIÁ VÀ KHO CHO SẢN PHẨM KHÔNG CÓ BIẾN THỂ --}}
+                        <div class="row mb-3" id="add_simple_price_row">
                             <div class="col-md-4">
                                 <label class="form-label">Giá niêm yết (Giá gốc) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" name="price" id="add_price" min="0" step="1000" required placeholder="0">
+                                    <input type="number" class="form-control" name="price" id="add_price" min="0" step="1000" placeholder="0">
                                     <span class="input-group-text">₫</span>
                                 </div>
                             </div>
@@ -98,9 +101,13 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Số lượng kho <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" name="stock" id="add_stock" min="0" value="1" required placeholder="Số lượng">
+                                <input type="number" class="form-control" name="stock" id="add_stock" min="0" value="1" placeholder="Số lượng">
                             </div>
                         </div>
+
+                        {{-- BIẾN THỂ SẢN PHẨM (SHOPEE / TIKTOK SHOP STYLE) --}}
+                        @include('client.seller-store.partials.variant-builder', ['prefix' => 'add'])
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Mã SKU <span class="text-muted small">(Tùy chọn)</span></label>
@@ -127,7 +134,7 @@
                 </x-modal>
 
                 {{-- ===== MODAL: SỬA SẢN PHẨM ===== --}}
-                <x-modal name="editProductModal" title="Chỉnh sửa sản phẩm" max-width="lg">
+                <x-modal name="editProductModal" title="Chỉnh sửa sản phẩm" max-width="xl">
                     <form id="editProductForm" method="post" action="#" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="_method" value="PUT">
@@ -159,11 +166,13 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+
+                        {{-- GIÁ VÀ KHO CHO SẢN PHẨM KHÔNG CÓ BIẾN THỂ --}}
+                        <div class="row mb-3" id="edit_simple_price_row">
                             <div class="col-md-4">
                                 <label class="form-label">Giá niêm yết (Giá gốc) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" name="price" id="edit_price" min="0" step="1000" required placeholder="0">
+                                    <input type="number" class="form-control" name="price" id="edit_price" min="0" step="1000" placeholder="0">
                                     <span class="input-group-text">₫</span>
                                 </div>
                             </div>
@@ -179,9 +188,13 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Số lượng kho <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" name="stock" id="edit_stock" min="0" required placeholder="Số lượng">
+                                <input type="number" class="form-control" name="stock" id="edit_stock" min="0" placeholder="Số lượng">
                             </div>
                         </div>
+
+                        {{-- BIẾN THỂ SẢN PHẨM (SHOPEE / TIKTOK SHOP STYLE) --}}
+                        @include('client.seller-store.partials.variant-builder', ['prefix' => 'edit'])
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Mã SKU</label>

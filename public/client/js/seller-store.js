@@ -69,7 +69,557 @@ document.addEventListener('DOMContentLoaded', function () {
     setupDiscountCalculation('add_price', 'add_sale_price', 'add_discount_calc', 'add_discount_percent', 'add_discount_amount');
     setupDiscountCalculation('edit_price', 'edit_sale_price', 'edit_discount_calc', 'edit_discount_percent', 'edit_discount_amount');
 
-    // 5. Xử lý mở Modal Chỉnh sửa sản phẩm và điền thông tin
+    // =========================================================================
+    // 5. SHOPEE & TIKTOK SHOP STYLE PRODUCT VARIANT MANAGER
+    // =========================================================================
+    class ProductVariantManager {
+        constructor(prefix) {
+            this.prefix = prefix;
+            this.toggleSwitch = document.getElementById(`${prefix}_has_variants_toggle`);
+            this.configWrap = document.getElementById(`${prefix}_variant_config_wrap`);
+            this.simplePriceRow = document.getElementById(`${prefix}_simple_price_row`);
+            this.priceInput = document.getElementById(`${prefix}_price`);
+            this.stockInput = document.getElementById(`${prefix}_stock`);
+            
+            // Group 1
+            this.group1NameInput = document.getElementById(`${prefix}_group1_name`);
+            this.group1Container = document.getElementById(`${prefix}_group1_items_container`);
+            this.btnAddGroup1Val = document.getElementById(`${prefix}_btn_add_group1_val`);
+            
+            // Group 2
+            this.group2Card = document.getElementById(`${prefix}_group2_card`);
+            this.group2NameInput = document.getElementById(`${prefix}_group2_name`);
+            this.group2Container = document.getElementById(`${prefix}_group2_items_container`);
+            this.btnAddGroup2Val = document.getElementById(`${prefix}_btn_add_group2_val`);
+            this.btnShowGroup2 = document.getElementById(`${prefix}_btn_show_group2`);
+            this.btnRemoveGroup2 = document.getElementById(`${prefix}_btn_remove_group2`);
+            this.addGroup2Wrap = document.getElementById(`${prefix}_add_group2_btn_wrap`);
+
+            // Matrix Table
+            this.thGroup1 = document.getElementById(`${prefix}_th_group1`);
+            this.thGroup2 = document.getElementById(`${prefix}_th_group2`);
+            this.tbody = document.getElementById(`${prefix}_matrix_tbody`);
+            this.variantsCountEl = document.getElementById(`${prefix}_variants_count`);
+            this.totalStockEl = document.getElementById(`${prefix}_total_stock`);
+            this.priceRangeEl = document.getElementById(`${prefix}_price_range`);
+
+            // Batch apply
+            this.btnBatchApply = document.getElementById(`${prefix}_btn_batch_apply`);
+            this.batchPrice = document.getElementById(`${prefix}_batch_price`);
+            this.batchSalePrice = document.getElementById(`${prefix}_batch_sale_price`);
+            this.batchStock = document.getElementById(`${prefix}_batch_stock`);
+            this.batchSku = document.getElementById(`${prefix}_batch_sku`);
+
+            this.hasGroup2 = false;
+            this.existingVariantsData = {}; // key -> { price, sale_price, stock, sku, image_path, image_url, file }
+
+            this.init();
+        }
+
+        init() {
+            if (!this.toggleSwitch) return;
+
+            // Toggle switch event
+            this.toggleSwitch.addEventListener('change', () => {
+                this.updateVisibility();
+                if (this.toggleSwitch.checked && this.group1Container.children.length === 0) {
+                    this.addGroup1Item('Đen');
+                    this.addGroup1Item('Trắng');
+                }
+                this.renderMatrix();
+            });
+
+            // Group 1 change
+            if (this.group1NameInput) {
+                this.group1NameInput.addEventListener('input', () => {
+                    if (this.thGroup1) this.thGroup1.textContent = this.group1NameInput.value.trim() || 'Nhóm 1';
+                });
+            }
+
+            if (this.btnAddGroup1Val) {
+                this.btnAddGroup1Val.addEventListener('click', () => {
+                    this.addGroup1Item('');
+                });
+            }
+
+            // Group 2 change
+            if (this.btnShowGroup2) {
+                this.btnShowGroup2.addEventListener('click', () => {
+                    this.hasGroup2 = true;
+                    this.group2Card.classList.remove('d-none');
+                    this.addGroup2Wrap.classList.add('d-none');
+                    if (this.group2Container.children.length === 0) {
+                        this.addGroup2Item('S');
+                        this.addGroup2Item('M');
+                    }
+                    this.renderMatrix();
+                });
+            }
+
+            if (this.btnRemoveGroup2) {
+                this.btnRemoveGroup2.addEventListener('click', () => {
+                    this.hasGroup2 = false;
+                    this.group2Card.classList.add('d-none');
+                    this.addGroup2Wrap.classList.remove('d-none');
+                    this.group2Container.innerHTML = '';
+                    this.renderMatrix();
+                });
+            }
+
+            if (this.group2NameInput) {
+                this.group2NameInput.addEventListener('input', () => {
+                    if (this.thGroup2) this.thGroup2.textContent = this.group2NameInput.value.trim() || 'Nhóm 2';
+                });
+            }
+
+            if (this.btnAddGroup2Val) {
+                this.btnAddGroup2Val.addEventListener('click', () => {
+                    this.addGroup2Item('');
+                });
+            }
+
+            // Batch apply event
+            if (this.btnBatchApply) {
+                this.btnBatchApply.addEventListener('click', () => {
+                    this.applyBatchValues();
+                });
+            }
+        }
+
+        updateVisibility() {
+            const isChecked = this.toggleSwitch.checked;
+            if (isChecked) {
+                this.configWrap.classList.remove('d-none');
+                if (this.simplePriceRow) this.simplePriceRow.classList.add('d-none');
+                if (this.priceInput) this.priceInput.removeAttribute('required');
+                if (this.stockInput) this.stockInput.removeAttribute('required');
+            } else {
+                this.configWrap.classList.add('d-none');
+                if (this.simplePriceRow) this.simplePriceRow.classList.remove('d-none');
+                if (this.priceInput) this.priceInput.setAttribute('required', 'required');
+                if (this.stockInput) this.stockInput.setAttribute('required', 'required');
+            }
+        }
+
+        addGroup1Item(val = '', imagePath = '', imageUrl = '') {
+            const itemId = `g1_${this.prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+            const row = document.createElement('div');
+            row.className = 'd-flex align-items-center gap-2 group1-item-row';
+            row.dataset.id = itemId;
+
+            let imgPreviewHtml = '';
+            if (imageUrl || imagePath) {
+                const src = imageUrl || (imagePath.startsWith('http') ? imagePath : `/storage/${imagePath.replace(/^\//, '')}`);
+                imgPreviewHtml = `<img src="${src}" class="g1-thumb-preview" style="width:32px;height:32px;object-fit:cover;border-radius:4px;border:1px solid #dee2e6;">`;
+            } else {
+                imgPreviewHtml = `<span class="g1-thumb-placeholder text-muted d-flex align-items-center justify-content-center border rounded" style="width:32px;height:32px;font-size:12px;background:#f8f9fa;"><i class="fa-solid fa-image"></i></span>`;
+            }
+
+            row.innerHTML = `
+                <div class="position-relative d-inline-block g1-img-wrap" style="flex-shrink:0;">
+                    <label class="m-0 cursor-pointer" title="Chọn ảnh cho phân loại này" style="cursor:pointer;">
+                        ${imgPreviewHtml}
+                        <input type="file" class="d-none g1-img-input" accept="image/*">
+                    </label>
+                </div>
+                <div class="input-group input-group-sm flex-fill" style="max-width:320px;">
+                    <input type="text" class="form-control g1-val-input" placeholder="Tên phân loại (vd: Đen, Trắng...)" value="${val}">
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm text-danger border-0 g1-btn-del" title="Xóa">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+
+            // Lưu imagePath nếu có
+            if (imagePath) {
+                row.dataset.imagePath = imagePath;
+            }
+
+            const valInput = row.querySelector('.g1-val-input');
+            const fileInput = row.querySelector('.g1-img-input');
+            const btnDel = row.querySelector('.g1-btn-del');
+
+            valInput.addEventListener('input', () => this.renderMatrix());
+            
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    row.imageFile = file;
+                    const url = URL.createObjectURL(file);
+                    const imgWrap = row.querySelector('.g1-img-wrap label');
+                    imgWrap.innerHTML = `<img src="${url}" class="g1-thumb-preview" style="width:32px;height:32px;object-fit:cover;border-radius:4px;border:1px solid #dee2e6;"><input type="file" class="d-none g1-img-input" accept="image/*">`;
+                    // Re-bind
+                    imgWrap.querySelector('.g1-img-input').addEventListener('change', (ev) => fileInput.dispatchEvent(new Event('change')));
+                    this.renderMatrix();
+                }
+            });
+
+            btnDel.addEventListener('click', () => {
+                row.remove();
+                this.renderMatrix();
+            });
+
+            this.group1Container.appendChild(row);
+            if (val) this.renderMatrix();
+        }
+
+        addGroup2Item(val = '') {
+            const itemId = `g2_${this.prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+            const chip = document.createElement('div');
+            chip.className = 'input-group input-group-sm group2-item-chip';
+            chip.style.width = '140px';
+            chip.dataset.id = itemId;
+
+            chip.innerHTML = `
+                <input type="text" class="form-control g2-val-input" placeholder="Size (vd: S, M)" value="${val}">
+                <button class="btn btn-outline-secondary text-danger g2-btn-del" type="button"><i class="fa-solid fa-xmark"></i></button>
+            `;
+
+            const valInput = chip.querySelector('.g2-val-input');
+            const btnDel = chip.querySelector('.g2-btn-del');
+
+            valInput.addEventListener('input', () => this.renderMatrix());
+            btnDel.addEventListener('click', () => {
+                chip.remove();
+                this.renderMatrix();
+            });
+
+            this.group2Container.appendChild(chip);
+            if (val) this.renderMatrix();
+        }
+
+        getGroup1Values() {
+            const items = [];
+            this.group1Container.querySelectorAll('.group1-item-row').forEach(row => {
+                const val = row.querySelector('.g1-val-input')?.value.trim();
+                if (val) {
+                    const imgEl = row.querySelector('.g1-thumb-preview');
+                    const imgUrl = imgEl ? imgEl.src : '';
+                    items.push({
+                        id: row.dataset.id,
+                        name: val,
+                        imagePath: row.dataset.imagePath || '',
+                        imageUrl: imgUrl,
+                        imageFile: row.imageFile || null
+                    });
+                }
+            });
+            return items;
+        }
+
+        getGroup2Values() {
+            if (!this.hasGroup2) return [];
+            const items = [];
+            this.group2Container.querySelectorAll('.group2-item-chip').forEach(chip => {
+                const val = chip.querySelector('.g2-val-input')?.value.trim();
+                if (val) {
+                    items.push(val);
+                }
+            });
+            return items;
+        }
+
+        // Lưu giá trị hiện tại của matrix trước khi re-render
+        saveCurrentMatrixState() {
+            this.tbody.querySelectorAll('.matrix-row').forEach(tr => {
+                const key = tr.dataset.variantName;
+                if (key) {
+                    this.existingVariantsData[key] = {
+                        price: tr.querySelector('.matrix-price')?.value || '',
+                        sale_price: tr.querySelector('.matrix-sale-price')?.value || '',
+                        stock: tr.querySelector('.matrix-stock')?.value || '',
+                        sku: tr.querySelector('.matrix-sku')?.value || '',
+                        imagePath: tr.dataset.imagePath || '',
+                        imageUrl: tr.dataset.imageUrl || '',
+                    };
+                }
+            });
+        }
+
+        renderMatrix() {
+            this.saveCurrentMatrixState();
+            const g1List = this.getGroup1Values();
+            const g2List = this.getGroup2Values();
+
+            if (this.thGroup1) {
+                this.thGroup1.textContent = this.group1NameInput.value.trim() || 'Nhóm 1';
+            }
+
+            if (this.hasGroup2 && g2List.length > 0) {
+                if (this.thGroup2) {
+                    this.thGroup2.textContent = this.group2NameInput.value.trim() || 'Nhóm 2';
+                    this.thGroup2.classList.remove('d-none');
+                }
+            } else {
+                if (this.thGroup2) this.thGroup2.classList.add('d-none');
+            }
+
+            this.tbody.innerHTML = '';
+
+            let rows = [];
+            if (g1List.length === 0) {
+                this.tbody.innerHTML = `<tr><td colspan="7" class="text-muted py-3">Vui lòng nhập ít nhất một giá trị phân loại ở trên.</td></tr>`;
+                this.updateStats([]);
+                return;
+            }
+
+            if (this.hasGroup2 && g2List.length > 0) {
+                // Tích Descartes: Nhóm 1 x Nhóm 2
+                g1List.forEach(g1 => {
+                    g2List.forEach(g2 => {
+                        const variantName = `${g1.name}, ${g2}`;
+                        rows.push({
+                            variantName: variantName,
+                            g1Val: g1.name,
+                            g2Val: g2,
+                            imagePath: g1.imagePath,
+                            imageUrl: g1.imageUrl,
+                            imageFile: g1.imageFile
+                        });
+                    });
+                });
+            } else {
+                // Chỉ có Nhóm 1
+                g1List.forEach(g1 => {
+                    rows.push({
+                        variantName: g1.name,
+                        g1Val: g1.name,
+                        g2Val: '',
+                        imagePath: g1.imagePath,
+                        imageUrl: g1.imageUrl,
+                        imageFile: g1.imageFile
+                    });
+                });
+            }
+
+            rows.forEach((r, idx) => {
+                const saved = this.existingVariantsData[r.variantName] || {};
+                const price = saved.price || '';
+                const salePrice = saved.sale_price || '';
+                const stock = saved.stock !== undefined ? saved.stock : '';
+                const sku = saved.sku || '';
+
+                const tr = document.createElement('tr');
+                tr.className = 'matrix-row';
+                tr.dataset.variantName = r.variantName;
+                tr.dataset.index = idx;
+                if (r.imagePath) tr.dataset.imagePath = r.imagePath;
+                if (r.imageUrl) tr.dataset.imageUrl = r.imageUrl;
+                tr.imageFile = r.imageFile || null;
+
+                let imgHtml = '<span class="text-muted" style="font-size:12px;">--</span>';
+                if (r.imageUrl) {
+                    imgHtml = `<img src="${r.imageUrl}" style="width:30px;height:30px;object-fit:cover;border-radius:4px;border:1px solid #dee2e6;">`;
+                }
+
+                tr.innerHTML = `
+                    <td>${imgHtml}</td>
+                    <td class="fw-semibold text-start">${r.g1Val}</td>
+                    ${this.hasGroup2 && g2List.length > 0 ? `<td class="text-start">${r.g2Val}</td>` : ''}
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control matrix-price text-end" value="${price}" placeholder="0" min="0" step="1000" required>
+                            <span class="input-group-text">₫</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control matrix-sale-price text-end" value="${salePrice}" placeholder="Giá sale" min="0" step="1000">
+                            <span class="input-group-text">₫</span>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm matrix-stock text-center" value="${stock}" placeholder="0" min="0" required>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm matrix-sku" value="${sku}" placeholder="Mã SKU">
+                    </td>
+                `;
+
+                // Event listener on inputs to update stats in real time
+                tr.querySelectorAll('input').forEach(inp => {
+                    inp.addEventListener('input', () => this.updateStats(rows));
+                });
+
+                this.tbody.appendChild(tr);
+            });
+
+            this.updateStats(rows);
+        }
+
+        applyBatchValues() {
+            const bPrice = this.batchPrice ? this.batchPrice.value : '';
+            const bSalePrice = this.batchSalePrice ? this.batchSalePrice.value : '';
+            const bStock = this.batchStock ? this.batchStock.value : '';
+            const bSku = this.batchSku ? this.batchSku.value.trim() : '';
+
+            this.tbody.querySelectorAll('.matrix-row').forEach((tr, i) => {
+                if (bPrice !== '') tr.querySelector('.matrix-price').value = bPrice;
+                if (bSalePrice !== '') tr.querySelector('.matrix-sale-price').value = bSalePrice;
+                if (bStock !== '') tr.querySelector('.matrix-stock').value = bStock;
+                if (bSku !== '') tr.querySelector('.matrix-sku').value = `${bSku}-${i + 1}`;
+            });
+
+            this.renderMatrix();
+        }
+
+        updateStats(rows) {
+            let totalStock = 0;
+            let prices = [];
+
+            this.tbody.querySelectorAll('.matrix-row').forEach(tr => {
+                const stock = parseInt(tr.querySelector('.matrix-stock')?.value) || 0;
+                const price = parseFloat(tr.querySelector('.matrix-price')?.value) || 0;
+                const salePrice = parseFloat(tr.querySelector('.matrix-sale-price')?.value) || 0;
+                
+                totalStock += stock;
+                if (salePrice > 0 && salePrice < price) {
+                    prices.push(salePrice);
+                } else if (price > 0) {
+                    prices.push(price);
+                }
+            });
+
+            if (this.variantsCountEl) this.variantsCountEl.textContent = rows ? rows.length : 0;
+            if (this.totalStockEl) this.totalStockEl.textContent = new Intl.NumberFormat('vi-VN').format(totalStock);
+
+            if (this.priceRangeEl) {
+                if (prices.length > 0) {
+                    const min = Math.min(...prices);
+                    const max = Math.max(...prices);
+                    if (min === max) {
+                        this.priceRangeEl.textContent = `${new Intl.NumberFormat('vi-VN').format(min)}₫`;
+                    } else {
+                        this.priceRangeEl.textContent = `${new Intl.NumberFormat('vi-VN').format(min)}₫ - ${new Intl.NumberFormat('vi-VN').format(max)}₫`;
+                    }
+                } else {
+                    this.priceRangeEl.textContent = '0₫';
+                }
+            }
+        }
+
+        getPayload() {
+            const isChecked = this.toggleSwitch && this.toggleSwitch.checked;
+            if (!isChecked) {
+                return { has_variants: false, attributes: null, variants: [] };
+            }
+
+            const g1Name = this.group1NameInput.value.trim() || 'Màu sắc';
+            const g1Items = this.getGroup1Values();
+            const g2Name = this.group2NameInput.value.trim() || 'Kích cỡ';
+            const g2Items = this.getGroup2Values();
+
+            const attributes = [
+                { name: g1Name, options: g1Items.map(x => x.name) }
+            ];
+            if (this.hasGroup2 && g2Items.length > 0) {
+                attributes.push({ name: g2Name, options: g2Items });
+            }
+
+            const variants = [];
+            const variantFiles = {};
+
+            this.tbody.querySelectorAll('.matrix-row').forEach((tr, idx) => {
+                const name = tr.dataset.variantName;
+                const price = parseFloat(tr.querySelector('.matrix-price')?.value) || 0;
+                const salePriceVal = tr.querySelector('.matrix-sale-price')?.value;
+                const salePrice = salePriceVal !== '' && !isNaN(salePriceVal) ? parseFloat(salePriceVal) : null;
+                const stock = parseInt(tr.querySelector('.matrix-stock')?.value) || 0;
+                const sku = tr.querySelector('.matrix-sku')?.value.trim() || '';
+                const imagePath = tr.dataset.imagePath || '';
+
+                variants.push({
+                    name: name,
+                    sku: sku,
+                    price: price,
+                    sale_price: salePrice,
+                    stock: stock,
+                    image_path: imagePath
+                });
+
+                if (tr.imageFile) {
+                    variantFiles[`variant_image_${idx}`] = tr.imageFile;
+                }
+            });
+
+            return {
+                has_variants: true,
+                attributes: attributes,
+                variants: variants,
+                variantFiles: variantFiles
+            };
+        }
+
+        loadData(hasVariants, attributes, variants) {
+            this.existingVariantsData = {};
+            this.group1Container.innerHTML = '';
+            this.group2Container.innerHTML = '';
+
+            if (!hasVariants || !variants || variants.length === 0) {
+                this.toggleSwitch.checked = false;
+                this.updateVisibility();
+                return;
+            }
+
+            this.toggleSwitch.checked = true;
+            this.updateVisibility();
+
+            // Populate attributes
+            if (attributes && Array.isArray(attributes) && attributes.length > 0) {
+                const g1 = attributes[0];
+                if (g1) {
+                    this.group1NameInput.value = g1.name || 'Màu sắc';
+                    const g1Opts = Array.isArray(g1.options) ? g1.options : [];
+                    g1Opts.forEach(optName => {
+                        // Tìm variant tương ứng để lấy ảnh nếu có
+                        const matchedVar = variants.find(v => v.name.startsWith(optName));
+                        const imgPath = matchedVar?.image_path || '';
+                        this.addGroup1Item(optName, imgPath);
+                    });
+                }
+
+                if (attributes.length > 1) {
+                    const g2 = attributes[1];
+                    this.hasGroup2 = true;
+                    this.group2Card.classList.remove('d-none');
+                    this.addGroup2Wrap.classList.add('d-none');
+                    this.group2NameInput.value = g2.name || 'Kích cỡ';
+                    const g2Opts = Array.isArray(g2.options) ? g2.options : [];
+                    g2Opts.forEach(optName => {
+                        this.addGroup2Item(optName);
+                    });
+                } else {
+                    this.hasGroup2 = false;
+                    this.group2Card.classList.add('d-none');
+                    this.addGroup2Wrap.classList.remove('d-none');
+                }
+            } else {
+                // Fallback nếu không có attributes rõ ràng: load từ variants
+                variants.forEach(v => {
+                    this.addGroup1Item(v.name, v.image_path);
+                });
+            }
+
+            // Populate variant rows data
+            variants.forEach(v => {
+                this.existingVariantsData[v.name] = {
+                    price: v.price || '',
+                    sale_price: v.sale_price || '',
+                    stock: v.stock !== undefined ? v.stock : '',
+                    sku: v.sku || '',
+                    imagePath: v.image_path || ''
+                };
+            });
+
+            this.renderMatrix();
+        }
+    }
+
+    // Khởi tạo Variant Managers cho cả Add Modal & Edit Modal
+    const addVariantMgr = new ProductVariantManager('add');
+    const editVariantMgr = new ProductVariantManager('edit');
+
+    // 6. Xử lý mở Modal Chỉnh sửa sản phẩm và điền thông tin
     const editProductButtons = document.querySelectorAll('.btn-edit-product');
     const editProductForm = document.getElementById('editProductForm');
 
@@ -84,6 +634,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const stock = this.dataset.stock || '';
             const description = this.dataset.description || '';
             const thumbnail = this.dataset.thumbnail || '';
+            const hasVariants = this.dataset.has_variants === '1';
+
+            let attributes = [];
+            let variants = [];
+            try {
+                attributes = JSON.parse(this.dataset.attributes || '[]');
+            } catch (e) { attributes = []; }
+            try {
+                variants = JSON.parse(this.dataset.variants || '[]');
+            } catch (e) { variants = []; }
 
             if (editProductForm) {
                 editProductForm.action = `/seller/products/${id}`;
@@ -112,11 +672,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (priceInput && salePriceInput) {
                     priceInput.dispatchEvent(new Event('input'));
                 }
+
+                // Load dữ liệu biến thể vào Edit Variant Manager
+                editVariantMgr.loadData(hasVariants, attributes, variants);
             }
         });
     });
 
-    // 6. Xử lý submit AJAX cho Form Thêm sản phẩm
+    // 7. Xử lý submit AJAX cho Form Thêm sản phẩm
     const addProductForm = document.getElementById('addProductForm');
     if (addProductForm) {
         addProductForm.addEventListener('submit', function (e) {
@@ -129,6 +692,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const formData = new FormData(addProductForm);
+            const variantPayload = addVariantMgr.getPayload();
+
+            formData.set('has_variants', variantPayload.has_variants ? '1' : '0');
+            if (variantPayload.has_variants) {
+                formData.set('attributes', JSON.stringify(variantPayload.attributes));
+                formData.set('variants', JSON.stringify(variantPayload.variants));
+                if (variantPayload.variantFiles) {
+                    for (const [key, file] of Object.entries(variantPayload.variantFiles)) {
+                        formData.append(key, file);
+                    }
+                }
+            }
+
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             fetch(addProductForm.action, {
@@ -167,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 7. Xử lý submit AJAX cho Form Sửa sản phẩm
+    // 8. Xử lý submit AJAX cho Form Sửa sản phẩm
     if (editProductForm) {
         editProductForm.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -179,6 +755,22 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const formData = new FormData(editProductForm);
+            const variantPayload = editVariantMgr.getPayload();
+
+            formData.set('has_variants', variantPayload.has_variants ? '1' : '0');
+            if (variantPayload.has_variants) {
+                formData.set('attributes', JSON.stringify(variantPayload.attributes));
+                formData.set('variants', JSON.stringify(variantPayload.variants));
+                if (variantPayload.variantFiles) {
+                    for (const [key, file] of Object.entries(variantPayload.variantFiles)) {
+                        formData.append(key, file);
+                    }
+                }
+            } else {
+                formData.set('attributes', '');
+                formData.set('variants', '');
+            }
+
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             fetch(editProductForm.action, {
@@ -217,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 8. Xử lý xóa sản phẩm
+    // 9. Xử lý xóa sản phẩm
     const deleteButtons = document.querySelectorAll('.btn-delete-product');
     deleteButtons.forEach(function (btn) {
         btn.addEventListener('click', function () {

@@ -29,12 +29,56 @@ class Product extends Model
         'likes_count',
     ];
 
+    protected $casts = [
+        'has_variants' => 'boolean',
+        'attributes' => 'array',
+        'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
+        'stock' => 'integer',
+        'views_count' => 'integer',
+        'likes_count' => 'integer',
+    ];
+
     protected $appends = [
         'is_on_sale',
         'discount_percentage',
         'current_price',
         'thumbnail_url',
+        'min_price',
+        'max_price',
+        'price_range_display',
     ];
+
+    public function getMinPriceAttribute(): float
+    {
+        if ($this->has_variants && $this->relationLoaded('variants') && $this->variants->isNotEmpty()) {
+            return (float) $this->variants->min('current_price');
+        }
+
+        return (float) $this->current_price;
+    }
+
+    public function getMaxPriceAttribute(): float
+    {
+        if ($this->has_variants && $this->relationLoaded('variants') && $this->variants->isNotEmpty()) {
+            return (float) $this->variants->max('current_price');
+        }
+
+        return (float) $this->current_price;
+    }
+
+    public function getPriceRangeDisplayAttribute(): string
+    {
+        if ($this->has_variants && $this->relationLoaded('variants') && $this->variants->isNotEmpty()) {
+            $min = $this->variants->min('current_price');
+            $max = $this->variants->max('current_price');
+            if ($min !== null && $max !== null && $min != $max) {
+                return number_format($min, 0, ',', '.') . '₫ - ' . number_format($max, 0, ',', '.') . '₫';
+            }
+        }
+
+        return number_format($this->current_price, 0, ',', '.') . '₫';
+    }
 
     public function getThumbnailUrlAttribute(): ?string
     {

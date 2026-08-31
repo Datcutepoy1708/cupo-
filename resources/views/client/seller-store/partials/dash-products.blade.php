@@ -31,7 +31,14 @@
                             <img src="{{ $thumbUrl }}" class="dash-product-thumb" alt="{{ $product->name }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px;">
                         </td>
                         <td>
-                            <div class="fw-semibold text-dark">{{ $product->name }}</div>
+                            <div class="fw-semibold text-dark d-flex align-items-center flex-wrap gap-1">
+                                <span>{{ $product->name }}</span>
+                                @if ($product->has_variants && $product->variants->isNotEmpty())
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.7rem;">
+                                        <i class="fa-solid fa-layer-group me-1"></i>{{ $product->variants->count() }} biến thể
+                                    </span>
+                                @endif
+                            </div>
                             <small class="text-muted">SKU: {{ $product->sku }}</small>
                         </td>
                         <td>
@@ -41,7 +48,10 @@
                             </span>
                         </td>
                         <td>
-                            @if ($product->is_on_sale)
+                            @if ($product->has_variants && $product->variants->isNotEmpty())
+                                <div class="fw-bold text-danger">{{ $product->price_range_display }}</div>
+                                <small class="text-muted" style="font-size: 0.75rem;">(Theo phân loại)</small>
+                            @elseif ($product->is_on_sale)
                                 <div class="fw-bold text-danger">{{ number_format($product->sale_price) }}₫</div>
                                 <div class="d-flex align-items-center gap-1">
                                     <del class="text-muted small">{{ number_format($product->price) }}₫</del>
@@ -51,7 +61,12 @@
                                 <div class="fw-bold text-dark">{{ number_format($product->price) }}₫</div>
                             @endif
                         </td>
-                        <td>{{ $product->stock }}</td>
+                        <td>
+                            {{ $product->stock }}
+                            @if ($product->has_variants && $product->variants->isNotEmpty())
+                                <span class="d-block text-muted" style="font-size: 0.7rem;">Tổng kho biến thể</span>
+                            @endif
+                        </td>
                         <td>
                             @if ($product->status === 'approved')
                                 @if ($product->stock <= 0)
@@ -78,6 +93,9 @@
                                 data-price="{{ (float)$product->price }}"
                                 data-sale_price="{{ $product->sale_price ? (float)$product->sale_price : '' }}"
                                 data-stock="{{ $product->stock }}"
+                                data-has_variants="{{ $product->has_variants ? '1' : '0' }}"
+                                data-attributes="{{ json_encode($product->attributes ?? []) }}"
+                                data-variants="{{ json_encode($product->variants ?? []) }}"
                                 data-description="{{ $product->description }}"
                                 data-thumbnail="{{ $thumbUrl }}"
                                 data-bs-toggle="modal" 

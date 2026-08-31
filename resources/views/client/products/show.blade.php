@@ -47,19 +47,51 @@
                                     class="w-100 h-100 object-fit-cover">
                             </div>
 
-                            {{-- Thumbnail Carousel --}}
+                            {{-- Thumbnail Carousel (Ảnh chính + Gallery + Ảnh Biến thể) --}}
+                            @php
+                                $galleryList = [];
+                                if ($mainImg) {
+                                    $galleryList[] = [
+                                        'url' => $mainImg,
+                                        'title' => 'Ảnh đại diện',
+                                        'type' => 'main'
+                                    ];
+                                }
+                                // Thêm ảnh chi tiết sản phẩm
+                                foreach ($product->images as $img) {
+                                    $subPath = Str::startsWith($img->image_path, ['http://', 'https://'])
+                                        ? $img->image_path
+                                        : asset('storage/' . ltrim($img->image_path, '/'));
+                                    if (!in_array($subPath, array_column($galleryList, 'url'))) {
+                                        $galleryList[] = [
+                                            'url' => $subPath,
+                                            'title' => 'Ảnh chi tiết',
+                                            'type' => 'gallery'
+                                        ];
+                                    }
+                                }
+                                // Thêm ảnh từ các biến thể (Màu sắc / Phân loại)
+                                if ($product->has_variants && $product->variants->isNotEmpty()) {
+                                    foreach ($product->variants as $varItem) {
+                                        if ($varItem->image_url && !in_array($varItem->image_url, array_column($galleryList, 'url'))) {
+                                            $galleryList[] = [
+                                                'url' => $varItem->image_url,
+                                                'title' => 'Phân loại: ' . $varItem->name,
+                                                'type' => 'variant',
+                                                'variant_name' => $varItem->name,
+                                            ];
+                                        }
+                                    }
+                                }
+                            @endphp
                             <div class="d-flex gap-2 overflow-auto pb-2 prod-thumb-list">
-                                <div class="prod-thumb-item active" onclick="changeMainImg('{{ $mainImg }}', this)">
-                                    <img src="{{ $mainImg }}" alt="Thumb Main">
-                                </div>
-                                @foreach ($product->images as $img)
-                                    @php
-                                        $subPath = Str::startsWith($img->image_path, ['http://', 'https://'])
-                                            ? $img->image_path
-                                            : asset('storage/' . ltrim($img->image_path, '/'));
-                                    @endphp
-                                    <div class="prod-thumb-item" onclick="changeMainImg('{{ $subPath }}', this)">
-                                        <img src="{{ $subPath }}" alt="Thumb">
+                                @foreach ($galleryList as $index => $gItem)
+                                    <div class="prod-thumb-item {{ $index === 0 ? 'active' : '' }}"
+                                        data-img-src="{{ $gItem['url'] }}"
+                                        data-variant-name="{{ $gItem['variant_name'] ?? '' }}"
+                                        onclick="changeMainImg('{{ $gItem['url'] }}', this)"
+                                        title="{{ $gItem['title'] }}">
+                                        <img src="{{ $gItem['url'] }}" alt="{{ $gItem['title'] }}">
                                     </div>
                                 @endforeach
                             </div>
@@ -121,20 +153,18 @@
                             </div>
                             <div class="border-start ps-3">
                                 <strong class="text-dark">{{ number_format($soldCount) }}</strong> Đã bán
-                            </div>
-                        </div>
-
-                        {{-- Price Box --}}
-                        <div class="prod-price-box p-3 rounded-2 mb-3 d-flex align-items-baseline gap-3">
-                            @if ($product->is_on_sale)
-                                <span class="prod-original-price">{{ number_format($product->price, 0, ',', '.') }}
-                                    ₫</span>
-                                <span class="prod-current-price">{{ number_format($product->current_price, 0, ',', '.') }}
-                                    ₫</span>
-                                <span class="badge bg-danger fs-6">-{{ $product->discount_percentage }}%</span>
+                         {{-- Price Box --}}
+                        <div class="prod-price-box p-3 rounded-2 mb-3 d-flex align-items-baseline gap-3" id="prodPriceBox">
+                            @if ($product->has_variants && $product->variants->isNotEmpty())
+                                <span class="prod-original-price d-none" id="prodOriginalPrice"></span>
+                                <span class="prod-current-price" id="prodCurrentPrice">{{ $product->price_range_display }}</span>
+                                <span class="badge bg-danger fs-6 d-none" id="prodDiscountBadge"></span>
+                            @elseif ($product->is_on_sale)
+                                <span class="prod-original-price" id="prodOriginalPrice">{{ number_format($product->price, 0, ',', '.') }} ₫</span>
+                                <span class="prod-current-price" id="prodCurrentPrice">{{ number_format($product->current_price, 0, ',', '.') }} ₫</span>
+                                <span class="badge bg-danger fs-6" id="prodDiscountBadge">-{{ $product->discount_percentage }}%</span>
                             @else
-                                <span class="prod-current-price">{{ number_format($product->current_price, 0, ',', '.') }}
-                                    ₫</span>
+                                <span class="prod-current-price" id="prodCurrentPrice">{{ number_format($product->current_price, 0, ',', '.') }} ₫</span>
                             @endif
                         </div>
 
@@ -156,20 +186,86 @@
                             </div>
                         </div>
 
-                        {{-- Product Variants (Nếu có) --}}
+                        {{-- Product Variants (Shopee / TikTok Shop Style) --}}
                         @if ($product->has_variants && $product->variants->isNotEmpty())
-                            <div class="mb-3">
-                                <label class="fw-bold text-dark small mb-2 d-block">Phân loại sản phẩm:</label>
-                                <div class="d-flex flex-wrap gap-2" id="variantOptions">
-                                    @foreach ($product->variants as $index => $v)
-                                        <button type="button"
-                                            class="btn btn-outline-secondary btn-sm btn-variant {{ $index === 0 ? 'active' : '' }}"
-                                            data-variant-id="{{ $v->id }}" data-price="{{ $v->price }}"
-                                            data-stock="{{ $v->stock }}" onclick="selectVariant(this)">
-                                            {{ $v->name ?: 'Biến thể #' . ($index + 1) }}
-                                        </button>
-                                    @endforeach
+                            @php
+                                $attrGroups = [];
+                                if (is_array($product->attributes) && !empty($product->attributes) && isset($product->attributes[0]['name'])) {
+                                    $attrGroups = $product->attributes;
+                                } else {
+                                    // Tự động phân tách từ danh sách variants
+                                    $firstVarName = $product->variants->first()->name;
+                                    if (str_contains($firstVarName, ',')) {
+                                        $g1Opts = [];
+                                        $g2Opts = [];
+                                        foreach ($product->variants as $v) {
+                                            $parts = array_map('trim', explode(',', $v->name));
+                                            if (isset($parts[0]) && !in_array($parts[0], $g1Opts)) $g1Opts[] = $parts[0];
+                                            if (isset($parts[1]) && !in_array($parts[1], $g2Opts)) $g2Opts[] = $parts[1];
+                                        }
+                                        $attrGroups = [
+                                            ['name' => 'Màu sắc', 'options' => $g1Opts],
+                                            ['name' => 'Kích cỡ', 'options' => $g2Opts]
+                                        ];
+                                    } else {
+                                        $attrGroups = [
+                                            ['name' => 'Phân loại', 'options' => $product->variants->pluck('name')->unique()->values()->all()]
+                                        ];
+                                    }
+                                }
+                            @endphp
+
+                            <div class="prod-variants-section mb-3" id="productVariantsSection"
+                                data-has-variants="true"
+                                data-groups-count="{{ count($attrGroups) }}"
+                                data-variants="{{ json_encode($product->variants) }}">
+                                
+                                @foreach ($attrGroups as $gIndex => $group)
+                                    <div class="variant-group-row" data-group-index="{{ $gIndex }}">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="variant-group-label fw-bold text-dark small">{{ $group['name'] }}:</span>
+                                            <span class="variant-selected-hint text-danger small fw-semibold ms-2" id="variant_hint_{{ $gIndex }}"></span>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2 variant-options-list">
+                                            @foreach ($group['options'] as $optVal)
+                                                @php
+                                                    $matchedVar = $product->variants->first(function($v) use ($optVal) {
+                                                        return (Str::startsWith($v->name, $optVal) || Str::contains($v->name, $optVal)) && !empty($v->image_path);
+                                                    });
+                                                    $optImg = $matchedVar ? $matchedVar->image_url : null;
+                                                @endphp
+
+                                                @if ($optImg && $gIndex === 0)
+                                                    {{-- Button có thumbnail ảnh (Màu sắc) --}}
+                                                    <button type="button" class="btn btn-variant-option btn-variant-with-img"
+                                                        data-group-index="{{ $gIndex }}"
+                                                        data-value="{{ $optVal }}"
+                                                        onclick="onSelectVariantOption(this, {{ $gIndex }}, '{{ addslashes($optVal) }}')">
+                                                        <img src="{{ $optImg }}" alt="{{ $optVal }}" class="variant-thumb-mini">
+                                                        <span class="variant-text">{{ $optVal }}</span>
+                                                        <i class="fa-solid fa-check variant-check-icon"></i>
+                                                    </button>
+                                                @else
+                                                    {{-- Button text chip --}}
+                                                    <button type="button" class="btn btn-variant-option btn-variant-text-only"
+                                                        data-group-index="{{ $gIndex }}"
+                                                        data-value="{{ $optVal }}"
+                                                        onclick="onSelectVariantOption(this, {{ $gIndex }}, '{{ addslashes($optVal) }}')">
+                                                        <span class="variant-text">{{ $optVal }}</span>
+                                                        <i class="fa-solid fa-check variant-check-icon"></i>
+                                                    </button>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                {{-- Khung tóm tắt phân loại đã chọn --}}
+                                <div id="selectedVariantSummaryWrap" class="p-2 rounded bg-light border small d-none mt-2">
+                                    <span class="text-muted"><i class="fa-solid fa-circle-check text-success me-1"></i>Đã chọn phân loại:</span>
+                                    <strong class="text-danger ms-1" id="selectedVariantFullTitle">--</strong>
                                 </div>
+
                             </div>
                         @endif
 
@@ -191,13 +287,13 @@
                         {{-- ACTION BUTTONS --}}
                         <div class="d-flex gap-3 mt-auto pt-2">
                             {{-- Thêm vào giỏ hàng --}}
-                            <button type="button" class="btn btn-cart-add flex-fill py-2 fw-bold"
+                            <button type="button" class="btn btn-cart-add flex-fill py-2 fw-bold" id="btnAddToCart"
                                 onclick="addToCart({{ $product->id }}, false)">
                                 <i class="fa-solid fa-cart-plus me-2"></i>Thêm Vào Giỏ Hàng
                             </button>
 
                             {{-- Mua ngay --}}
-                            <button type="button" class="btn btn-buy-now flex-fill py-2 fw-bold"
+                            <button type="button" class="btn btn-buy-now flex-fill py-2 fw-bold" id="btnBuyNow"
                                 onclick="addToCart({{ $product->id }}, true)">
                                 Mua Ngay
                             </button>

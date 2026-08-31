@@ -90,6 +90,28 @@
 
                 </div>
 
+                {{-- Danh sách biến thể (nếu có) --}}
+                <div id="dVariantsWrap" class="px-4 py-3 border-top d-none">
+                    <div class="detail-section-title mb-2">
+                        <i class="fa-solid fa-layer-group text-danger me-1"></i> Danh sách phân loại / biến thể (<span id="dVariantsCount">0</span>)
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered text-center align-middle mb-0" style="font-size: 13px;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px;">Ảnh</th>
+                                    <th>Tên biến thể</th>
+                                    <th>Mã SKU</th>
+                                    <th>Giá bán</th>
+                                    <th>Giá sale</th>
+                                    <th>Kho</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dVariantsTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {{-- Mô tả chi tiết --}}
                 <div class="px-4 py-3 border-top">
                     <div class="detail-section-title mb-2">Mô tả chi tiết</div>
