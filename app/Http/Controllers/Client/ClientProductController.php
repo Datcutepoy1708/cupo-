@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,10 +34,12 @@ class ClientProductController extends Controller
 
         // Tính điểm đánh giá trung bình & tổng số đánh giá
         $approvedReviews = $product->reviews;
-        $avgRating = round($approvedReviews->avg('rating') ?: 4.9, 1);
-        $totalReviews = $approvedReviews->count() ?: rand(25, 480);
-        $likesCount = $product->likes_count ?: rand(150, 3200);
-        $soldCount = rand(500, 6800);
+        $avgRating = round((float) $approvedReviews->avg('rating'), 1);
+        $totalReviews = $approvedReviews->count();
+        $likesCount = (int) $product->likes_count;
+        $soldCount = (int) OrderItem::where('product_id', $product->id)
+            ->whereHas('sellerOrder', fn ($query) => $query->where('status', 'completed'))
+            ->sum('quantity');
 
         // Sản phẩm liên quan cùng danh mục
         $relatedProducts = Product::with(['seller.sellerProfile', 'category'])
