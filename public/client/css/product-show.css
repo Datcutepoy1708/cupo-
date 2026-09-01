@@ -249,9 +249,18 @@
 }
 
 @keyframes variantShake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20%,
+    60% {
+        transform: translateX(-6px);
+    }
+    40%,
+    80% {
+        transform: translateX(6px);
+    }
 }
 
 .btn-cart-add {
@@ -261,6 +270,7 @@
     border-radius: 2px;
     font-size: 15px;
     transition: background 0.15s ease;
+    border-radius: 10px;
 }
 .btn-cart-add:hover {
     background: #f8d7da;
@@ -274,6 +284,7 @@
     border-radius: 2px;
     font-size: 15px;
     transition: background 0.15s ease;
+    border-radius: 10px;
 }
 .btn-buy-now:hover {
     background: #b71c1c;

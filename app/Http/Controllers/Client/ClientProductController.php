@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class ClientProductController extends Controller
@@ -49,13 +50,23 @@ class ClientProductController extends Controller
             ->take(6)
             ->get();
 
+        // Nếu người dùng đã đăng nhập: nạp địa chỉ để pre-fill modal Mua Ngay
+        $addresses = collect();
+        $defaultAddress = null;
+        if (Auth::check()) {
+            $addresses = Auth::user()->addresses()->orderByDesc('is_default')->get();
+            $defaultAddress = $addresses->firstWhere('is_default', true) ?? $addresses->first();
+        }
+
         return view('client.products.show', compact(
             'product',
             'avgRating',
             'totalReviews',
             'likesCount',
             'soldCount',
-            'relatedProducts'
+            'relatedProducts',
+            'addresses',
+            'defaultAddress'
         ));
     }
 

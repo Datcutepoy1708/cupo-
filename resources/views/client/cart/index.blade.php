@@ -1,126 +1,260 @@
 @extends('layouts.client.app')
 
-@section('content')
-    <div class="container py-4">
-        <h2 class="h4 fw-bold mb-4">
-            <i class="fa-solid fa-cart-shopping text-danger me-2"></i>Giỏ hàng của tôi ({{ $totalItems }} sản phẩm)
-        </h2>
+@section('page-title', 'Giỏ hàng — Cupo')
 
+@section('content')
+    <div class="container py-4 cart-page-wrapper" id="cartMainWrapper">
+        {{-- Flash Session Alerts --}}
         @if (session('status'))
-            <div class="alert alert-success mb-3">{{ session('status') }}</div>
+            <div class="alert alert-success alert-dismissible fade show mb-3 shadow-sm" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i>{{ session('status') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @elseif (session('error'))
-            <div class="alert alert-danger mb-3">{{ session('error') }}</div>
+            <div class="alert alert-danger alert-dismissible fade show mb-3 shadow-sm" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
 
-        @if ($groupedShops->isEmpty())
-            <div class="content-card text-center py-5">
-                <h5>Giỏ hàng của bạn đang trống!</h5>
-                <p class="text-muted">Hãy khám phá thêm hàng ngàn sản phẩm giá tốt trên Cupo.</p>
-                <a href="{{ route('home') }}" class="btn btn-save px-4 mt-2">
-                    <i class="fa-solid fa-bag-shopping me-2"></i>Mua sắm ngay
-                </a>
+        {{-- Top Promotion & Guarantee Notice --}}
+        <div class="cart-top-notice shadow-sm">
+            <i class="fa-solid fa-truck-fast text-danger"></i>
+            <div>
+                <strong>Miễn phí vận chuyển</strong> cho đơn hàng từ 50.000₫. Áp dụng mã giảm giá tốt nhất khi thanh toán!
             </div>
-        @else
-            <div class="row g-4">
-                {{-- Cột trái: Danh sách các Shop & Sản phẩm --}}
-                <div class="col-lg-8">
-                    @foreach ($groupedShops as $shopData)
-                        <div class="content-card mb-3">
-                            <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
-                                <i class="fa-solid fa-store text-danger me-2"></i>
-                                <span class="fw-bold">{{ $shopData['shop_name'] }}</span>
-                            </div>
+        </div>
 
-                            <div class="cart-items">
-                                @foreach ($shopData['items'] as $item)
-                                    @php
-                                        $unitPrice = $item->variant ? $item->variant->price : $item->product->price;
-                                        $itemSubtotal = $unitPrice * $item->quantity;
-                                    @endphp
-                                    <div class="order-item-row align-items-center py-3 border-bottom">
-                                        <img src="{{ asset($item->product->thumbnail ?? 'https://via.placeholder.com/80') }}"
-                                            alt="{{ $item->product->name }}" class="order-thumb me-3">
+        {{-- Trạng thái Giỏ hàng Trống (Empty State) --}}
+        <div class="cart-empty-container {{ $groupedShops->isEmpty() ? '' : 'd-none' }}" id="cartEmptyContainer">
+            <div class="cart-empty-icon-wrap">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <h4 class="cart-empty-title">Giỏ hàng của bạn còn trống</h4>
+            <p class="cart-empty-desc">Hãy khám phá hàng ngàn sản phẩm chất lượng, giá sốc và ưu đãi độc quyền trên Cupo
+                ngay hôm nay!</p>
+            <a href="{{ route('home') }}" class="btn-shop-now">
+                <i class="fa-solid fa-arrow-left me-1"></i> Mua sắm ngay
+            </a>
+        </div>
 
-                                        <div class="order-info flex-grow-1">
-                                            <h6 class="mb-1 text-truncate" style="max-width: 300px;">
+        {{-- Nội dung Giỏ hàng khi có sản phẩm --}}
+        <div class="{{ $groupedShops->isEmpty() ? 'd-none' : '' }}" id="cartContentContainer">
+            {{-- Header Bar (Desktop Table Style) --}}
+            <div class="cart-header-card">
+                <div class="col-prod-main">
+                    <label class="cupo-checkbox">
+                        <input type="checkbox" class="cart-select-all" checked>
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label">Sản phẩm ({{ $totalItems }})</span>
+                    </label>
+                </div>
+                <div class="col-unit-price">Đơn giá</div>
+                <div class="col-quantity">Số lượng</div>
+                <div class="col-subtotal">Số tiền</div>
+                <div class="col-action">Thao tác</div>
+            </div>
+
+            {{-- Danh sách các Shop & Sản phẩm --}}
+            <div id="cartShopList">
+                @foreach ($groupedShops as $shopData)
+                    <div class="cart-shop-group" data-seller-id="{{ $shopData['seller_id'] }}">
+                        {{-- Shop Header --}}
+                        <div class="cart-shop-header">
+                            <label class="cupo-checkbox">
+                                <input type="checkbox" class="shop-select-checkbox" checked>
+                                <span class="checkmark"></span>
+                            </label>
+
+                            <span class="shop-badge-preferred">Yêu thích</span>
+
+                            @if (!empty($shopData['shop_profile']))
+                                <a href="{{ route('shops.show', $shopData['shop_profile']) }}" class="cart-shop-title"
+                                    title="Xem gian hàng">
+                                    <i class="fa-solid fa-store text-danger"></i>
+                                    <span>{{ $shopData['shop_name'] }}</span>
+                                    <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                                </a>
+                            @else
+                                <span class="cart-shop-title">
+                                    <i class="fa-solid fa-store text-danger"></i>
+                                    <span>{{ $shopData['shop_name'] }}</span>
+                                </span>
+                            @endif
+
+                            <button type="button" class="btn-chat-shop"
+                                onclick="window.showCartToast('Tính năng Chat với người bán đang được kích hoạt!', 'info')">
+                                <i class="fa-regular fa-comment-dots"></i> Chat ngay
+                            </button>
+                        </div>
+
+                        {{-- Danh sách sản phẩm của Shop --}}
+                        <div class="cart-items-wrapper">
+                            @foreach ($shopData['items'] as $item)
+                                @php
+                                    $unitPrice = $item->variant
+                                        ? $item->variant->current_price
+                                        : $item->product->current_price;
+                                    $originalPrice = $item->variant ? $item->variant->price : $item->product->price;
+                                    $isOnSale = $item->variant
+                                        ? $item->variant->is_on_sale
+                                        : $item->product->is_on_sale;
+                                    $discountPct = $item->variant
+                                        ? $item->variant->discount_percentage
+                                        : $item->product->discount_percentage;
+                                    $maxStock = $item->variant ? $item->variant->stock : $item->product->stock;
+                                    $itemSubtotal = $unitPrice * $item->quantity;
+                                    $thumbUrl =
+                                        $item->variant?->image_url ??
+                                        ($item->product->thumbnail_url ?? 'https://via.placeholder.com/80');
+                                @endphp
+
+                                <div class="cart-item-row" data-item-id="{{ $item->id }}"
+                                    data-current-price="{{ $unitPrice }}" data-original-price="{{ $originalPrice }}"
+                                    data-current-qty="{{ $item->quantity }}" data-max-stock="{{ $maxStock }}"
+                                    data-product-name="{{ $item->product->name }}"
+                                    data-variant-name="{{ $item->variant ? $item->variant->name : '' }}"
+                                    data-update-url="{{ route('cart.update', $item->id) }}"
+                                    data-delete-url="{{ route('cart.destroy', $item->id) }}">
+
+                                    {{-- Cột Checkbox & Thông tin Sản phẩm --}}
+                                    <div class="cart-product-cell col-prod-main">
+                                        <label class="cupo-checkbox me-2">
+                                            <input type="checkbox" class="item-select-checkbox" checked>
+                                            <span class="checkmark"></span>
+                                        </label>
+
+                                        <a href="{{ route('products.show', $item->product->slug) }}">
+                                            <img src="{{ $thumbUrl }}" alt="{{ $item->product->name }}"
+                                                class="cart-product-thumb">
+                                        </a>
+
+                                        <div class="cart-product-meta">
+                                            <a href="{{ route('products.show', $item->product->slug) }}"
+                                                class="cart-product-name" title="{{ $item->product->name }}">
                                                 {{ $item->product->name }}
-                                            </h6>
+                                            </a>
+
                                             @if ($item->variant)
-                                                <span class="badge bg-light text-dark border">
-                                                    Phân loại: {{ $item->variant->name }}
-                                                </span>
+                                                <div class="cart-variant-tag">
+                                                    <span>Phân loại:</span>
+                                                    <strong>{{ $item->variant->name }}</strong>
+                                                </div>
                                             @endif
-                                            <div class="text-danger fw-bold mt-1">
-                                                {{ number_format($unitPrice) }}₫
+
+                                            <div class="cart-guarantee-tag">
+                                                <i class="fa-solid fa-shield-check"></i> Đổi ý miễn phí 15 ngày
                                             </div>
                                         </div>
-
-                                        {{-- Cập nhật số lượng --}}
-                                        <form action="{{ route('cart.update', $item->id) }}" method="POST"
-                                            class="d-flex align-items-center me-3">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
-                                                class="form-control form-control-sm text-center me-2" style="width: 70px;">
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cập nhật số lượng">
-                                                <i class="fa-solid fa-rotate"></i>
-                                            </button>
-                                        </form>
-
-                                        <div class="fw-bold text-end me-3" style="min-width: 100px;">
-                                            {{ number_format($itemSubtotal) }}₫
-                                        </div>
-
-                                        {{-- Xóa mục khỏi giỏ --}}
-                                        <form action="{{ route('cart.destroy', $item->id) }}" method="POST"
-                                            onsubmit="return confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
                                     </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
 
-                    {{-- Nút xóa sạch giỏ hàng --}}
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <a href="{{ route('home') }}" class="btn btn-outline-secondary">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Tiếp tục mua sắm
-                        </a>
-                        <form action="{{ route('cart.clear') }}" method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa sạch toàn bộ giỏ hàng?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger">
-                                <i class="fa-solid fa-broom me-2"></i>Xóa toàn bộ giỏ hàng
-                            </button>
-                        </form>
+                                    {{-- Cột Đơn giá --}}
+                                    <div class="cart-unit-price-wrap col-unit-price">
+                                        @if ($isOnSale && $originalPrice > $unitPrice)
+                                            <span
+                                                class="original-price-val">{{ number_format($originalPrice, 0, ',', '.') }}₫</span>
+                                        @endif
+                                        <div>
+                                            <span
+                                                class="current-price-val">{{ number_format($unitPrice, 0, ',', '.') }}₫</span>
+                                            @if ($isOnSale && $discountPct > 0)
+                                                <span class="discount-badge-val">-{{ $discountPct }}%</span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    {{-- Cột Bộ tăng giảm số lượng --}}
+                                    <div class="col-quantity text-center">
+                                        <div class="cart-quantity-stepper">
+                                            <button type="button" class="stepper-btn btn-minus"
+                                                {{ $item->quantity <= 1 ? 'disabled' : '' }}>
+                                                <i class="fa-solid fa-minus" style="font-size: 0.75rem;"></i>
+                                            </button>
+                                            <input type="number" class="stepper-input" value="{{ $item->quantity }}"
+                                                min="1" max="{{ $maxStock }}">
+                                            <button type="button" class="stepper-btn btn-plus"
+                                                {{ $item->quantity >= $maxStock ? 'disabled' : '' }}>
+                                                <i class="fa-solid fa-plus" style="font-size: 0.75rem;"></i>
+                                            </button>
+                                        </div>
+                                        @if ($maxStock <= 5)
+                                            <div class="stock-warning-text">Chỉ còn {{ $maxStock }} sản phẩm</div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Cột Thành tiền --}}
+                                    <div class="cart-subtotal-wrap col-subtotal">
+                                        <span
+                                            class="subtotal-price-val">{{ number_format($itemSubtotal, 0, ',', '.') }}₫</span>
+                                    </div>
+
+                                    {{-- Cột Thao tác xóa --}}
+                                    <div class="cart-action-wrap col-action">
+                                        <button type="button" class="btn-remove-item" title="Xóa sản phẩm">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
+                @endforeach
+            </div>
 
-                {{-- Cột phải: Tóm tắt đơn hàng & Checkout --}}
-                <div class="col-lg-4">
-                    <div class="content-card position-sticky" style="top: 80px;">
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">Tóm tắt đơn hàng</h5>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Tổng số lượng sản phẩm:</span>
-                            <span class="fw-bold">{{ $totalItems }}</span>
+            {{-- Dải Cupo Voucher --}}
+            <div class="cart-voucher-strip">
+                <div class="cart-voucher-left">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Cupo Voucher</span>
+                </div>
+                <a href="{{ route('promotions') }}" class="cart-voucher-link">
+                    <span>Xem thêm mã giảm giá</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+                </a>
+            </div>
+
+            {{-- Thanh Thanh Toán Thông Minh Dính Đáy (Sticky Bottom Checkout Bar) --}}
+            <div class="cart-sticky-bottom" id="cartStickyBar">
+                <div class="container">
+                    <div class="sticky-bar-inner">
+                        <div class="sticky-actions-left">
+                            <label class="cupo-checkbox">
+                                <input type="checkbox" class="cart-select-all" checked>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">Chọn tất cả (<span
+                                        class="selected-items-count">{{ $totalItems }}</span>)</span>
+                            </label>
+
+                            <button type="button" class="btn-bulk-delete" id="btnBulkDelete">
+                                <i class="fa-solid fa-trash-can me-1"></i> Xóa các mục đã chọn
+                            </button>
+
+                            <a href="{{ route('home') }}" class="btn-bulk-delete text-decoration-none">
+                                <i class="fa-solid fa-bag-shopping me-1"></i> Tiếp tục mua sắm
+                            </a>
                         </div>
-                        <div class="d-flex justify-content-between mb-3 fs-5">
-                            <span class="fw-bold">Tổng tiền tạm tính:</span>
-                            <span class="fw-bold text-danger">{{ number_format($totalPrice) }}₫</span>
+
+                        <div class="sticky-summary-right">
+                            <div class="total-payment-box">
+                                <div class="total-payment-label">
+                                    Tổng thanh toán (<span class="selected-items-count">{{ $totalItems }}</span> sản
+                                    phẩm):
+                                    <span class="total-payment-amount"
+                                        id="totalPaymentAmount">{{ number_format($totalPrice, 0, ',', '.') }}₫</span>
+                                </div>
+                                <div class="total-saved-label d-none" id="totalSavedBox">
+                                    Tiết kiệm: <span id="totalSavedAmount" class="fw-semibold text-danger">0₫</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-checkout-now" id="btnCheckoutNow"
+                                data-checkout-url="{{ route('checkout.index') }}">
+                                <i class="fa-solid fa-credit-card"></i> Mua Hàng
+                            </button>
                         </div>
-                        <hr>
-                        <a href="{{ route('customer.orders.index') }}" class="btn btn-save w-100 py-2 fs-6">
-                            <i class="fa-solid fa-credit-card me-2"></i>Tiến hành Đặt hàng
-                        </a>
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
     </div>
 @endsection

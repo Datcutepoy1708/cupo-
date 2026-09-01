@@ -33,6 +33,8 @@
         <link href="{{ asset('client/css/profile.css') }}" rel="stylesheet">
     @elseif (request()->routeIs('seller.shop'))
         <link href="{{ asset('client/css/seller-store.css') }}" rel="stylesheet">
+    @elseif (request()->routeIs('cart.*'))
+        <link href="{{ asset('client/css/cart.css') }}" rel="stylesheet">
     @endif
     @stack('styles')
     {{-- embed modal css --}}

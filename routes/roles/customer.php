@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // API Đặt hàng & Checkout Tách Đơn
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::put('/reviews/{review}', [ProductReviewController::class, 'update'])->name('products.reviews.update');
     Route::delete('/reviews/{review}', [ProductReviewController::class, 'destroy'])->name('products.reviews.destroy');
