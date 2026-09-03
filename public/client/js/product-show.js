@@ -293,10 +293,22 @@ document.addEventListener("DOMContentLoaded", function () {
                         ).format(data.likes_count);
                     }
                     if (btn) {
+                        const labelEl = document.getElementById("likeLabelText");
+                        const iconEl = document.getElementById("likeHeartIcon");
                         if (data.liked) {
                             btn.classList.add("liked");
+                            if (labelEl) labelEl.innerText = "Đã thích";
+                            if (iconEl) {
+                                iconEl.classList.remove("fa-regular");
+                                iconEl.classList.add("fa-solid");
+                            }
                         } else {
                             btn.classList.remove("liked");
+                            if (labelEl) labelEl.innerText = "Thích";
+                            if (iconEl) {
+                                iconEl.classList.remove("fa-solid");
+                                iconEl.classList.add("fa-regular");
+                            }
                         }
                     }
                 }

@@ -95,7 +95,10 @@
                                         </span>
                                     </div>
 
-                                    <div class="order-row-actions text-end mt-2">
+                                    <div class="order-row-actions text-end mt-2 d-flex justify-content-end gap-2">
+                                        <x-chat-button :seller-id="$sellerOrder->seller_id" class="btn btn-sm btn-outline-danger">
+                                            <i class="fa-regular fa-comment-dots me-1"></i>Chat với Shop
+                                        </x-chat-button>
                                         @if ($order->payment_status === 'unpaid')
                                             <a href="#" class="btn btn-sm btn-danger">Thanh toán ngay</a>
                                         @elseif ($sellerOrder->status === 'completed')

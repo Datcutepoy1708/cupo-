@@ -100,15 +100,24 @@
 
 .btn-like-product {
     background: transparent;
-    border: 1px solid #ffccd5;
-    color: #c62828;
+    border: 1px solid #d0d0d0;
+    color: #757575;
     font-size: 13px;
     padding: 4px 12px;
     border-radius: 20px;
     transition: all 0.2s ease;
 }
-.btn-like-product:hover,
+.btn-like-product:hover {
+    background: #f5f5f5;
+    color: #616161;
+    border-color: #bdbdbd;
+}
 .btn-like-product.liked {
+    background: #fdecea;
+    color: #b71c1c;
+    border-color: #b71c1c;
+}
+.btn-like-product.liked:hover {
     background: #fdecea;
     color: #b71c1c;
     border-color: #b71c1c;

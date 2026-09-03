@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Client\AddressController;
 use App\Http\Controllers\Client\CartController;
+use App\Http\Controllers\Client\ChatController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CustomerOrderController;
 use App\Http\Controllers\Client\CustomerVoucherController;
@@ -55,5 +56,14 @@ Route::middleware('auth')->group(function () {
 
     // Lưu / Nhận Mã giảm giá (Customer Vouchers)
     Route::post('/customer/vouchers/{coupon}/save', [CustomerVoucherController::class, 'save'])->name('customer.vouchers.save');
+
+    // Chat khách hàng — người bán
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/rooms', [ChatController::class, 'index'])->name('rooms.index');
+        Route::post('/rooms', [ChatController::class, 'store'])->name('rooms.store');
+        Route::get('/rooms/{chatRoom}/messages', [ChatController::class, 'messages'])->name('rooms.messages');
+        Route::post('/rooms/{chatRoom}/messages', [ChatController::class, 'send'])->name('rooms.messages.store');
+        Route::post('/rooms/{chatRoom}/read', [ChatController::class, 'markRead'])->name('rooms.read');
+    });
 
 });

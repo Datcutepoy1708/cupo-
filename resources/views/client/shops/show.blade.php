@@ -61,10 +61,9 @@
                                 <i
                                     class="fa-regular {{ $isFollowed ? 'fa-circle-check' : 'fa-heart' }} me-1"></i>{{ $isFollowed ? 'Đang theo dõi' : 'Theo dõi' }}
                             </button>
-                            @if (Route::has('chat.room'))
-                                <a href="{{ route('chat.room', ['seller_id' => $shop->user_id]) }}" class="btn btn-save"><i
-                                        class="fa-solid fa-comment-dots me-1"></i>Chat ngay</a>
-                            @endif
+                            <x-chat-button :seller-id="$shop->user_id" class="btn btn-save">
+                                <i class="fa-solid fa-comment-dots me-1"></i>Chat ngay
+                            </x-chat-button>
                         </div>
                     </div>
                 </div>

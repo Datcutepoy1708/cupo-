@@ -1,6 +1,6 @@
 <div class="card border-0 shadow-sm rounded-3 mb-4 p-3 p-lg-4" style="background:#fff;" id="reviews-section">
     <h2 class="h5 fw-bold text-dark border-bottom pb-2 mb-3">
-        ĐÁNH GIÁ SẢN PHẨM (5 SAO)
+        ĐÁNH GIÁ SẢN PHẨM
     </h2>
 
     {{-- Rating Summary Bar --}}

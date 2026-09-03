@@ -11,7 +11,8 @@
         $sellerObj = $product->seller;
         $profile = $sellerObj->sellerProfile ?? null;
         $shopName = $profile->shop_name ?? ($sellerObj->name ?? 'Gian Hàng Chính Hãng');
-        $avatarUrl = $profile?->logo ?: ($sellerObj->avatar ? asset('storage/' . ltrim($sellerObj->avatar, '/')) : null);
+        $avatarUrl =
+            $profile?->logo ?: ($sellerObj->avatar ? asset('storage/' . ltrim($sellerObj->avatar, '/')) : null);
         $shopNameWords = preg_split('/\s+/', trim($shopName));
         $shopInitials = mb_strtoupper(
             mb_substr($shopNameWords[0] ?? 'G', 0, 1) .
@@ -20,6 +21,7 @@
         $shopProductCount = $profile?->products()->where('status', 'approved')->count() ?? 0;
         $shopFollowersCount = $profile?->followers()->count() ?? 0;
         $reviews = $product->reviews;
+        $isLiked = (bool) session('liked_product_' . $product->id);
 
         $mainImg = $product->thumbnail_url ?? asset('images/product-placeholder.png');
         $galleryList = [];
@@ -57,7 +59,11 @@
 
         $attrGroups = [];
         if ($product->has_variants && $product->variants->isNotEmpty()) {
-            if (is_array($product->attributes) && !empty($product->attributes) && isset($product->attributes[0]['name'])) {
+            if (
+                is_array($product->attributes) &&
+                !empty($product->attributes) &&
+                isset($product->attributes[0]['name'])
+            ) {
                 $attrGroups = $product->attributes;
             } else {
                 $firstVarName = $product->variants->first()->name;
@@ -96,39 +102,45 @@
             @include('client.products.partials.breadcrumb', [
                 'product' => $product,
             ])
-            @include('client.products.partials.card-info', [
-                'product' => $product,
-                'mainImg' => $mainImg,
-                'galleryList' => $galleryList,
-                'attrGroups' => $attrGroups,
-                'likesCount' => $likesCount,
-                'avgRating' => $avgRating,
-                'totalReviews' => $totalReviews,
-                'soldCount' => $soldCount,
-            ])
-            @include('client.products.partials.shop-info', [
-                'sellerObj' => $sellerObj,
-                'profile' => $profile,
-                'shopName' => $shopName,
-                'avatarUrl' => $avatarUrl,
-                'shopInitials' => $shopInitials,
-                'totalReviews' => $totalReviews,
-                'shopProductCount' => $shopProductCount,
-                'shopFollowersCount' => $shopFollowersCount,
-            ])
-            @include('client.products.partials.product-detail', [
-                'product' => $product,
-                'profile' => $profile,
-                'shopName' => $shopName,
-            ])
-            @include('client.products.partials.product-reviews', [
-                'reviews' => $reviews,
-                'totalReviews' => $totalReviews,
-                'avgRating' => $avgRating,
-            ])
-            @include('client.products.partials.product-suggestion', [
-                'relatedProducts' => $relatedProducts,
-            ])
+            <div class="card border-0 shadow-sm rounded-3 mb-4 overflow-hidden p-3 p-lg-4" style="background:#fff;">
+                <div class="row g-4">
+
+                    @include('client.products.partials.card-info', [
+                        'product' => $product,
+                        'mainImg' => $mainImg,
+                        'galleryList' => $galleryList,
+                        'attrGroups' => $attrGroups,
+                        'likesCount' => $likesCount,
+                        'avgRating' => $avgRating,
+                        'totalReviews' => $totalReviews,
+                        'soldCount' => $soldCount,
+                        'isLiked' => $isLiked,
+                    ])
+                    @include('client.products.partials.shop-info', [
+                        'sellerObj' => $sellerObj,
+                        'profile' => $profile,
+                        'shopName' => $shopName,
+                        'avatarUrl' => $avatarUrl,
+                        'shopInitials' => $shopInitials,
+                        'totalReviews' => $totalReviews,
+                        'shopProductCount' => $shopProductCount,
+                        'shopFollowersCount' => $shopFollowersCount,
+                    ])
+                    @include('client.products.partials.product-detail', [
+                        'product' => $product,
+                        'profile' => $profile,
+                        'shopName' => $shopName,
+                    ])
+                    @include('client.products.partials.product-reviews', [
+                        'reviews' => $reviews,
+                        'totalReviews' => $totalReviews,
+                        'avgRating' => $avgRating,
+                    ])
+                    @include('client.products.partials.product-suggestion', [
+                        'relatedProducts' => $relatedProducts,
+                    ])
+                </div>
+            </div>
         </div>
     </div>
 @endsection

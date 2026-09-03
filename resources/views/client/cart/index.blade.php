@@ -82,10 +82,9 @@
                                 </span>
                             @endif
 
-                            <button type="button" class="btn-chat-shop"
-                                onclick="window.showCartToast('Tính năng Chat với người bán đang được kích hoạt!', 'info')">
+                            <x-chat-button :seller-id="$shopData['seller_id']" class="btn-chat-shop">
                                 <i class="fa-regular fa-comment-dots"></i> Chat ngay
-                            </button>
+                            </x-chat-button>
                         </div>
 
                         {{-- Danh sách sản phẩm của Shop --}}

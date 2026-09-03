@@ -83,6 +83,19 @@ class User extends Authenticatable
             ->withPivot('followed_at');
     }
 
+    public function chatRooms()
+    {
+        if ($this->role === 'customer') {
+            return $this->hasMany(ChatRoom::class, 'buyer_id');
+        }
+
+        if ($this->role === 'seller') {
+            return $this->hasMany(ChatRoom::class, 'seller_id');
+        }
+
+        return $this->hasMany(ChatRoom::class, 'buyer_id')->whereRaw('1 = 0');
+    }
+
     public function savedCoupons()
     {
         return $this->belongsToMany(Coupon::class, 'customer_coupons')

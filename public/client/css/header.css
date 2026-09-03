@@ -4,6 +4,17 @@ header {
     top: -2px;
     box-shadow: 0 8px 10px rgba(0, 0, 0, 0.15);
 }
+
+:root {
+    --cupo-red: #c62828;
+    --cupo-red-dark: #a81e1e;
+    --cupo-red-soft: #fff3f1;
+    --cupo-text: #1f1f1f;
+    --cupo-muted: #7c7c7c;
+    --cupo-border: rgba(198, 40, 40, 0.14);
+    --cupo-shadow: 0 18px 40px rgba(41, 13, 13, 0.18);
+}
+
 /* ===== Nền & khung navbar ===== */
 .navbar.bg-body-tertiary {
     background-color: #c62828 !important; /* đỏ chủ đạo */

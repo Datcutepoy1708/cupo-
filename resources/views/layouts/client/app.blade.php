@@ -20,6 +20,11 @@
     <link href="{{ asset('client/css/common.css') }}" rel="stylesheet">
     {{-- embed header css --}}
     <link href="{{ asset('client/css/header.css') }}" rel="stylesheet">
+    @auth
+        @if (in_array(auth()->user()->role ?? '', ['customer', 'seller'], true))
+            <link href="{{ asset('client/css/chat.css') }}" rel="stylesheet">
+        @endif
+    @endauth
     {{-- embed footer css --}}
     <link href="{{ asset('client/css/footer.css') }}" rel="stylesheet">
     {{-- embed content css --}}
@@ -52,6 +57,12 @@
     <footer>
         @include('layouts.client.footer')
     </footer>
+
+    @auth
+        @if (in_array(auth()->user()->role ?? '', ['customer', 'seller'], true))
+            @include('layouts.client.partials.chat-widget')
+        @endif
+    @endauth
 
     @auth
         <form method="POST" action="{{ route('logout') }}" id="logoutForm">
@@ -90,6 +101,12 @@
 
     {{-- embed cart js --}}
     <script src="{{ asset('client/js/cart.js') }}"></script>
+
+    @auth
+        @if (in_array(auth()->user()->role ?? '', ['customer', 'seller'], true))
+            <script src="{{ asset('client/js/chat.js') }}"></script>
+        @endif
+    @endauth
 
     @stack('scripts')
 </body>
