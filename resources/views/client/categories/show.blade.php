@@ -24,15 +24,8 @@
             </ol>
         </nav>
 
-        {{-- Top Category Banner (nếu có) --}}
-        @if (isset($categoryBanner) && $categoryBanner)
-            <div class="cat-top-banner mb-4">
-                <a href="{{ $categoryBanner->link_url ?: '#' }}">
-                    <img src="{{ Str::contains($categoryBanner->image_path, 'http') ? $categoryBanner->image_path : asset('storage/' . $categoryBanner->image_path) }}"
-                         alt="{{ $categoryBanner->title }}" class="img-fluid rounded-3 w-100 shadow-sm" style="max-height: 200px; object-fit: cover;">
-                </a>
-            </div>
-        @endif
+        {{-- Top Category Banner (category_top) --}}
+        @include('client.categories.partials.top-banner')
 
         {{-- Main 2 Columns Layout --}}
         <div class="row g-4">
@@ -137,6 +130,9 @@
                     </div>
 
                 </div>
+                
+                {{-- Banner Sidebar Khuyến Mãi (sidebar) --}}
+                @include('client.categories.partials.sidebar-banners')
             </div>
 
             {{-- ===== CỘT PHẢI: KẾT QUẢ SẢN PHẨM & TOOLBAR SẮP XẾP ===== --}}

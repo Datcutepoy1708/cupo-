@@ -25,9 +25,23 @@ class ClientCategoryController extends Controller
             ->where('status', true)
             ->get();
 
-        $categoryBanner = Banner::active()->atPosition('category_top')->first();
+        // 1. Banner đầu trang danh mục (category_top) qua Cache
+        $categoryBanners = collect(Cache::remember('banners:category_top', 3600, function () {
+            return Banner::active()->atPosition('category_top')->get()->toArray();
+        }))->map(fn ($item) => (object) $item);
+        $categoryBanner = $categoryBanners->first();
 
-        return view('client.categories.categories-list', compact('categories', 'categoryBanner'));
+        // 2. Banner thanh bên (sidebar) qua Cache
+        $sidebarBanners = collect(Cache::remember('banners:sidebar', 3600, function () {
+            return Banner::active()->atPosition('sidebar')->get()->toArray();
+        }))->map(fn ($item) => (object) $item);
+
+        return view('client.categories.categories-list', compact(
+            'categories',
+            'categoryBanners',
+            'categoryBanner',
+            'sidebarBanners'
+        ));
     }
 
     /**
@@ -74,12 +88,15 @@ class ClientCategoryController extends Controller
         });
 
         // 4. Banner đầu trang danh mục (category_top) qua Redis Cache
-        $bannerArr = Cache::remember('banners:category_top', 3600, function () {
-            $b = Banner::active()->atPosition('category_top')->first();
+        $categoryBanners = collect(Cache::remember('banners:category_top', 3600, function () {
+            return Banner::active()->atPosition('category_top')->get()->toArray();
+        }))->map(fn ($item) => (object) $item);
+        $categoryBanner = $categoryBanners->first();
 
-            return $b ? $b->toArray() : null;
-        });
-        $categoryBanner = $bannerArr ? (object) $bannerArr : null;
+        // Banner thanh bên (sidebar) qua Redis Cache
+        $sidebarBanners = collect(Cache::remember('banners:sidebar', 3600, function () {
+            return Banner::active()->atPosition('sidebar')->get()->toArray();
+        }))->map(fn ($item) => (object) $item);
 
         // 5. Khởi tạo truy vấn sản phẩm
         $query = Product::with(['seller.sellerProfile', 'category'])
@@ -132,7 +149,9 @@ class ClientCategoryController extends Controller
             'selectedChild',
             'subCategories',
             'allRootCategories',
+            'categoryBanners',
             'categoryBanner',
+            'sidebarBanners',
             'products',
             'sort'
         ));

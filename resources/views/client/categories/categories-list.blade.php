@@ -18,6 +18,9 @@
                 </ol>
             </nav>
 
+            {{-- 1. Banner Đầu Trang Danh Mục (category_top) --}}
+            @include('client.categories.partials.top-banner')
+
             {{-- Header Tiêu Đề --}}
             <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
                 <h4 class="fw-bold mb-0 text-dark">
@@ -27,80 +30,154 @@
             </div>
 
             @php
-                // Chia danh mục thành 3 cột cố định độc lập
-                $columns = [[], [], []];
+                $hasSidebar = isset($sidebarBanners) && $sidebarBanners->isNotEmpty();
+                $numCols = $hasSidebar ? 2 : 3;
+                $columns = [];
+                for ($i = 0; $i < $numCols; $i++) {
+                    $columns[$i] = [];
+                }
                 foreach ($categories as $index => $root) {
-                    $columns[$index % 3][] = $root;
+                    $columns[$index % $numCols][] = $root;
                 }
             @endphp
 
-            {{-- 3 Cột Flexbox Độc Lập --}}
-            <div class="row g-4 align-items-start">
-                @foreach ($columns as $colIndex => $colCategories)
-                    <div class="col-lg-4 col-md-6 d-flex flex-column gap-4">
-                        @foreach ($colCategories as $root)
-                            <div class="card border-0 shadow-sm p-3 rounded-3 cat-card-item" style="background:#fff;">
+            @if ($hasSidebar)
+                {{-- Bố cục có Banner Sidebar: Cột trái (Sidebar) + Cột phải (Lưới danh mục 2 cột) --}}
+                <div class="row g-4 align-items-start">
 
-                                {{-- Header danh mục gốc --}}
-                                <div
-                                    class="d-flex align-items-center justify-content-between pb-3 mb-2 border-bottom cat-root-header">
-                                    <a href="{{ url('/categories/' . $root->slug) }}"
-                                        class="fw-bold text-dark text-decoration-none h5 mb-0 hover-red">
-                                        {{ $root->name }}
-                                    </a>
+                    {{-- CỘT TRÁI: SIDEBAR BANNER KHUYẾN MÃI --}}
+                    <div class="col-lg-4 col-xl-3 order-2 order-lg-1">
+                        <div class="cat-sidebar-sticky">
+                            @include('client.categories.partials.sidebar-banners')
+                        </div>
+                    </div>
 
-                                    <span class="badge bg-danger rounded-pill px-3 py-2">{{ $root->products_count ?? 0 }}
-                                        SP</span>
-                                </div>
+                    {{-- CỘT PHẢI: LƯỚI DANH MỤC --}}
+                    <div class="col-lg-8 col-xl-9 order-1 order-lg-2">
+                        <div class="row g-4 align-items-start">
+                            @foreach ($columns as $colIndex => $colCategories)
+                                <div class="col-md-6 d-flex flex-column gap-4">
+                                    @foreach ($colCategories as $root)
+                                        <div class="card border-0 shadow-sm p-3 rounded-3 cat-card-item" style="background:#fff;">
 
-                                {{-- Dropdown danh mục con (Chỉ đẩy các phần tử BÊN DƯỚI thuộc cùng 1 cột) --}}
-                                <div class="pt-2">
-                                    <button
-                                        class="btn btn-outline-danger btn-sm w-100 dropdown-toggle d-flex align-items-center justify-content-between px-3 py-2 rounded-2 cat-collapse-btn"
-                                        type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#catCollapse{{ $root->id }}" aria-expanded="false"
-                                        aria-controls="catCollapse{{ $root->id }}">
-                                        <span>
-                                            <i class="fa-solid fa-list-ul me-2"></i>Danh mục con
-                                            ({{ $root->children ? $root->children->count() : 0 }})
-                                        </span>
-                                    </button>
+                                            {{-- Header danh mục gốc --}}
+                                            <div class="d-flex align-items-center justify-content-between pb-3 mb-2 border-bottom cat-root-header">
+                                                <a href="{{ url('/categories/' . $root->slug) }}"
+                                                   class="fw-bold text-dark text-decoration-none h5 mb-0 hover-red">
+                                                    {{ $root->name }}
+                                                </a>
+                                                <span class="badge bg-danger rounded-pill px-3 py-2">{{ $root->products_count ?? 0 }} SP</span>
+                                            </div>
 
-                                    <div class="collapse mt-2" id="catCollapse{{ $root->id }}">
-                                        <div class="card card-body border-0 bg-light p-2 rounded-2">
-                                            @if ($root->children && $root->children->isNotEmpty())
-                                                <ul class="cat-dropdown-list mb-0">
-                                                    @foreach ($root->children as $child)
-                                                        <li>
-                                                            <a class="cat-dropdown-link d-flex align-items-center justify-content-between py-2 px-3 text-decoration-none"
-                                                                href="{{ url('/categories/' . $child->slug) }}">
-                                                                <span>
-                                                                    <i
-                                                                        class="fa-solid fa-angle-right me-2 text-danger small"></i>
-                                                                    {{ $child->name }}
-                                                                </span>
-                                                                <span
-                                                                    class="badge bg-white text-secondary border rounded-pill small">
-                                                                    {{ $child->products_count ?? 0 }} SP
-                                                                </span>
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @else
-                                                <div class="text-center text-muted small py-2">
-                                                    <i class="fa-solid fa-circle-info me-1"></i>Không có danh mục con
+                                            {{-- Dropdown danh mục con --}}
+                                            <div class="pt-2">
+                                                <button class="btn btn-outline-danger btn-sm w-100 dropdown-toggle d-flex align-items-center justify-content-between px-3 py-2 rounded-2 cat-collapse-btn"
+                                                        type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#catCollapse{{ $root->id }}" aria-expanded="false"
+                                                        aria-controls="catCollapse{{ $root->id }}">
+                                                    <span>
+                                                        <i class="fa-solid fa-list-ul me-2"></i>Danh mục con ({{ $root->children ? $root->children->count() : 0 }})
+                                                    </span>
+                                                </button>
+
+                                                <div class="collapse mt-2" id="catCollapse{{ $root->id }}">
+                                                    <div class="card card-body border-0 bg-light p-2 rounded-2">
+                                                        @if ($root->children && $root->children->isNotEmpty())
+                                                            <ul class="cat-dropdown-list mb-0">
+                                                                @foreach ($root->children as $child)
+                                                                    <li>
+                                                                        <a class="cat-dropdown-link d-flex align-items-center justify-content-between py-2 px-3 text-decoration-none"
+                                                                           href="{{ url('/categories/' . $child->slug) }}">
+                                                                            <span>
+                                                                                <i class="fa-solid fa-angle-right me-2 text-danger small"></i>
+                                                                                {{ $child->name }}
+                                                                            </span>
+                                                                            <span class="badge bg-white text-secondary border rounded-pill small">
+                                                                                {{ $child->products_count ?? 0 }} SP
+                                                                            </span>
+                                                                        </a>
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
+                                                        @else
+                                                            <div class="text-center text-muted small py-2">
+                                                                <i class="fa-solid fa-circle-info me-1"></i>Không có danh mục con
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            @endif
+                                            </div>
+
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                </div>
+            @else
+                {{-- Bố cục mặc định không có Sidebar: 3 cột độc lập --}}
+                <div class="row g-4 align-items-start">
+                    @foreach ($columns as $colIndex => $colCategories)
+                        <div class="col-lg-4 col-md-6 d-flex flex-column gap-4">
+                            @foreach ($colCategories as $root)
+                                <div class="card border-0 shadow-sm p-3 rounded-3 cat-card-item" style="background:#fff;">
+
+                                    {{-- Header danh mục gốc --}}
+                                    <div class="d-flex align-items-center justify-content-between pb-3 mb-2 border-bottom cat-root-header">
+                                        <a href="{{ url('/categories/' . $root->slug) }}"
+                                           class="fw-bold text-dark text-decoration-none h5 mb-0 hover-red">
+                                            {{ $root->name }}
+                                        </a>
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">{{ $root->products_count ?? 0 }} SP</span>
+                                    </div>
+
+                                    {{-- Dropdown danh mục con --}}
+                                    <div class="pt-2">
+                                        <button class="btn btn-outline-danger btn-sm w-100 dropdown-toggle d-flex align-items-center justify-content-between px-3 py-2 rounded-2 cat-collapse-btn"
+                                                type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#catCollapse{{ $root->id }}" aria-expanded="false"
+                                                aria-controls="catCollapse{{ $root->id }}">
+                                            <span>
+                                                <i class="fa-solid fa-list-ul me-2"></i>Danh mục con ({{ $root->children ? $root->children->count() : 0 }})
+                                            </span>
+                                        </button>
+
+                                        <div class="collapse mt-2" id="catCollapse{{ $root->id }}">
+                                            <div class="card card-body border-0 bg-light p-2 rounded-2">
+                                                @if ($root->children && $root->children->isNotEmpty())
+                                                    <ul class="cat-dropdown-list mb-0">
+                                                        @foreach ($root->children as $child)
+                                                            <li>
+                                                                <a class="cat-dropdown-link d-flex align-items-center justify-content-between py-2 px-3 text-decoration-none"
+                                                                   href="{{ url('/categories/' . $child->slug) }}">
+                                                                    <span>
+                                                                        <i class="fa-solid fa-angle-right me-2 text-danger small"></i>
+                                                                        {{ $child->name }}
+                                                                    </span>
+                                                                    <span class="badge bg-white text-secondary border rounded-pill small">
+                                                                        {{ $child->products_count ?? 0 }} SP
+                                                                    </span>
+                                                                </a>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <div class="text-center text-muted small py-2">
+                                                        <i class="fa-solid fa-circle-info me-1"></i>Không có danh mục con
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
-                        @endforeach
-                    </div>
-                @endforeach
-            </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+            @endif
 
         </div>
     </div>

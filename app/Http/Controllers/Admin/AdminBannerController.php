@@ -191,6 +191,8 @@ class AdminBannerController extends Controller
         $count = Banner::whereIn('id', $validated['ids'])
             ->update(['is_active' => $validated['is_active']]);
 
+        Banner::clearBannerCache();
+
         $statusText = $validated['is_active'] ? 'hiển thị' : 'ẩn';
 
         return response()->json([
@@ -213,6 +215,8 @@ class AdminBannerController extends Controller
         ]);
 
         $count = Banner::whereIn('id', $validated['ids'])->delete();
+
+        Banner::clearBannerCache();
 
         return response()->json([
             'message' => "Đã xóa {$count} banner thành công!",
