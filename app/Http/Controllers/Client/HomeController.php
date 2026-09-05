@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
+use App\Models\FlashSale;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
@@ -30,12 +31,9 @@ class HomeController extends Controller
             return Banner::active()->atPosition('sidebar')->get()->toArray();
         }))->map(fn ($item) => (object) $item);
 
-        // 2. Redis Cache cho Cây Danh Mục Nổi Bật (TTL 24h)
-        $featuredCategories = collect(Cache::remember('categories:tree', 86400, function () {
-            return Category::with(['children' => function ($q) {
-                $q->where('status', true);
-            }])
-                ->withCount(['sellerProfiles', 'children', 'products'])
+        // 2. Redis Cache cho Cây danh mục nổi bật (cha + con)
+        $featuredCategories = collect(Cache::remember('categories:featured_tree', 600, function () {
+            return Category::with(['children' => fn ($q) => $q->where('status', true)])
                 ->whereNull('parent_id')
                 ->where('status', true)
                 ->take(16)
@@ -48,49 +46,28 @@ class HomeController extends Controller
             return $catObj;
         });
 
-        // 3. Redis Cache cho Sản Phẩm Flash Sale & Mới nhất
-        $flashSaleProducts = collect(Cache::remember('products:flash_sale', 600, function () {
-            return Product::with(['seller.sellerProfile', 'category'])
-                ->where('status', 'approved')
-                ->latest()
-                ->take(8)
-                ->get()
-                ->toArray();
-        }))->map(function ($p) {
-            $pObj = (object) $p;
-            $pObj->seller = (object) ($p['seller'] ?? []);
-            if (isset($p['seller']['seller_profile'])) {
-                $pObj->seller->sellerProfile = (object) $p['seller']['seller_profile'];
-            }
-            $pObj->category = (object) ($p['category'] ?? []);
+        // 3. Phiên Flash Sale đang Live (nếu có)
+        $liveFlashSale = FlashSale::live()
+            ->with(['products' => function ($q) {
+                $q->with(['product' => function ($pq) {
+                    $pq->with(['images', 'variants'])->where('status', 'approved');
+                }]);
+            }])
+            ->first();
 
-            return $pObj;
-        });
-
-        $latestProducts = collect(Cache::remember('products:latest', 600, function () {
-            return Product::with(['seller.sellerProfile', 'category'])
-                ->where('status', 'approved')
-                ->latest()
-                ->take(16)
-                ->get()
-                ->toArray();
-        }))->map(function ($p) {
-            $pObj = (object) $p;
-            $pObj->seller = (object) ($p['seller'] ?? []);
-            if (isset($p['seller']['seller_profile'])) {
-                $pObj->seller->sellerProfile = (object) $p['seller']['seller_profile'];
-            }
-            $pObj->category = (object) ($p['category'] ?? []);
-
-            return $pObj;
-        });
+        // 4. Sản phẩm gợi ý hôm nay / mới nhất (dữ liệu thật từ DB)
+        $latestProducts = Product::with(['seller.sellerProfile', 'category', 'variants'])
+            ->where('status', 'approved')
+            ->latest()
+            ->take(15)
+            ->get();
 
         return view('client.home.index', compact(
             'heroBanners',
             'midBanners',
             'sideBanners',
             'featuredCategories',
-            'flashSaleProducts',
+            'liveFlashSale',
             'latestProducts'
         ));
     }

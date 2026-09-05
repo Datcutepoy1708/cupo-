@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', function () {
             this.simplePriceRow = document.getElementById(`${prefix}_simple_price_row`);
             this.priceInput = document.getElementById(`${prefix}_price`);
             this.stockInput = document.getElementById(`${prefix}_stock`);
-            
+
             // Group 1
             this.group1NameInput = document.getElementById(`${prefix}_group1_name`);
             this.group1Container = document.getElementById(`${prefix}_group1_items_container`);
             this.btnAddGroup1Val = document.getElementById(`${prefix}_btn_add_group1_val`);
-            
+
             // Group 2
             this.group2Card = document.getElementById(`${prefix}_group2_card`);
             this.group2NameInput = document.getElementById(`${prefix}_group2_name`);
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const btnDel = row.querySelector('.g1-btn-del');
 
             valInput.addEventListener('input', () => this.renderMatrix());
-            
+
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const stock = parseInt(tr.querySelector('.matrix-stock')?.value) || 0;
                 const price = parseFloat(tr.querySelector('.matrix-price')?.value) || 0;
                 const salePrice = parseFloat(tr.querySelector('.matrix-sale-price')?.value) || 0;
-                
+
                 totalStock += stock;
                 if (salePrice > 0 && salePrice < price) {
                     prices.push(salePrice);
@@ -715,31 +715,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: formData
             })
-            .then(async (response) => {
-                const data = await response.json();
-                if (!response.ok) {
-                    let errMsg = data.message || 'Đã có lỗi xảy ra khi lưu sản phẩm.';
-                    if (data.errors) {
-                        errMsg = Object.values(data.errors).flat().join('\n');
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        let errMsg = data.message || 'Đã có lỗi xảy ra khi lưu sản phẩm.';
+                        if (data.errors) {
+                            errMsg = Object.values(data.errors).flat().join('\n');
+                        }
+                        throw new Error(errMsg);
                     }
-                    throw new Error(errMsg);
-                }
-                return data;
-            })
-            .then((data) => {
-                alert(data.message || 'Thêm sản phẩm thành công!');
-                window.location.hash = '#dashProducts';
-                window.location.reload();
-            })
-            .catch((err) => {
-                alert(err.message);
-            })
-            .finally(() => {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnHtml;
-                }
-            });
+                    return data;
+                })
+                .then((data) => {
+                    alert(data.message || 'Thêm sản phẩm thành công!');
+                    window.location.hash = '#dashProducts';
+                    window.location.reload();
+                })
+                .catch((err) => {
+                    alert(err.message);
+                })
+                .finally(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnHtml;
+                    }
+                });
         });
     }
 
@@ -781,31 +781,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: formData
             })
-            .then(async (response) => {
-                const data = await response.json();
-                if (!response.ok) {
-                    let errMsg = data.message || 'Đã có lỗi xảy ra khi cập nhật.';
-                    if (data.errors) {
-                        errMsg = Object.values(data.errors).flat().join('\n');
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        let errMsg = data.message || 'Đã có lỗi xảy ra khi cập nhật.';
+                        if (data.errors) {
+                            errMsg = Object.values(data.errors).flat().join('\n');
+                        }
+                        throw new Error(errMsg);
                     }
-                    throw new Error(errMsg);
-                }
-                return data;
-            })
-            .then((data) => {
-                alert(data.message || 'Cập nhật sản phẩm thành công!');
-                window.location.hash = '#dashProducts';
-                window.location.reload();
-            })
-            .catch((err) => {
-                alert(err.message);
-            })
-            .finally(() => {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnHtml;
-                }
-            });
+                    return data;
+                })
+                .then((data) => {
+                    alert(data.message || 'Cập nhật sản phẩm thành công!');
+                    window.location.hash = '#dashProducts';
+                    window.location.reload();
+                })
+                .catch((err) => {
+                    alert(err.message);
+                })
+                .finally(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnHtml;
+                    }
+                });
         });
     }
 
@@ -829,26 +829,259 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Accept': 'application/json'
                 }
             })
-            .then(async (response) => {
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.message || 'Không thể xóa sản phẩm.');
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Không thể xóa sản phẩm.');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    alert(data.message || 'Xóa sản phẩm thành công!');
+                    const row = document.getElementById(`product-row-${id}`);
+                    if (row) {
+                        row.remove();
+                    } else {
+                        window.location.hash = '#dashProducts';
+                        window.location.reload();
+                    }
+                })
+                .catch((err) => {
+                    alert(err.message);
+                });
+        });
+    });
+
+    // =========================================================================
+    // 10. FLASH SALE REGISTRATION LOGIC FOR SELLER
+    // =========================================================================
+    const fsForms = document.querySelectorAll('.seller-flash-sale-form');
+
+    fsForms.forEach(form => {
+        const productSelect = form.querySelector('.fs-select-product');
+        const discountPctInput = form.querySelector('.fs-discount-percent');
+        const hiddenPriceInput = form.querySelector('.fs-proposed-price');
+        const qtyInput = form.querySelector('.fs-proposed-quantity');
+        const priceHint = form.querySelector('.fs-price-hint');
+        const stockHint = form.querySelector('.fs-stock-hint');
+        const submitBtn = form.querySelector('.btn-submit-fs');
+        const quickPctBtns = form.querySelectorAll('.btn-quick-pct');
+
+        function updateHints() {
+            const selectedOpt = productSelect.options[productSelect.selectedIndex];
+            if (!selectedOpt || !selectedOpt.value) {
+                if (priceHint) {
+                    priceHint.textContent = 'Tối thiểu giảm 10%';
+                    priceHint.className = 'fs-price-hint text-muted small mt-1';
                 }
-                return data;
-            })
-            .then((data) => {
-                alert(data.message || 'Xóa sản phẩm thành công!');
-                const row = document.getElementById(`product-row-${id}`);
-                if (row) {
-                    row.remove();
-                } else {
-                    window.location.hash = '#dashProducts';
-                    window.location.reload();
+                if (stockHint) stockHint.textContent = '';
+                if (hiddenPriceInput) hiddenPriceInput.value = '';
+                return;
+            }
+
+            const originPrice = parseFloat(selectedOpt.dataset.price) || 0;
+            const stock = parseInt(selectedOpt.dataset.stock) || 0;
+
+            const hasVars = selectedOpt.dataset.hasVariants === '1';
+            const varCount = parseInt(selectedOpt.dataset.varCount) || 0;
+            const minPrice = parseFloat(selectedOpt.dataset.minPrice) || originPrice;
+            const maxPrice = parseFloat(selectedOpt.dataset.maxPrice) || originPrice;
+
+            if (stockHint) {
+                stockHint.textContent = `Tổng tồn kho: ${stock}`;
+            }
+            if (stock > 0 && qtyInput) {
+                qtyInput.max = stock;
+            }
+
+            const pctVal = parseFloat(discountPctInput.value);
+
+            if (isNaN(pctVal) || pctVal <= 0) {
+                if (priceHint) {
+                    if (hasVars && minPrice !== maxPrice) {
+                        priceHint.textContent = `Tối thiểu giảm 10% (Giá gốc: ${new Intl.NumberFormat('vi-VN').format(minPrice)}₫ - ${new Intl.NumberFormat('vi-VN').format(maxPrice)}₫)`;
+                    } else {
+                        priceHint.textContent = `Tối thiểu giảm 10% (Giá gốc: ${new Intl.NumberFormat('vi-VN').format(originPrice)}₫)`;
+                    }
+                    priceHint.className = 'fs-price-hint text-muted small mt-1';
                 }
-            })
-            .catch((err) => {
-                alert(err.message);
+                if (hiddenPriceInput) hiddenPriceInput.value = '';
+                return;
+            }
+
+            if (pctVal < 10) {
+                if (priceHint) {
+                    priceHint.textContent = `Mức giảm phải từ 10% trở lên theo quy định!`;
+                    priceHint.className = 'fs-price-hint text-danger small mt-1 fw-semibold';
+                }
+                if (hiddenPriceInput) hiddenPriceInput.value = '';
+            } else if (pctVal > 90) {
+                if (priceHint) {
+                    priceHint.textContent = `Mức giảm tối đa là 90%!`;
+                    priceHint.className = 'fs-price-hint text-danger small mt-1 fw-semibold';
+                }
+                if (hiddenPriceInput) hiddenPriceInput.value = '';
+            } else {
+                // Tính giá Flash Sale cho biến thể rẻ nhất và đắt nhất
+                const minCalculatedPrice = Math.round((minPrice * (100 - pctVal) / 100) / 1000) * 1000;
+                const maxCalculatedPrice = Math.round((maxPrice * (100 - pctVal) / 100) / 1000) * 1000;
+                const savedAmount = minPrice - minCalculatedPrice;
+
+                // Lưu giá của biến thể rẻ nhất vào hidden input để gửi backend
+                if (hiddenPriceInput) {
+                    hiddenPriceInput.value = minCalculatedPrice;
+                }
+
+                if (priceHint) {
+                    if (hasVars && minPrice !== maxPrice) {
+                        priceHint.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-layer-group me-1"></i>Áp dụng -${pctVal}% cho toàn bộ ${varCount} biến thể:</span><br><span class="text-dark">Giá biến thể rẻ nhất: <strong class="text-danger">${new Intl.NumberFormat('vi-VN').format(minCalculatedPrice)}₫</strong> (Khoảng giá: ${new Intl.NumberFormat('vi-VN').format(minCalculatedPrice)}₫ - ${new Intl.NumberFormat('vi-VN').format(maxCalculatedPrice)}₫)</span>`;
+                    } else {
+                        priceHint.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-check-circle me-1"></i>Giá Flash Sale: ${new Intl.NumberFormat('vi-VN').format(minCalculatedPrice)}₫</span> <span class="text-muted">(Tiết kiệm ${new Intl.NumberFormat('vi-VN').format(savedAmount)}₫)</span>`;
+                    }
+                    priceHint.className = 'fs-price-hint small mt-1';
+                }
+            }
+        }
+
+        if (productSelect) {
+            productSelect.addEventListener('change', updateHints);
+        }
+        if (discountPctInput) {
+            discountPctInput.addEventListener('input', updateHints);
+        }
+
+        // Nút chọn nhanh % (10%, 20%, 30%, 50%)
+        quickPctBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const pct = this.dataset.pct;
+                if (discountPctInput) {
+                    discountPctInput.value = pct;
+                    updateHints();
+                }
             });
+        });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const selectedOpt = productSelect.options[productSelect.selectedIndex];
+            if (!selectedOpt || !selectedOpt.value) {
+                alert('Vui lòng chọn sản phẩm muốn đăng ký!');
+                return;
+            }
+
+            const originPrice = parseFloat(selectedOpt.dataset.price) || 0;
+            const pctVal = parseFloat(discountPctInput.value);
+            const proposedPrice = parseFloat(hiddenPriceInput.value) || 0;
+            const proposedQty = parseInt(qtyInput.value) || 0;
+            const stock = parseInt(selectedOpt.dataset.stock) || 0;
+
+            if (isNaN(pctVal) || pctVal < 10 || pctVal > 90) {
+                alert('Mức giảm giá phải từ 10% đến 90% theo quy định Flash Sale!');
+                discountPctInput.focus();
+                return;
+            }
+            if (proposedPrice <= 0) {
+                alert('Giá đề xuất không hợp lệ! Vui lòng kiểm tra lại phần trăm giảm.');
+                return;
+            }
+            if (proposedQty <= 0) {
+                alert('Số lượng đăng ký phải lớn hơn 0!');
+                qtyInput.focus();
+                return;
+            }
+            if (proposedQty > stock) {
+                alert(`Số lượng đăng ký (${proposedQty}) không được vượt tồn kho khả dụng (${stock})!`);
+                qtyInput.focus();
+                return;
+            }
+
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang gửi...';
+
+            const formData = new FormData(form);
+            // Đảm bảo proposed_price luôn có trong formData
+            formData.set('proposed_price', proposedPrice);
+
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            fetch('/seller/flash-sale-registrations', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        let errMsg = data.message || 'Có lỗi xảy ra khi gửi đăng ký.';
+                        if (data.errors) {
+                            errMsg = Object.values(data.errors).flat().join('\n');
+                        }
+                        throw new Error(errMsg);
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    alert(data.message || 'Đăng ký sản phẩm vào Flash Sale thành công! Đang chờ Admin duyệt.');
+                    window.location.hash = '#dashFlashSale';
+                    window.location.reload();
+                })
+                .catch((err) => {
+                    alert(err.message);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                });
+        });
+    });
+
+    // Xử lý Hủy đăng ký Flash Sale
+    const cancelFsButtons = document.querySelectorAll('.btn-cancel-fs-reg');
+    cancelFsButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const url = this.dataset.url;
+            const regId = this.dataset.id;
+
+            if (!confirm('Bạn có chắc chắn muốn hủy đăng ký sản phẩm này khỏi phiên Flash Sale không?')) {
+                return;
+            }
+
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            this.disabled = true;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                }
+            })
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Không thể hủy đăng ký.');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    alert(data.message || 'Đã hủy đăng ký thành công!');
+                    const row = document.getElementById(`fs-reg-row-${regId}`);
+                    if (row) {
+                        row.remove();
+                    } else {
+                        window.location.hash = '#dashFlashSale';
+                        window.location.reload();
+                    }
+                })
+                .catch((err) => {
+                    alert(err.message);
+                    this.disabled = false;
+                });
         });
     });
 });

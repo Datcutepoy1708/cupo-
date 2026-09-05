@@ -45,6 +45,7 @@
                     @include('client.seller-store.partials.dash-products')
                     @include('client.seller-store.partials.dash-orders')
                     @include('client.seller-store.partials.dash-reviews')
+                    @include('client.seller-store.partials.dash-flash-sale')
                     @include('client.seller-store.partials.dash-info')
                 </div>
 

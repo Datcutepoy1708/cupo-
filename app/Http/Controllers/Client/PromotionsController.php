@@ -22,7 +22,7 @@ class PromotionsController extends Controller
         $flashSale = FlashSale::live()
             ->with(['products' => function ($q) {
                 $q->with(['product' => function ($pq) {
-                    $pq->with('images')->where('status', 'approved');
+                    $pq->with(['images', 'variants'])->where('status', 'approved');
                 }]);
             }])
             ->first();
@@ -33,7 +33,7 @@ class PromotionsController extends Controller
             $flashSale = FlashSale::upcoming()
                 ->with(['products' => function ($q) {
                     $q->with(['product' => function ($pq) {
-                        $pq->with('images')->where('status', 'approved');
+                        $pq->with(['images', 'variants'])->where('status', 'approved');
                     }]);
                 }])
                 ->orderBy('starts_at')
@@ -66,14 +66,21 @@ class PromotionsController extends Controller
                 ->pluck('coupons.id');
         }
 
-        // 5. San pham dang giam gia sau do Seller tu cau hinh (sale_price < price)
+        // 5. San pham dang giam gia sau (Seller tu cau hinh HOAC dang trong phien Flash Sale)
+        $flashSaleProductIds = array_keys(Product::getActiveFlashSaleMap());
+
         $deepDiscountProducts = Product::where('status', 'approved')
-            ->whereNotNull('sale_price')
-            ->where('sale_price', '>', 0)
-            ->whereColumn('sale_price', '<', 'price')
-            ->with(['seller.sellerProfile', 'category', 'images'])
-            ->selectRaw('products.*, ROUND(((price - sale_price) / price) * 100) as discount_rate')
-            ->orderByDesc('discount_rate')
+            ->where(function ($query) use ($flashSaleProductIds) {
+                $query->where(function ($q) {
+                    $q->whereNotNull('sale_price')
+                        ->where('sale_price', '>', 0)
+                        ->whereColumn('sale_price', '<', 'price');
+                });
+                if (! empty($flashSaleProductIds)) {
+                    $query->orWhereIn('id', $flashSaleProductIds);
+                }
+            })
+            ->with(['seller.sellerProfile', 'category', 'images', 'variants'])
             ->take(16)
             ->get();
 

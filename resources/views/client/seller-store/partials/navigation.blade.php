@@ -17,6 +17,14 @@
         <a class="nav-link" data-bs-toggle="pill" href="#dashReviews" role="tab">Đánh giá</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link tab-flash-sale-link" data-bs-toggle="pill" href="#dashFlashSale" role="tab">
+            <i class="fa-solid fa-bolt me-1 text-danger"></i>Flash Sale
+            @if (isset($openFlashSales) && $openFlashSales->count() > 0)
+                <span class="tab-badge bg-danger">{{ $openFlashSales->count() }}</span>
+            @endif
+        </a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#dashInfo" role="tab">Thông tin</a>
     </li>
 </ul>

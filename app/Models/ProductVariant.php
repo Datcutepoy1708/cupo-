@@ -47,11 +47,21 @@ class ProductVariant extends Model
 
     public function getIsOnSaleAttribute(): bool
     {
+        $product = $this->relationLoaded('product') ? $this->product : $this->product()->first();
+        if ($product && $product->is_flash_sale) {
+            return true;
+        }
+
         return ! is_null($this->sale_price) && $this->sale_price > 0 && $this->sale_price < $this->price;
     }
 
     public function getDiscountPercentageAttribute(): int
     {
+        $product = $this->relationLoaded('product') ? $this->product : $this->product()->first();
+        if ($product && $product->is_flash_sale) {
+            return (int) ($product->flash_sale_info['discount_percentage'] ?? 0);
+        }
+
         if ($this->is_on_sale && $this->price > 0) {
             return (int) round((($this->price - $this->sale_price) / $this->price) * 100);
         }
@@ -61,6 +71,14 @@ class ProductVariant extends Model
 
     public function getCurrentPriceAttribute(): float
     {
+        $product = $this->relationLoaded('product') ? $this->product : $this->product()->first();
+        if ($product && $product->is_flash_sale) {
+            $fsDiscount = (int) ($product->flash_sale_info['discount_percentage'] ?? 0);
+            if ($fsDiscount > 0) {
+                return (float) (round(($this->price * (100 - $fsDiscount) / 100) / 1000) * 1000);
+            }
+        }
+
         return $this->is_on_sale ? (float) $this->sale_price : (float) $this->price;
     }
 

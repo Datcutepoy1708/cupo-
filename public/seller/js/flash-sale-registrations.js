@@ -18,34 +18,69 @@
     const storeUrl = app.dataset.storeUrl;
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
-    // ----------- Cap nhat goi y gia khi chon san pham -----------
+    // ----------- Cap nhat goi y gia khi chon san pham hoac nhap % -----------
 
-    document.addEventListener('change', function (e) {
-        const select = e.target.closest('.product-select');
-        if (!select) return;
+    function updatePriceFromPercent(form) {
+        const select = form.querySelector('.product-select');
+        const option = select ? select.options[select.selectedIndex] : null;
+        const price = parseFloat(option?.dataset.price || 0);
+        const stock = parseInt(option?.dataset.stock || 0);
 
-        const option = select.options[select.selectedIndex];
-        const price = parseFloat(option.dataset.price || 0);
-        const stock = parseInt(option.dataset.stock || 0);
-
-        const form = select.closest('.registration-form');
-        const priceInput = form.querySelector('.proposed-price');
+        const pctInput = form.querySelector('.proposed-percent');
+        const hiddenPrice = form.querySelector('.proposed-price');
         const priceHint = form.querySelector('.proposed-price-hint');
         const qtyInput = form.querySelector('.proposed-quantity');
 
-        if (price > 0) {
-            const maxPrice = Math.floor(price * 0.9);
-            priceHint.textContent = 'Gia toi da duoc phep: ' + maxPrice.toLocaleString('vi-VN') + 'd (90% gia goc ' + price.toLocaleString('vi-VN') + 'd)';
-            priceInput.max = maxPrice;
-        } else {
-            priceHint.textContent = '';
-            priceInput.removeAttribute('max');
+        if (stock > 0 && qtyInput) {
+            qtyInput.max = stock;
         }
 
-        if (stock > 0) {
-            qtyInput.max = stock;
+        if (price <= 0 || !pctInput) return;
+
+        const pct = parseFloat(pctInput.value);
+        if (isNaN(pct) || pct <= 0) {
+            priceHint.textContent = 'Toi thieu giam 10% (Gia goc: ' + price.toLocaleString('vi-VN') + 'd)';
+            if (hiddenPrice) hiddenPrice.value = '';
+            return;
+        }
+
+        if (pct < 10) {
+            priceHint.textContent = 'Muc giam phai tu 10% tro len theo quy dinh!';
+            if (hiddenPrice) hiddenPrice.value = '';
+        } else if (pct > 90) {
+            priceHint.textContent = 'Muc giam toi da la 90%!';
+            if (hiddenPrice) hiddenPrice.value = '';
         } else {
-            qtyInput.removeAttribute('max');
+            const calculatedPrice = Math.round((price * (100 - pct) / 100) / 1000) * 1000;
+            const savedAmount = price - calculatedPrice;
+            if (hiddenPrice) hiddenPrice.value = calculatedPrice;
+            priceHint.textContent = 'Gia Flash Sale: ' + calculatedPrice.toLocaleString('vi-VN') + 'd (Tiet kiem ' + savedAmount.toLocaleString('vi-VN') + 'd)';
+        }
+    }
+
+    document.addEventListener('change', function (e) {
+        const select = e.target.closest('.product-select');
+        if (select) {
+            updatePriceFromPercent(select.closest('.registration-form'));
+        }
+    });
+
+    document.addEventListener('input', function (e) {
+        const pctInput = e.target.closest('.proposed-percent');
+        if (pctInput) {
+            updatePriceFromPercent(pctInput.closest('.registration-form'));
+        }
+    });
+
+    // Nút chọn nhanh % (10%, 20%, 30%, 50%)
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-quick-pct');
+        if (!btn) return;
+        const form = btn.closest('.registration-form');
+        const pctInput = form ? form.querySelector('.proposed-percent') : null;
+        if (pctInput) {
+            pctInput.value = btn.dataset.pct;
+            updatePriceFromPercent(form);
         }
     });
 
@@ -58,10 +93,16 @@
 
         clearFormErrors(form);
 
+        const proposedPriceVal = form.querySelector('.proposed-price')?.value;
+        if (!proposedPriceVal || parseFloat(proposedPriceVal) <= 0) {
+            alert('Vui long nhap muc giam gia hop le (tu 10% den 90%)!');
+            return;
+        }
+
         const data = {
             flash_sale_id: form.querySelector('[name="flash_sale_id"]').value,
             product_id: form.querySelector('[name="product_id"]').value,
-            proposed_price: form.querySelector('[name="proposed_price"]').value,
+            proposed_price: proposedPriceVal,
             proposed_quantity: form.querySelector('[name="proposed_quantity"]').value,
         };
 

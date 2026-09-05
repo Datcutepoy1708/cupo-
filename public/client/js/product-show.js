@@ -89,6 +89,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const defaultCurrentPriceText = prodCurrentPrice
         ? prodCurrentPrice.textContent
         : "";
+    const defaultOriginalPriceText = prodOriginalPrice
+        ? prodOriginalPrice.textContent
+        : "";
+    const defaultDiscountBadgeHtml = prodDiscountBadge
+        ? prodDiscountBadge.innerHTML
+        : "";
     const defaultStockText = stockDisplay ? stockDisplay.textContent : "0";
 
     window.onSelectVariantOption = function (btn, groupIndex, val) {
@@ -150,31 +156,52 @@ document.addEventListener("DOMContentLoaded", function () {
                 const price = parseFloat(activeMatchedVariant.price) || 0;
                 const salePrice =
                     parseFloat(activeMatchedVariant.sale_price) || 0;
-                const hasSale = salePrice > 0 && salePrice < price;
+                const isFlashSale = variantsSection?.dataset.isFlashSale === "1";
+                const flashSaleDiscount = parseInt(variantsSection?.dataset.flashSaleDiscount) || 0;
+                const variantHint = document.getElementById("prodPriceVariantHint");
 
-                if (hasSale) {
-                    const discount = Math.round(
-                        ((price - salePrice) / price) * 100,
-                    );
+                if (isFlashSale && flashSaleDiscount > 0) {
+                    // Flash Sale áp dụng cho toàn bộ biến thể theo %
+                    const fsPrice = Math.round((price * (100 - flashSaleDiscount) / 100) / 1000) * 1000;
                     if (prodOriginalPrice) {
                         prodOriginalPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(price)} ₫`;
                         prodOriginalPrice.classList.remove("d-none");
                     }
                     if (prodCurrentPrice) {
-                        prodCurrentPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(salePrice)} ₫`;
+                        prodCurrentPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(fsPrice)} ₫`;
                     }
                     if (prodDiscountBadge) {
-                        prodDiscountBadge.textContent = `-${discount}%`;
+                        prodDiscountBadge.innerHTML = `<i class="fa-solid fa-bolt-lightning me-1"></i>-${flashSaleDiscount}% FLASH SALE`;
                         prodDiscountBadge.classList.remove("d-none");
                     }
+                    if (variantHint) variantHint.classList.add("d-none");
                 } else {
-                    if (prodOriginalPrice)
-                        prodOriginalPrice.classList.add("d-none");
-                    if (prodDiscountBadge)
-                        prodDiscountBadge.classList.add("d-none");
-                    if (prodCurrentPrice) {
-                        prodCurrentPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(price)} ₫`;
+                    const hasSale = salePrice > 0 && salePrice < price;
+                    if (hasSale) {
+                        const discount = Math.round(
+                            ((price - salePrice) / price) * 100,
+                        );
+                        if (prodOriginalPrice) {
+                            prodOriginalPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(price)} ₫`;
+                            prodOriginalPrice.classList.remove("d-none");
+                        }
+                        if (prodCurrentPrice) {
+                            prodCurrentPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(salePrice)} ₫`;
+                        }
+                        if (prodDiscountBadge) {
+                            prodDiscountBadge.textContent = `-${discount}%`;
+                            prodDiscountBadge.classList.remove("d-none");
+                        }
+                    } else {
+                        if (prodOriginalPrice)
+                            prodOriginalPrice.classList.add("d-none");
+                        if (prodDiscountBadge)
+                            prodDiscountBadge.classList.add("d-none");
+                        if (prodCurrentPrice) {
+                            prodCurrentPrice.textContent = `${new Intl.NumberFormat("vi-VN").format(price)} ₫`;
+                        }
                     }
+                    if (variantHint) variantHint.classList.add("d-none");
                 }
 
                 // Cập nhật số lượng kho
@@ -228,8 +255,24 @@ document.addEventListener("DOMContentLoaded", function () {
             activeMatchedVariant = null;
             if (prodCurrentPrice)
                 prodCurrentPrice.textContent = defaultCurrentPriceText;
-            if (prodOriginalPrice) prodOriginalPrice.classList.add("d-none");
-            if (prodDiscountBadge) prodDiscountBadge.classList.add("d-none");
+
+            const isFlashSale = variantsSection?.dataset.isFlashSale === "1";
+            if (isFlashSale) {
+                if (prodOriginalPrice) {
+                    prodOriginalPrice.textContent = defaultOriginalPriceText;
+                    prodOriginalPrice.classList.remove("d-none");
+                }
+                if (prodDiscountBadge) {
+                    prodDiscountBadge.innerHTML = defaultDiscountBadgeHtml;
+                    prodDiscountBadge.classList.remove("d-none");
+                }
+                const variantHint = document.getElementById("prodPriceVariantHint");
+                if (variantHint) variantHint.classList.remove("d-none");
+            } else {
+                if (prodOriginalPrice) prodOriginalPrice.classList.add("d-none");
+                if (prodDiscountBadge) prodDiscountBadge.classList.add("d-none");
+            }
+
             if (stockDisplay) stockDisplay.textContent = defaultStockText;
             if (summaryWrap) summaryWrap.classList.add("d-none");
 
@@ -426,4 +469,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Không thể kết nối đến máy chủ.");
             });
     };
+
+    // =========================================================================
+    // FLASH SALE DETAIL COUNTDOWN TIMER
+    // =========================================================================
+    const fsCountdownEl = document.querySelector(".fs-detail-countdown");
+    if (fsCountdownEl) {
+        const endsTimestamp = parseInt(fsCountdownEl.dataset.endsTimestamp, 10);
+        if (endsTimestamp) {
+            function updateDetailCd() {
+                const diff = Math.max(0, Math.floor((endsTimestamp - Date.now()) / 1000));
+                const h = Math.floor(diff / 3600);
+                const m = Math.floor((diff % 3600) / 60);
+                const s = diff % 60;
+                const hEl = fsCountdownEl.querySelector(".cd-hours");
+                const mEl = fsCountdownEl.querySelector(".cd-minutes");
+                const sEl = fsCountdownEl.querySelector(".cd-seconds");
+                if (hEl) hEl.textContent = String(h).padStart(2, "0");
+                if (mEl) mEl.textContent = String(m).padStart(2, "0");
+                if (sEl) sEl.textContent = String(s).padStart(2, "0");
+            }
+            updateDetailCd();
+            setInterval(updateDetailCd, 1000);
+        }
+    }
 });

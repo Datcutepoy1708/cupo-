@@ -39,8 +39,12 @@ class SyncFlashSaleProductsRequest extends FormRequest
                     continue;
                 }
 
-                // Rule 1: Max 90% of regular price (flash_sale_price <= 0.9 * price)
-                $maxPrice = bcmul((string) $product->price, '0.90', 2);
+                // Rule 1: Max 90% of regular price (flash_sale_price <= 0.9 * price, tinh theo bien the re nhat neu co bien the)
+                $basePrice = $product->has_variants && $product->variants()->exists()
+                    ? (float) $product->variants()->min('price')
+                    : (float) $product->price;
+
+                $maxPrice = bcmul((string) $basePrice, '0.90', 2);
                 if (isset($item['flash_sale_price']) && (float) $item['flash_sale_price'] > (float) $maxPrice) {
                     $validator->errors()->add(
                         "products.{$index}.flash_sale_price",
@@ -48,11 +52,15 @@ class SyncFlashSaleProductsRequest extends FormRequest
                     );
                 }
 
-                // Rule 2: quantity_limit <= product.stock
-                if (isset($item['quantity_limit']) && (int) $item['quantity_limit'] > $product->stock) {
+                // Rule 2: quantity_limit <= product.stock (tong ton kho neu co bien the)
+                $totalStock = $product->has_variants && $product->variants()->exists()
+                    ? (int) $product->variants()->sum('stock')
+                    : (int) $product->stock;
+
+                if (isset($item['quantity_limit']) && (int) $item['quantity_limit'] > $totalStock) {
                     $validator->errors()->add(
                         "products.{$index}.quantity_limit",
-                        "Số lượng Flash Sale không được vượt quá tồn kho thực tế ({$product->stock})."
+                        "Số lượng Flash Sale không được vượt quá tồn kho thực tế ({$totalStock})."
                     );
                 }
 

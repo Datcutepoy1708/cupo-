@@ -125,34 +125,62 @@
                                 } else {
                                     $thumb = asset('storage/' . $rawPath);
                                 }
-                                $origPrice = (float) $product->price;
-                                $salePrice = (float) $fsp->flash_sale_price;
-                                $discount = $origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0;
+                                $hasVariants = $product->has_variants && $product->relationLoaded('variants') && $product->variants->isNotEmpty();
+                                if ($hasVariants) {
+                                    $cheapestVariant = $product->variants->sortBy('price')->first();
+                                    $origPrice = (float) ($cheapestVariant->price ?? $product->price);
+                                    $salePrice = (float) $fsp->flash_sale_price;
+                                    if ($product->price > 0 && $salePrice >= $origPrice) {
+                                        $pctDiscount = round((($product->price - $salePrice) / $product->price) * 100);
+                                        if ($pctDiscount >= 10) {
+                                            $salePrice = round(($origPrice * (100 - $pctDiscount) / 100) / 1000) * 1000;
+                                        }
+                                    }
+                                    $discount = $origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0;
+                                } else {
+                                    $origPrice = (float) $product->price;
+                                    $salePrice = (float) $fsp->flash_sale_price;
+                                    $discount = $origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0;
+                                }
                                 $soldPct =
                                     $fsp->quantity_limit > 0
                                         ? min(100, round(($fsp->quantity_sold / $fsp->quantity_limit) * 100))
                                         : 0;
                             @endphp
                             <div class="col">
-                                <a href="{{ route('products.show', $product->slug) }}" class="promo-fs-card">
-                                    <div class="promo-fs-img">
-                                        <span class="promo-discount-badge">-{{ $discount }}%</span>
+                                <div class="fs-card h-100 d-flex flex-column" onclick="window.location.href='{{ route('products.show', $product->slug) }}'">
+                                    <div class="fs-image position-relative">
+                                        @if ($discount > 0)
+                                            <span class="discount-badge">-{{ $discount }}%</span>
+                                        @endif
+                                        <span class="fs-flame-badge" title="Flash Sale">
+                                            <i class="fa-solid fa-fire-flame-curved"></i>
+                                        </span>
                                         <img src="{{ $thumb }}" alt="{{ $product->name }}" loading="lazy">
                                     </div>
-                                    <div class="promo-fs-info">
-                                        <h3 class="promo-fs-name">{{ $product->name }}</h3>
-                                        <div class="promo-price-row">
-                                            <span class="promo-price-sale">{{ number_format($salePrice) }}₫</span>
-                                            <del class="promo-price-orig">{{ number_format($origPrice) }}₫</del>
+
+                                    <div class="fs-info flex-grow-1">
+                                        <h3 title="{{ $product->name }}">{{ $product->name }}</h3>
+                                        <div class="price-row">
+                                            <span class="price">{{ number_format($salePrice) }}₫</span>
+                                            @if ($origPrice > $salePrice)
+                                                <del class="old-price">{{ number_format($origPrice) }}₫</del>
+                                            @endif
                                         </div>
                                     </div>
-                                    <div class="promo-fs-footer">
-                                        <div class="promo-sold-bar">
-                                            <div class="promo-sold-fill" style="width:{{ $soldPct }}%"></div>
+
+                                    <div class="fs-footer">
+                                        <div class="sold-progress">
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill" style="width: {{ $soldPct }}%;"></div>
+                                            </div>
+                                            <span class="sold-text">Đã bán {{ $soldPct }}%</span>
                                         </div>
-                                        <span class="promo-sold-text">Đã bán {{ $soldPct }}%</span>
+                                        <a href="{{ route('products.show', $product->slug) }}" class="btn btn-flash-buy" onclick="event.stopPropagation();">
+                                            <i class="fa-solid fa-bolt"></i> Mua ngay
+                                        </a>
                                     </div>
-                                </a>
+                                </div>
                             </div>
                         @endif
                     @endforeach
@@ -180,7 +208,7 @@
                 <div class="promo-section-title-group">
                     <div>
                         <h2 class="promo-section-title">Đang Giảm Giá Sâu</h2>
-                        <p class="promo-section-sub">Ưu đãi giảm giá cực tốt do các gian hàng tự cấu hình</p>
+                        <p class="promo-section-sub">Ưu đãi giảm giá cực tốt do các gian hàng tự cấu hình & các siêu phẩm Flash Sale</p>
                     </div>
                 </div>
                 <div class="promo-badge-hot">
@@ -202,12 +230,27 @@
                             } else {
                                 $thumb = asset('storage/' . $rawPath);
                             }
-                            $origPrice = (float) $product->price;
-                            $salePrice = (float) $product->sale_price;
-                            $discount =
-                                $product->discount_percentage ??
-                                ($origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0);
-                            $savedAmount = $origPrice - $salePrice;
+
+                            $isFs = $product->is_flash_sale && !empty($product->flash_sale_info);
+                            if ($isFs) {
+                                $salePrice = (float) $product->flash_sale_info['price'];
+                                $origPrice = (float) $product->flash_sale_info['original_price'];
+                                $discount = (int) $product->flash_sale_info['discount_percentage'];
+                            } else {
+                                $hasDeepVariants = $product->has_variants && $product->relationLoaded('variants') && $product->variants->isNotEmpty();
+                                if ($hasDeepVariants) {
+                                    $cheapestVariant = $product->variants->sortBy('current_price')->first();
+                                    $origPrice = (float) ($cheapestVariant->price ?? $product->price);
+                                    $salePrice = (float) ($cheapestVariant->sale_price ?? $cheapestVariant->price ?? $product->sale_price);
+                                } else {
+                                    $origPrice = (float) $product->price;
+                                    $salePrice = (float) $product->sale_price;
+                                }
+                                $discount =
+                                    $product->discount_percentage ??
+                                    ($origPrice > 0 ? round((($origPrice - $salePrice) / $origPrice) * 100) : 0);
+                            }
+                            $savedAmount = max(0, $origPrice - $salePrice);
                             $shopName =
                                 $product->seller?->sellerProfile?->shop_name ??
                                 ($product->seller?->name ?? 'Gian hàng Cupo');
@@ -216,13 +259,24 @@
                             <div class="promo-deal-card">
                                 <a href="{{ route('products.show', $product->slug) }}" class="promo-deal-img-link">
                                     <div class="promo-deal-img-wrap">
-                                        <span class="promo-deal-badge">-{{ $discount }}%</span>
+                                        @if ($discount > 0)
+                                            <span class="promo-deal-badge">-{{ $discount }}%</span>
+                                        @endif
+                                        @if ($isFs)
+                                            <span class="fs-flame-badge" title="Flash Sale">
+                                                <i class="fa-solid fa-fire-flame-curved"></i>
+                                            </span>
+                                        @endif
                                         <img src="{{ $thumb }}" alt="{{ $product->name }}" loading="lazy">
                                     </div>
                                 </a>
                                 <div class="promo-deal-body">
                                     <div class="promo-deal-shop">
-                                        <i class="fa-solid fa-store me-1 text-danger"></i>
+                                        @if ($isFs)
+                                            <span class="badge-flash-sale-card me-1"><i class="fa-solid fa-fire-flame-curved"></i> Flash Sale</span>
+                                        @else
+                                            <i class="fa-solid fa-store me-1 text-danger"></i>
+                                        @endif
                                         <span class="text-truncate">{{ $shopName }}</span>
                                     </div>
                                     <h3 class="promo-deal-name">
@@ -230,7 +284,9 @@
                                     </h3>
                                     <div class="promo-deal-prices">
                                         <span class="promo-deal-price-sale">{{ number_format($salePrice) }}₫</span>
-                                        <del class="promo-deal-price-orig">{{ number_format($origPrice) }}₫</del>
+                                        @if ($origPrice > $salePrice)
+                                            <del class="promo-deal-price-orig">{{ number_format($origPrice) }}₫</del>
+                                        @endif
                                     </div>
                                     <div class="promo-deal-saving">
                                         <i class="fa-solid fa-circle-check me-1"></i>Tiết kiệm

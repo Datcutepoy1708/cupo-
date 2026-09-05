@@ -76,9 +76,59 @@
         </div>
     </div>
 
+    {{-- Flash Sale Live Banner nếu sản phẩm đang trong phiên Flash Sale --}}
+    @if ($product->is_flash_sale)
+        @php
+            $fsInfo = $product->flash_sale_info;
+        @endphp
+        <div class="flash-sale-detail-banner mb-3 p-3 rounded-2 text-white shadow-sm"
+             style="background: linear-gradient(90deg, #d32f2f 0%, #ee4d2d 55%, #ff5722 100%);">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="fs-flame-icon">
+                        <i class="fa-solid fa-bolt-lightning fs-4 text-warning fa-beat"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold fs-6 text-uppercase mb-0 d-flex align-items-center gap-2">
+                            <span>CUPO FLASH SALE</span>
+                            <span class="badge bg-warning text-dark fw-bold rounded-pill px-2" style="font-size: 11px;">
+                                -{{ $fsInfo['discount_percentage'] }}%
+                            </span>
+                        </div>
+                        <div class="text-white-50 small" style="font-size: 11px;">
+                            Áp dụng cho toàn bộ biến thể • Số lượng ưu đãi có hạn
+                        </div>
+                    </div>
+                </div>
+
+                @if (!empty($fsInfo['ends_at_timestamp']))
+                    <div class="d-flex align-items-center gap-2 fs-detail-countdown"
+                         data-ends-timestamp="{{ $fsInfo['ends_at_timestamp'] }}">
+                        <span class="small fw-semibold text-white-50"><i class="fa-regular fa-clock me-1"></i>KẾT THÚC TRONG</span>
+                        <div class="d-flex gap-1 fw-bold">
+                            <span class="badge bg-dark text-white p-1 px-2 rounded cd-hours">00</span>:
+                            <span class="badge bg-dark text-white p-1 px-2 rounded cd-minutes">00</span>:
+                            <span class="badge bg-dark text-white p-1 px-2 rounded cd-seconds">00</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- Price Box --}}
-    <div class="prod-price-box p-3 rounded-2 mb-3 d-flex align-items-baseline gap-3" id="prodPriceBox">
-        @if ($product->has_variants && $product->variants->isNotEmpty())
+    <div class="prod-price-box p-3 rounded-2 mb-3 d-flex align-items-baseline gap-3 {{ $product->is_flash_sale ? 'border border-danger-subtle bg-danger-subtle bg-opacity-10' : '' }}" id="prodPriceBox">
+        @if ($product->is_flash_sale)
+            @php
+                $fsInfo = $product->flash_sale_info;
+            @endphp
+            <del class="prod-original-price text-muted" id="prodOriginalPrice">{{ number_format($fsInfo['original_price'], 0, ',', '.') }} ₫</del>
+            <span class="prod-current-price text-danger fw-bold fs-3" id="prodCurrentPrice">{{ number_format($fsInfo['price'], 0, ',', '.') }} ₫</span>
+            <span class="badge bg-danger fs-6" id="prodDiscountBadge"><i class="fa-solid fa-bolt-lightning me-1"></i>-{{ $fsInfo['discount_percentage'] }}% FLASH SALE</span>
+            @if ($product->has_variants)
+                <span class="text-muted small ms-1" id="prodPriceVariantHint" style="font-size: 11px;">(Giá biến thể rẻ nhất)</span>
+            @endif
+        @elseif ($product->has_variants && $product->variants->isNotEmpty())
             <span class="prod-original-price d-none" id="prodOriginalPrice"></span>
             <span class="prod-current-price" id="prodCurrentPrice">{{ $product->price_range_display }}</span>
             <span class="badge bg-danger fs-6 d-none" id="prodDiscountBadge"></span>
@@ -119,7 +169,10 @@
     {{-- Product Variants (Shopee / TikTok Shop Style) --}}
     @if ($product->has_variants && $product->variants->isNotEmpty())
         <div class="prod-variants-section mb-3" id="productVariantsSection" data-has-variants="true"
-            data-groups-count="{{ count($attrGroups) }}" data-variants="{{ json_encode($product->variants) }}">
+            data-groups-count="{{ count($attrGroups) }}" 
+            data-variants="{{ json_encode($product->variants) }}"
+            data-is-flash-sale="{{ $product->is_flash_sale ? '1' : '0' }}"
+            data-flash-sale-discount="{{ $product->is_flash_sale ? $product->flash_sale_info['discount_percentage'] : '0' }}">
 
             @foreach ($attrGroups as $gIndex => $group)
                 <div class="variant-group-row" data-group-index="{{ $gIndex }}">

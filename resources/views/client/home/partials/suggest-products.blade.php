@@ -240,35 +240,76 @@
 
     <div class="suggest-grid">
         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
-            @forelse ($suggestedProducts as $product)
+            @php
+                $productsList = (isset($latestProducts) && $latestProducts->isNotEmpty()) ? $latestProducts : $suggestedProducts;
+            @endphp
+            @forelse ($productsList as $item)
+                @php
+                    $isModel = $item instanceof \App\Models\Product;
+                    $pId = $isModel ? $item->id : ($item['id'] ?? 0);
+                    $pName = $isModel ? $item->name : ($item['name'] ?? '');
+                    $pSlug = $isModel ? $item->slug : null;
+                    $pUrl = $pSlug ? route('products.show', $pSlug) : '#';
+                    $pThumb = $isModel ? ($item->thumbnail_url ?? asset('images/product-placeholder.png')) : ($item['thumbnail'] ?? '');
+                    $isFs = $isModel ? $item->is_flash_sale : false;
+                    if ($isFs && $item->flash_sale_info) {
+                        $pPrice = $item->flash_sale_info['price'];
+                        $pOldPrice = $item->flash_sale_info['original_price'];
+                        $pDiscount = $item->flash_sale_info['discount_percentage'];
+                    } elseif ($isModel && $item->is_on_sale) {
+                        $pPrice = $item->sale_price;
+                        $pOldPrice = $item->price;
+                        $pDiscount = $item->discount_percentage;
+                    } elseif ($isModel) {
+                        $pPrice = $item->price;
+                        $pOldPrice = null;
+                        $pDiscount = 0;
+                    } else {
+                        $pPrice = $item['price'] ?? 0;
+                        $pOldPrice = $item['old_price'] ?? null;
+                        $pDiscount = $item['discount_percent'] ?? 0;
+                    }
+                    $pRating = $isModel ? 5.0 : ($item['rating'] ?? 5.0);
+                    $pSold = $isModel ? ($item->views_count ?? 120) : ($item['sold_count'] ?? 100);
+                @endphp
                 <div class="col">
-                    <div class="suggest-card">
-                        <a href="#" class="suggest-image">
-                            @if (($product['discount_percent'] ?? 0) > 0)
-                                <span class="discount-badge">-{{ $product['discount_percent'] }}%</span>
+                    <div class="suggest-card h-100 {{ $isFs ? 'shopee-card--flash-sale' : '' }}">
+                        <a href="{{ $pUrl }}" class="suggest-image position-relative">
+                            @if ($isFs)
+                                <span class="fs-flame-badge" title="Flash Sale">
+                                    <i class="fa-solid fa-fire-flame-curved"></i>
+                                </span>
                             @endif
-                            <img src="{{ $product['thumbnail'] }}" alt="{{ $product['name'] }}" loading="lazy">
+                            @if ($pDiscount > 0)
+                                <span class="discount-badge">-{{ $pDiscount }}%</span>
+                            @endif
+                            <img src="{{ $pThumb }}" alt="{{ $pName }}" loading="lazy">
                         </a>
 
                         <div class="suggest-info">
-                            <a href="#" class="suggest-name-link">
-                                <h3>{{ $product['name'] }}</h3>
+                            @if ($isFs)
+                                <div class="mb-1">
+                                    <span class="badge-flash-sale-card"><i class="fa-solid fa-fire-flame-curved"></i> Flash Sale</span>
+                                </div>
+                            @endif
+                            <a href="{{ $pUrl }}" class="suggest-name-link">
+                                <h3 title="{{ $pName }}">{{ $pName }}</h3>
                             </a>
-                            <div class="price-row">
-                                <span class="price">{{ number_format($product['price']) }}₫</span>
-                                @if (!empty($product['old_price']))
-                                    <span class="old-price">{{ number_format($product['old_price']) }}₫</span>
+                            <div class="price-row flex-wrap align-items-baseline gap-1">
+                                <span class="price {{ $isFs ? 'text-danger fw-bold' : '' }}">{{ number_format($pPrice) }}₫</span>
+                                @if (!empty($pOldPrice) && $pOldPrice > $pPrice)
+                                    <span class="old-price"><del>{{ number_format($pOldPrice) }}₫</del></span>
                                 @endif
                             </div>
                         </div>
 
                         <div class="suggest-meta">
                             <span class="suggest-rating">
-                                <i class="fa-solid fa-star"></i> {{ number_format($product['rating'], 1) }}
+                                <i class="fa-solid fa-star"></i> {{ number_format($pRating, 1) }}
                             </span>
-                            <span class="suggest-sold">Đã bán {{ number_format($product['sold_count']) }}</span>
-                            <button type="button" class="btn-add-cart" data-id="{{ $product['id'] }}"
-                                title="Thêm vào giỏ">
+                            <span class="suggest-sold">Đã bán {{ number_format($pSold) }}</span>
+                            <button type="button" class="btn-add-cart" data-id="{{ $pId }}"
+                                title="Xem sản phẩm" onclick="window.location.href='{{ $pUrl }}'">
                                 <i class="fa-solid fa-cart-plus"></i>
                             </button>
                         </div>

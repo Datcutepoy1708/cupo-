@@ -22,3 +22,106 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-red-dark);
 }
+
+/* =========================================================================
+   FLASH SALE GLOBAL STYLES (Cards & Detail Page)
+   ========================================================================= */
+.fs-flame-badge,
+.shopee-badge-flash-sale {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    left: auto;
+    z-index: 3;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(255, 61, 0, 0.28);
+    border: 1.5px solid rgba(255, 61, 0, 0.2);
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.fs-flame-badge i,
+.shopee-badge-flash-sale i {
+    color: #ff3d00;
+    font-size: 16px;
+    line-height: 1;
+    background: linear-gradient(180deg, #ffc107 0%, #ff3d00 55%, #d50000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(255, 61, 0, 0.4));
+    animation: flamePulse 1.6s infinite ease-in-out;
+}
+
+@keyframes flamePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.badge-flash-sale-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: linear-gradient(135deg, #d32f2f, #ff3d00);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(211, 47, 47, 0.3);
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+.badge-flash-sale-card i {
+    color: #ffd600;
+    font-size: 10px;
+}
+
+.shopee-card--flash-sale {
+    border-color: #ffcdd2 !important;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.shopee-card--flash-sale:hover {
+    border-color: #ef5350 !important;
+    box-shadow: 0 6px 16px rgba(239, 83, 80, 0.2) !important;
+}
+
+/* Flash Sale Live Banner on Product Detail */
+.flash-sale-detail-banner {
+    position: relative;
+    overflow: hidden;
+    animation: fsPulseGlow 3s infinite ease-in-out;
+}
+
+@keyframes fsPulseGlow {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 61, 0, 0.45);
+    }
+}
+
+.flash-sale-detail-banner .cd-hours,
+.flash-sale-detail-banner .cd-minutes,
+.flash-sale-detail-banner .cd-seconds {
+    background: #111111 !important;
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 13px;
+    min-width: 26px;
+    text-align: center;
+    display: inline-block;
+    padding: 3px 5px !important;
+}

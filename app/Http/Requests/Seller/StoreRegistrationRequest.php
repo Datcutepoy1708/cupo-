@@ -49,23 +49,34 @@ class StoreRegistrationRequest extends FormRequest
                 );
             }
 
-            // 3. Gia de xuat phai <= 90% gia goc
+            // 3. Gia de xuat phai <= 90% gia goc (neu co bien the thi tinh theo bien the re nhat)
             if ($product && $this->input('proposed_price')) {
-                $maxPrice = bcmul((string) $product->price, '0.90', 2);
+                $basePrice = $product->has_variants && $product->variants()->exists()
+                    ? (float) $product->variants()->min('price')
+                    : (float) $product->price;
+
+                $maxPrice = bcmul((string) $basePrice, '0.90', 2);
                 if ((float) $this->input('proposed_price') > (float) $maxPrice) {
+                    $hint = $product->has_variants && $product->variants()->exists()
+                        ? ' (tính theo biến thể rẻ nhất: '.number_format((float) $basePrice, 0, ',', '.').' VND)'
+                        : '';
                     $validator->errors()->add(
                         'proposed_price',
-                        'Gia de xuat phai nho hon hoac bang 90% gia goc ('.number_format((float) $maxPrice, 0, ',', '.').' VND).'
+                        'Giá đề xuất phải nhỏ hơn hoặc bằng 90% giá gốc'. $hint .' (tối đa '.number_format((float) $maxPrice, 0, ',', '.').' VND).'
                     );
                 }
             }
 
-            // 4. So luong de xuat khong duoc vuot ton kho
+            // 4. So luong de xuat khong duoc vuot ton kho (tong ton kho cua tat ca bien the)
             if ($product && $this->input('proposed_quantity')) {
-                if ((int) $this->input('proposed_quantity') > $product->stock) {
+                $totalStock = $product->has_variants && $product->variants()->exists()
+                    ? (int) $product->variants()->sum('stock')
+                    : (int) $product->stock;
+
+                if ((int) $this->input('proposed_quantity') > $totalStock) {
                     $validator->errors()->add(
                         'proposed_quantity',
-                        'So luong de xuat khong duoc vuot ton kho thuc te ('.$product->stock.').'
+                        'Số lượng đề xuất không được vượt tồn kho thực tế ('.$totalStock.').'
                     );
                 }
             }

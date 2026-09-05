@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\FlashSale;
+use App\Models\FlashSaleRegistration;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\SellerOrder;
@@ -52,7 +54,7 @@ class SellerProfileController extends Controller
                 ->get();
 
             $shop->products = Product::where('seller_id', $shop->user_id)
-                ->with('category')
+                ->with(['category', 'variants'])
                 ->latest()
                 ->get();
 
@@ -104,9 +106,35 @@ class SellerProfileController extends Controller
                 }])
                 ->orderBy('name')
                 ->get();
+
+            // 6. Flash Sale: Lấy các phiên đang mở đăng ký & danh sách đăng ký của shop
+            $openFlashSales = FlashSale::where('status', true)
+                ->whereNotNull('registration_deadline')
+                ->where('registration_deadline', '>', now())
+                ->where('starts_at', '>', now())
+                ->withCount([
+                    'registrations as my_registration_count' => function ($q) use ($shop) {
+                        $q->where('seller_id', $shop->user_id);
+                    },
+                ])
+                ->orderBy('registration_deadline')
+                ->get();
+
+            $myFlashSaleRegistrations = FlashSaleRegistration::where('seller_id', $shop->user_id)
+                ->with([
+                    'flashSale:id,name,starts_at,ends_at,registration_deadline',
+                    'product' => function ($q) {
+                        $q->with('variants');
+                    },
+                ])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $openFlashSales = collect();
+            $myFlashSaleRegistrations = collect();
         }
 
-        return view('client.seller-store.index', compact('shop', 'allCategories', 'allCategoriesForSelection'));
+        return view('client.seller-store.index', compact('shop', 'allCategories', 'allCategoriesForSelection', 'openFlashSales', 'myFlashSaleRegistrations'));
     }
 
     /**

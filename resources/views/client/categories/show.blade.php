@@ -193,30 +193,60 @@
                                         ? $p->thumbnail
                                         : asset('storage/' . ltrim($p->thumbnail, '/')))
                                     : asset('images/product-placeholder.png');
-                                $discountPercent = rand(10, 45); // Demo % giảm giá
+                                
+                                $isFs = $p->is_flash_sale;
+                                if ($isFs && $p->flash_sale_info) {
+                                    $displayPrice = $p->flash_sale_info['price'];
+                                    $origPrice = $p->flash_sale_info['original_price'];
+                                    $discountPercent = $p->flash_sale_info['discount_percentage'];
+                                } elseif ($p->is_on_sale) {
+                                    $displayPrice = $p->sale_price;
+                                    $origPrice = $p->price;
+                                    $discountPercent = $p->discount_percentage;
+                                } else {
+                                    $displayPrice = $p->price;
+                                    $origPrice = null;
+                                    $discountPercent = 0;
+                                }
                             @endphp
                             <div class="col-6 col-lg-3 col-md-4">
                                 <a href="{{ url('/products/' . $p->slug) }}" class="text-decoration-none text-dark">
-                                    <div class="shopee-card h-100">
+                                    <div class="shopee-card h-100 {{ $isFs ? 'shopee-card--flash-sale' : '' }}">
 
-                                        {{-- Image + Discount Badge --}}
-                                        <div class="shopee-card-img-wrap">
+                                        {{-- Image + Flash Sale / Discount Badge --}}
+                                        <div class="shopee-card-img-wrap position-relative">
                                             <img src="{{ $imgUrl }}" alt="{{ $p->name }}" loading="lazy">
-                                            <span class="shopee-badge-discount">-{{ $discountPercent }}%</span>
+                                            @if ($isFs)
+                                                <span class="fs-flame-badge" title="Flash Sale">
+                                                    <i class="fa-solid fa-fire-flame-curved"></i>
+                                                </span>
+                                            @endif
+                                            @if ($discountPercent > 0)
+                                                <span class="shopee-badge-discount">-{{ $discountPercent }}%</span>
+                                            @endif
                                         </div>
 
                                         {{-- Card Body --}}
                                         <div class="shopee-card-body">
                                             <h3 class="shopee-card-title">{{ $p->name }}</h3>
 
-                                            {{-- Tag yêu thích/mall --}}
+                                            {{-- Tag yêu thích/mall/flash sale --}}
                                             <div class="shopee-card-tags mb-1">
-                                                <span class="shopee-tag-fav">Yêu thích</span>
+                                                @if ($isFs)
+                                                    <span class="badge-flash-sale-card"><i class="fa-solid fa-fire-flame-curved"></i> Flash Sale</span>
+                                                @else
+                                                    <span class="shopee-tag-fav">Yêu thích</span>
+                                                @endif
                                             </div>
 
                                             {{-- Price & Sold --}}
-                                            <div class="d-flex align-items-baseline justify-content-between mt-auto">
-                                                <span class="shopee-card-price">{{ number_format($p->price, 0, ',', '.') }} ₫</span>
+                                            <div class="d-flex align-items-baseline justify-content-between mt-auto flex-wrap gap-1">
+                                                <div class="d-flex align-items-baseline gap-1 flex-wrap">
+                                                    <span class="shopee-card-price {{ $isFs ? 'text-danger fw-bold' : '' }}">{{ number_format($displayPrice, 0, ',', '.') }} ₫</span>
+                                                    @if ($origPrice && $origPrice > $displayPrice)
+                                                        <del class="text-muted small" style="font-size: 11px;">{{ number_format($origPrice, 0, ',', '.') }} ₫</del>
+                                                    @endif
+                                                </div>
                                                 <span class="shopee-card-sold">Đã bán {{ rand(50, 999) }}</span>
                                             </div>
 

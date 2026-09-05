@@ -66,9 +66,21 @@
                                 <div class="invalid-feedback product-id-error"></div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label fw-semibold">Gia de xuat (VND) <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control proposed-price" name="proposed_price" min="1" placeholder="0" required>
-                                <div class="form-text proposed-price-hint text-muted small"></div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-semibold mb-0">Muc giam gia (%) <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn btn-outline-secondary py-0 px-1 btn-quick-pct" data-pct="10" style="font-size: 10px;">10%</button>
+                                        <button type="button" class="btn btn-outline-secondary py-0 px-1 btn-quick-pct" data-pct="20" style="font-size: 10px;">20%</button>
+                                        <button type="button" class="btn btn-outline-secondary py-0 px-1 btn-quick-pct" data-pct="30" style="font-size: 10px;">30%</button>
+                                        <button type="button" class="btn btn-outline-secondary py-0 px-1 btn-quick-pct" data-pct="50" style="font-size: 10px;">50%</button>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="number" class="form-control proposed-percent text-end" name="discount_percent" min="10" max="90" step="1" placeholder="VD: 20" required>
+                                    <span class="input-group-text bg-light text-danger fw-bold">%</span>
+                                </div>
+                                <input type="hidden" class="proposed-price" name="proposed_price" value="">
+                                <div class="form-text proposed-price-hint text-muted small">Toi thieu giam 10%</div>
                                 <div class="invalid-feedback proposed-price-error"></div>
                             </div>
                             <div class="col-md-2">
